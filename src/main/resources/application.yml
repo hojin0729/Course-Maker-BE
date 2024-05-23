@@ -33,3 +33,7 @@ aws:
 # OpenAPI config
 openapi:
   key: ${OPENAPI_KEY}
+
+jwt:
+  token:
+    key: ${JWT_SECRET_KEY};
