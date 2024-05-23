@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: coursemaker
+
+    # my sql config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}/coursemaker?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+  # JPA config
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+    show-sql: 'true'
+    hibernate:
+      ddl-auto: update
+
+# AWS config
+aws:
+  credentials:
+    accessKey: ${AWS_ACCESS_KEY}
+    secretKey: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    region:
+      static: ${AWS_S3_REGION}
+    stack:
+      auto: false
+
+# OpenAPI config
+openapi:
+  key: ${OPENAPI_KEY}
