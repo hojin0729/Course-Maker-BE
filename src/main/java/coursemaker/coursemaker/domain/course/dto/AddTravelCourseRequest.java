@@ -14,7 +14,6 @@ public class AddTravelCourseRequest {
 
     private String title;
     private String content;
-    private LocalDateTime createdAt;
     private int duration;
     private int travelerCount;
     private int travelType;
@@ -24,7 +23,6 @@ public class AddTravelCourseRequest {
         return TravelCourse.builder()
                 .title(title)
                 .content(content)
-                .createdAt(createdAt)
                 .duration(duration)
                 .travelerCount(travelerCount)
                 .travelType(travelType)
