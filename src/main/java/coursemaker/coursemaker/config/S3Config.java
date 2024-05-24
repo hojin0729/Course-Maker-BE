@@ -9,7 +9,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 // Todo: implementation 'com.amazonaws:aws-java-sdk-s3:1.12.152' 의존성 주입 필요
-
 @Configuration
 public class S3Config {
     @Value("${aws.credentials.access-key}")

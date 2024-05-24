@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.tag.entity;
 
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +14,7 @@ public class CourseTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    TODO: 코스 도메인 엔티티 개발시 연결
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "TravelCourse_id")
     private TravelCourse course;
 
