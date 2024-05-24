@@ -25,19 +25,19 @@ public interface TagService {
 
     // ISSUE: 코스에 맞는 태그들을 추가하는 메소드 입니다. 이때 어떤 반환값을 주는게 좋을까요?
     // 추가적으로, 태그가 제대로 추가됬는지 검증하는 로직이 필요할까요?
-//    void AddTagsByCourse(Long courseId, List<Long> tagIds);
-//
-//    List<Tag> findAllByCourseId(Long courseId);
-//
-//    // 특정 태그에 맞는 코스 검색
-//    List<TravelCourse> findAllCourseByTagId(Long tagId);
-//
-//    // 동적쿼리 사용?
-//    void findCourseByTags(Long courseId, List<Tag> tags);
-//
-//    void deleteTagByCourse(Long courseId, List<Tag> tags);
-//
-//    void deleteAllTagByCourse(Long courseId);
+    void AddTagsByCourse(Long courseId, List<Long> tagIds);
+
+    List<Tag> findAllByCourseId(Long courseId);
+
+    // 특정 태그에 맞는 코스 검색
+    List<TravelCourse> findAllCourseByTagId(Long tagId);
+
+    // 동적쿼리 사용?
+    void findCourseByTags(Long courseId, List<Tag> tags);
+
+    void deleteTagByCourse(Long courseId, List<Tag> tags);
+
+    void deleteAllTagByCourse(Long courseId);
 
 
 
