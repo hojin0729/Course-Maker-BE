@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.destination.service;
 
+import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.entity.DestinationPicture;
 
@@ -12,7 +13,7 @@ public interface DestinationService {
 
 
     // id 기반으로 특정 여행지를 조회하는 메서드
-    Optional<Destination> findById(Long id);
+    Destination findById(Long id);
 
     // 모든 여행지를 조회하는 메서드
     List<Destination> findAll();
@@ -24,11 +25,14 @@ public interface DestinationService {
     DestinationPicture savePicture(DestinationPicture destinationPicture);
 
     // id 기반으로 특정 여행지 사진을 조회하는 메서드
-    Optional<DestinationPicture> findPictureById(Long id);
+    DestinationPicture findPictureById(Long id);
 
     // 모든 여행지 사진을 조회하는 메서드
     List<DestinationPicture> findAllPictures();
 
     // id 기반으로 여행지 사진을 삭제하는 메서드
     void deletePictureById(Long id);
+
+    // 위치 정보 메서드
+    Destination Location(Long destinationId, LocationDto locationDto);
 }
