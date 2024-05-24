@@ -2,15 +2,12 @@ package coursemaker.coursemaker.domain.destination.service;
 
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.entity.DestinationPicture;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DestinationService {
     // 여행지를 저장하는 메서드
     Destination save(Destination destination);
-
 
     // id 기반으로 특정 여행지를 조회하는 메서드
     Destination findById(Long id);
@@ -21,17 +18,17 @@ public interface DestinationService {
     // id 기반으로 여행지를 삭제하는 메서드
     void deleteById(Long id);
 
-    // 여행지 사진을 저장하는 메서드
-    DestinationPicture savePicture(DestinationPicture destinationPicture);
+    // 여행지 id에 대한 대표사진을 추가하는 메서드
+    void addPictureLink(Long destinationId, String pictureLink);
 
-    // id 기반으로 특정 여행지 사진을 조회하는 메서드
-    DestinationPicture findPictureById(Long id);
+    // 여행지 id로 여행지의 대표사진 URL을 조회하는 메서드
+    String getPictureLink(Long destinationId);
 
-    // 모든 여행지 사진을 조회하는 메서드
-    List<DestinationPicture> findAllPictures();
+    // 기존 여행지의 대표사진 URL을 새 URL로 변경하는 메서드
+    void updatePictureLink(Long destinationId, String newPictureLink);
 
-    // id 기반으로 여행지 사진을 삭제하는 메서드
-    void deletePictureById(Long id);
+    // 특정 여행지의 대표사진을 삭제하는 메서드
+    void deletePictureLink(Long destinationId);
 
     // 위치 정보 메서드
     Destination Location(Long destinationId, LocationDto locationDto);

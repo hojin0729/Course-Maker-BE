@@ -2,25 +2,20 @@ package coursemaker.coursemaker.domain.destination.service;
 
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.entity.DestinationPicture;
-import coursemaker.coursemaker.domain.destination.repository.DestinationPictureRepository;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class DestinationServiceImpl implements DestinationService {
     private final DestinationRepository destinationRepository;
-    private final DestinationPictureRepository destinationPictureRepository;
 
     @Autowired
-    public DestinationServiceImpl(DestinationRepository destinationRepository, DestinationPictureRepository destinationPictureRepository) {
+    public DestinationServiceImpl(DestinationRepository destinationRepository) {
         this.destinationRepository = destinationRepository;
-        this.destinationPictureRepository = destinationPictureRepository;
     }
 
     @Override
@@ -48,29 +43,40 @@ public class DestinationServiceImpl implements DestinationService {
         destinationRepository.deleteById(id);
     }
 
+    // 여행지 id에 대한 대표사진을 추가하는 메서드
     @Override
-    public DestinationPicture savePicture(DestinationPicture destinationPicture) {
-        // 여행지 사진 엔티티를 저장
-        return destinationPictureRepository.save(destinationPicture);
+    public void addPictureLink(Long destinationId, String pictureLink) {
+        Destination destination = destinationRepository.findById(destinationId)
+                .orElseThrow(() -> new RuntimeException("여행지가 존재 하지 않습니다: " + destinationId));
+        destination.setPictureLink(pictureLink);
+        destinationRepository.save(destination);
     }
 
+    // 여행지 id로 여행지의 대표사진 URL을 조회하는 메서드
     @Override
-    public DestinationPicture findPictureById(Long id) {
-        //  ID 값으로 여행지 사진을 찾아서 반환 없으면 예외처리
-        return destinationPictureRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("여행지 사진이 없음"));
+    public String getPictureLink(Long destinationId) {
+        Destination destination = destinationRepository.findById(destinationId)
+                .orElseThrow(() -> new RuntimeException("여행지가 존재 하지 않습니다: " + destinationId));
+        return destination.getPictureLink();
     }
 
+    // 기존 여행지의 대표사진 URL을 변경하는 메서드.
     @Override
-    public List<DestinationPicture> findAllPictures() {
-        // 모든 여행지 사진 목록을 조회
-        return destinationPictureRepository.findAll();
+    public void updatePictureLink(Long destinationId, String newPictureLink) {
+        Destination destination = destinationRepository.findById(destinationId)
+                .orElseThrow(() -> new RuntimeException("여행지가 존재하지 않습니다: " + destinationId));
+        destination.setPictureLink(newPictureLink);
+        destinationRepository.save(destination);
     }
 
+    // 특정 여행지의 대표사진 링크를 삭제하는 메서드.
     @Override
-    public void deletePictureById(Long id) {
-        // 주어진 ID의 여행지 사진을 삭제
-        destinationPictureRepository.deleteById(id);
+    public void deletePictureLink(Long destinationId) {
+        Destination destination = destinationRepository.findById(destinationId)
+                .orElseThrow(() -> new RuntimeException("여행지가 존재하지 않습니다: " + destinationId));
+        // 대표사진 링크만 삭제
+        destination.setPictureLink(null);
+        destinationRepository.save(destination);
     }
 
     @Override
