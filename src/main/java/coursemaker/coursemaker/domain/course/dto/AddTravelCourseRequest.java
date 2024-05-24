@@ -13,15 +13,21 @@ import java.time.LocalDateTime;
 public class AddTravelCourseRequest {
 
     private String title;
-    private String description;
+    private String content;
     private LocalDateTime createdAt;
+    private int duration;
+    private int travelerCount;
+    private int travelType;
 //    private Member member;
 
     public TravelCourse toEntity() {
         return TravelCourse.builder()
                 .title(title)
-                .description(description)
+                .content(content)
                 .createdAt(createdAt)
+                .duration(duration)
+                .travelerCount(travelerCount)
+                .travelType(travelType)
                 /*.member(member)*/
                 .build();
     }

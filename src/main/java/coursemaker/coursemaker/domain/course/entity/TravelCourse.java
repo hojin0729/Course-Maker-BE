@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TravelCourse{
 
@@ -20,28 +21,43 @@ public class TravelCourse{
     private String title;
 
     @Column(name = "description", nullable = false)
-    private String description;
+    private String content;
 
     @CreatedDate
     @Column(name = "createdAt")
     private LocalDateTime createdAt;
+
+    @Column(name = "duration")
+    private int duration;
+
+    @Column(name = "travelerCount")
+    private int travelerCount;
+
+    @Column(name = "travelType")
+    private int travelType;
 
 //    @ManyToOne
 //    @JoinColumn(name = "memberId", nullable = false)
 //    private Member member;
 
     @Builder
-    public TravelCourse(String title, String description, LocalDateTime createdAt/*, Member member*/) {
+    public TravelCourse(String title, String content, LocalDateTime createdAt, int duration, int travelerCount, int travelType/*, Member member*/) {
         this.title = title;
-        this.description = description;
+        this.content = content;
         this.createdAt = createdAt;
+        this.duration = duration;
+        this.travelerCount = travelerCount;
+        this.travelType = travelType;
 //        this.member = member;
     }
 
-    public void update(String title, String description, LocalDateTime createdAt/*, Member member*/) {
+    public void update(String title, String content, LocalDateTime createdAt, int duration, int travelerCount, int travelType/*, Member member*/) {
         this.title = title;
-        this.description = description;
+        this.content = content;
         this.createdAt = createdAt;
+        this.duration = duration;
+        this.travelerCount = travelerCount;
+        this.travelType = travelType;
 //        this.member = member;
     }
 
