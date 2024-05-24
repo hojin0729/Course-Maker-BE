@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.course.entity;
 
+import coursemaker.coursemaker.domain.destination.entity.Destination;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,20 +22,20 @@ public class CourseDestination {
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
 
-//    @OneToOne
-//    @JoinColumn(name = "destinationId")
-//    private Destination destination;
+    @OneToOne
+    @JoinColumn(name = "destinationId")
+    private Destination destination;
 
     @Builder
-    public CourseDestination(short visitOrder, TravelCourse travelCourse/*, Destination destination*/) {
+    public CourseDestination(short visitOrder, TravelCourse travelCourse, Destination destination) {
         this.visitOrder = visitOrder;
         this.travelCourse = travelCourse;
-//        this.destination = destination;
+        this.destination = destination;
     }
 
-    public void update(short visitOrder, TravelCourse travelCourse/*, Destination destination*/) {
+    public void update(short visitOrder, TravelCourse travelCourse, Destination destination) {
         this.visitOrder = visitOrder;
         this.travelCourse = travelCourse;
-//        this.destination = destination;
+        this.destination = destination;
     }
 }

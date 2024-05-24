@@ -23,26 +23,22 @@ public class Destination {
     @Column(name = "name", length = 50)
     private String name;
 
-    // Todo: 일단 50자, 실제 url길이 확인 후 수정
-    @Column(name = "pictureLink", length = 50)
+    @Column(name = "pictureLink", length = 300)
     private String pictureLink;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "content", columnDefinition = "MEDIUMTEXT")
+    private String content;
 
     @Column(name = "location", length = 50)
     private String location;
 
-    @Column(name = "longitude")
+    @Column(name = "longitude", precision = 15, scale = 13)
     private BigDecimal longitude;
 
-    @Column(name = "latitude")
+    @Column(name = "latitude", precision = 15, scale = 13)
     private BigDecimal latitude;
 
     //Todo: BaseEntity에 있는 createdAt 교체 해야함
     @Column(name = "createdAt")
     private Timestamp createdAt;
-
-    @OneToMany(mappedBy = "destination")
-    private List<DestinationPicture> pictures;
 }
