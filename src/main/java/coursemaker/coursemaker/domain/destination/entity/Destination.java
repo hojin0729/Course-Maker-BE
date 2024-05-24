@@ -16,9 +16,9 @@ public class Destination {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "memberId")
-    private Member member;
+//    @ManyToOne
+//    @JoinColumn(name = "memberId")
+//    private Member member;
 
     @Column(name = "name", length = 50)
     private String name;
