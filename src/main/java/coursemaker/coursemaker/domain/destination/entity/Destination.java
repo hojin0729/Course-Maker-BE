@@ -24,8 +24,8 @@ public class Destination {
     private String name;
 
     // Todo: 일단 50자, 실제 url길이 확인 후 수정
-    @Column(name = "prictureLink", length = 50)
-    private String prictureLink;
+    @Column(name = "pictureLink", length = 50)
+    private String pictureLink;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
