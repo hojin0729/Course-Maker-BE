@@ -31,5 +31,5 @@ public interface DestinationService {
     void deletePictureLink(Long destinationId);
 
     // 위치 정보 메서드
-    Destination Location(Long destinationId, LocationDto locationDto);
+    Destination getLocation(Long destinationId, LocationDto locationDto);
 }
