@@ -23,7 +23,7 @@ public class Destination {
     @Column(name = "name", length = 50)
     private String name;
 
-    // Todo: 일단 50자, 실제 url길이 확인 후 수정
+    // Todo: 대표사진 URL 길이가 50이 넘으면 수정
     @Column(name = "pictureLink", length = 50)
     private String pictureLink;
 
@@ -42,7 +42,4 @@ public class Destination {
     //Todo: BaseEntity에 있는 createdAt 교체 해야함
     @Column(name = "createdAt")
     private Timestamp createdAt;
-
-    @OneToMany(mappedBy = "destination")
-    private List<DestinationPicture> pictures;
 }
