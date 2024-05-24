@@ -80,8 +80,8 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
-    public Destination Location(Long destinationId, LocationDto locationDto) {
-        // dto를 이용하여 위치, 경도, 위도 찾기
+    public Destination getLocation(Long destinationId, LocationDto locationDto) {
+        // 여행지 id를 이용해서 dto내용들 위치, 경도, 위도 찾기
         Optional<Destination> destinationLocation = destinationRepository.findById(destinationId);
         if (destinationLocation.isPresent()) {
             Destination destination = destinationLocation.get();
