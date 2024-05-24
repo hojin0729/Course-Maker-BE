@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 public class UpdateTravelCourseRequest {
     private String title;
-    private String description;
+    private String content;
     private LocalDateTime createdAt;
+    private int duration;
+    private int travelerCount;
+    private int travelType;
 //    private Member member;
 }
