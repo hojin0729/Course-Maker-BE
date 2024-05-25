@@ -1,5 +1,9 @@
 package coursemaker.coursemaker.domain.tag.service;
 
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.course.service.CourseService;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
@@ -88,7 +92,7 @@ public class TagServiceImpl implements TagService{
 
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tagId).isEmpty()){
                 courseTag.setTag(tag);
-                courseTag.setCourseId(courseService.findById(courseId));
+                courseTag.setCourse(courseService.findById(courseId));
                 courseTagRepository.save(courseTag);
             }
         }
@@ -109,7 +113,7 @@ public class TagServiceImpl implements TagService{
 
     // 특정 태그에 맞는 코스 검색
     @Override
-    public List<Long> findAllCourseByTagId(Long tagId){
+    public List<TravelCourse> findAllCourseByTagId(Long tagId){
         List<TravelCourse> courses = new ArrayList<>();
         List<CourseTag> courseTags = courseTagRepository.findAllByTagId(tagId);
 
@@ -132,7 +136,7 @@ public class TagServiceImpl implements TagService{
             throw new RuntimeException("태그가 없습니다.");
         }
 
-        // TODO: 코스 도메인 서비스레이어 삭제시 연결
+        // TODO: 코스 도메인 서비스레이어 완성시 연결
         // 코스에 태그들 삭제
         for (Tag tag : tags) {
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tag.getId()).isPresent()){
@@ -149,7 +153,6 @@ public class TagServiceImpl implements TagService{
 
 
     /******태그-여행지 ******/
-    /*TODO: 여행지 도메인 엔티티, 서비스레이어 완성시 연결 및 검증*/
     @Override
     public void AddTagsByDestination(Long destinationId, List<Long> tagIds){
         DestinationTag destinationTag = new DestinationTag();
@@ -164,7 +167,7 @@ public class TagServiceImpl implements TagService{
 
             if(destinationTagRepository.findByDestinationIdAndTagId(destinationId, tagId).isEmpty()){
                 destinationTag.setTag(tag);
-                destinationTag.setDestination(destinationService.findById(destinationId));
+                destinationTag.setDestination(destinationService.findById(destinationId)); //오류나서 .get() 삭제
                 destinationTagRepository.save(destinationTag);
             }
         }
@@ -208,11 +211,10 @@ public class TagServiceImpl implements TagService{
             throw new RuntimeException("태그가 없습니다.");
         }
 
-        // TODO: 여행지 도메인 서비스레이어 삭제시 연결
         // 여행지에 포함된 태그들 삭제
         for (Tag tag : tags) {
             if(destinationTagRepository.findByDestinationIdAndTagId(destinationId, tag.getId()).isPresent()){
-                destinationTagRepository.deleteByDestinationAndTagId(destinationId, tag.getId());
+                destinationTagRepository.deleteByDestinationIdAndTagId(destinationId, tag.getId());
             }
         }
     }

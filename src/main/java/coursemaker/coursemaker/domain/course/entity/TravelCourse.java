@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.course.entity;
 
+import coursemaker.coursemaker.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TravelCourse{
+public class TravelCourse extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +23,6 @@ public class TravelCourse{
 
     @Column(name = "description", nullable = false)
     private String content;
-
-    @CreatedDate
-    @Column(name = "createdAt")
-    private LocalDateTime createdAt;
 
     @Column(name = "duration")
     private int duration;
@@ -41,20 +38,18 @@ public class TravelCourse{
 //    private Member member;
 
     @Builder
-    public TravelCourse(String title, String content, LocalDateTime createdAt, int duration, int travelerCount, int travelType/*, Member member*/) {
+    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType/*, Member member*/) {
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
         this.duration = duration;
         this.travelerCount = travelerCount;
         this.travelType = travelType;
 //        this.member = member;
     }
 
-    public void update(String title, String content, LocalDateTime createdAt, int duration, int travelerCount, int travelType/*, Member member*/) {
+    public void update(String title, String content, int duration, int travelerCount, int travelType/*, Member member*/) {
         this.title = title;
         this.content = content;
-        this.createdAt = createdAt;
         this.duration = duration;
         this.travelerCount = travelerCount;
         this.travelType = travelType;

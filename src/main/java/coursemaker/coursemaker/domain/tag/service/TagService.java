@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.domain.tag.service;
 
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public interface TagService {
     List<Tag> findAllByCourseId(Long courseId);
 
     // 특정 태그에 맞는 코스 검색
-    List<Long> findAllCourseByTagId(Long tagId);
+    List<TravelCourse> findAllCourseByTagId(Long tagId);
 
     // 동적쿼리 사용?
     void findCourseByTags(Long courseId, List<Tag> tags);

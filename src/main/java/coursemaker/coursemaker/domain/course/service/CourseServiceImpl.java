@@ -79,7 +79,7 @@ public class CourseServiceImpl implements CourseService{
     public TravelCourse update(long id, UpdateTravelCourseRequest request) {
         TravelCourse travelCourse = travelCourseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
-        travelCourse.update(request.getTitle(), request.getContent(), request.getCreatedAt(), request.getDuration(), request.getTravelerCount(), request.getTravelType()/*, request.getMember()*/);
+        travelCourse.update(request.getTitle(), request.getContent(), request.getDuration(), request.getTravelerCount(), request.getTravelType()/*, request.getMember()*/);
 
         return travelCourse;
     }
