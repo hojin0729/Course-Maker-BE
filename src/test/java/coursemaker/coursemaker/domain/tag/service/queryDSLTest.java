@@ -44,7 +44,7 @@ public class queryDSLTest {
             Tag myTag = new Tag();
             myTag.setName("tag" + i);
             myTag.setDescription("test"+ i);
-            myTag = tagService.CreateTag(myTag);
+            myTag = tagService.createTag(myTag);
             tags.add(myTag);
         }
 
@@ -64,7 +64,7 @@ public class queryDSLTest {
         for(int i = 0; i < 3; i++) {
             travelCourse = travelCourses.get(i);
             tag = tags.get(i);
-            tagService.AddTagsByCourse(travelCourse.getId(), List.of(tag.getId()));
+            tagService.addTagsByCourse(travelCourse.getId(), List.of(tag.getId()));
         }
 
         /*4번 코스 -> 1번 태그
@@ -75,11 +75,11 @@ public class queryDSLTest {
         * 1번, 2번 태그를 갖는 코스: 4번 코스*/
         travelCourse = travelCourses.get(3);
         tag = tags.get(0);
-        tagService.AddTagsByCourse(travelCourse.getId(), List.of(tag.getId()));
+        tagService.addTagsByCourse(travelCourse.getId(), List.of(tag.getId()));
 
         travelCourse = travelCourses.get(3);
         tag = tags.get(1);
-        tagService.AddTagsByCourse(travelCourse.getId(), List.of(tag.getId()));
+        tagService.addTagsByCourse(travelCourse.getId(), List.of(tag.getId()));
 
     }
 

@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.domain.tag.service;
 
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
@@ -29,10 +31,10 @@ class TagServiceImplTest {
     private DestinationService destinationService;
 
     // TODO: 코스 도메인 서비스레이어 개발시 적용
-//    @Mock
-//    private CourseTagRepository courseTagRepository;
-//    @Mock
-//    private CourseService courseService;
+    @Mock
+    private CourseTagRepository courseTagRepository;
+    @Mock
+    private CourseService courseService;
 
     @InjectMocks
     private TagServiceImpl tagService;
@@ -52,6 +54,17 @@ class TagServiceImplTest {
         return tags;
     }
 
+    public List<TravelCourse> createCourses(){
+        TravelCourse course = TravelCourse.builder().build();
+        List<TravelCourse> courses = new ArrayList<>();
+        for(Long i = 0L; i < 5L; i++){
+            course.setId(i);
+            course.setTitle("title" + i);
+            courses.add(course);
+        }
+        return courses;
+    }
+
     public List<Destination> createDestinations(){
         Destination destination = new Destination();
         List<Destination> destinations = new ArrayList<>();
@@ -65,9 +78,14 @@ class TagServiceImplTest {
     }
 
 
-
     @Test
     void createTag() {
+        // given
+
+    }
+
+    @Test
+    void createTag_중복생성() {
     }
 
     @Test
