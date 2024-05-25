@@ -58,12 +58,12 @@ class TagServiceImplTest {
         for(Long i = 0L; i < 5L; i++){
             destination.setId(i);
             destination.setName("name" + i);
-            destination.setDescription("description" + i);
+//            destination.setDescription("description" + i);
             destinations.add(destination);
         }
         return destinations;
     }
-    
+
 
 
     @Test
