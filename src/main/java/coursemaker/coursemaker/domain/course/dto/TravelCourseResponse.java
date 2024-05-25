@@ -10,7 +10,6 @@ public class TravelCourseResponse {
 
     private final String title;
     private final String content;
-    private final LocalDateTime createdAt;
     private final int duration;
     private final int travelerCount;
     private final int travelType;
@@ -19,7 +18,6 @@ public class TravelCourseResponse {
     public TravelCourseResponse(TravelCourse travelCourse) {
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
-        this.createdAt = travelCourse.getCreatedAt();
         this.duration = travelCourse.getDuration();
         this.travelerCount = travelCourse.getTravelerCount();
         this.travelType = travelCourse.getTravelType();
