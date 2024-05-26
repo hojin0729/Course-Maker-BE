@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
+@Table(name = "DestinationTag")
 public class DestinationTag {
 
     @Id

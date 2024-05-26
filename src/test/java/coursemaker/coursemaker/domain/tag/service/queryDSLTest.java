@@ -12,8 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 
@@ -100,21 +101,26 @@ public class queryDSLTest {
         BooleanBuilder condition = new BooleanBuilder();
         /*다중검색*/
         for(Long id : searchList) {
-            condition.and(courseTag.tag.id.eq(id));
+            condition.or(courseTag.tag.id.eq(id));
         }
 
+        Set<TravelCourse> duplicate = new HashSet<>();
         System.out.println("-----------query----------");
-        List<CourseTag> course2 = jpaQueryFactory
+        List<TravelCourse> course2 = jpaQueryFactory
                 .select(courseTag)// 코스 형태로 반환
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(condition)// 다중태그
-                .fetch();
+                .fetch()
+                .stream()
+                .map(CourseTag::getCourse)
+                .filter(n-> !duplicate.add(n))
+                .collect(Collectors.toList());
         System.out.println("-----------query----------");
         
         // 검색 조건에 맞는 코스 이름을 출력
-        for(CourseTag travelCourse : course2) {
-            System.out.println("===============================================================travelCourse.getTitle() = " + travelCourse.getCourse().getTitle());
+        for(TravelCourse travelCourse : course2) {
+            System.out.println("===============================================================travelCourse.getTitle() = " + travelCourse.getTitle());
         }
     }
 }
