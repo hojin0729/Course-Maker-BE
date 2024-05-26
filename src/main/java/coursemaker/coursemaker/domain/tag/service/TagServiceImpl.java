@@ -1,27 +1,42 @@
 package coursemaker.coursemaker.domain.tag.service;
 
+import com.querydsl.core.BooleanBuilder;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.entity.QDestination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
+import coursemaker.coursemaker.domain.tag.entity.QDestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.repository.CourseTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.DestinationTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.TagRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+
+import static coursemaker.coursemaker.domain.course.entity.QTravelCourse.travelCourse;
+import static coursemaker.coursemaker.domain.destination.entity.QDestination.destination;
+import static coursemaker.coursemaker.domain.tag.entity.QCourseTag.courseTag;
+import static coursemaker.coursemaker.domain.tag.entity.QDestinationTag.destinationTag;
 
 /*
-*TODO:
-* 메소드 실패시 커스텀 예외처리 하기
-* 여행지, 코스 도메인 서비스레이어 완성시 테스트 및 검증 진행
-* */
+ *TODO:
+ * 메소드 실패시 커스텀 예외처리 하기
+ * 여행지, 코스 도메인 서비스레이어 완성시 테스트 및 검증 진행
+ * */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService{
 
@@ -32,13 +47,18 @@ public class TagServiceImpl implements TagService{
     private final CourseService courseService;
     private final DestinationService destinationService;
 
-    /*****태그 기본 CRUD*****/
+    private final JPAQueryFactory queryFactory;
 
+    /*****태그 기본 CRUD*****/
     @Override
-    public Tag CreateTag(Tag tag){
-        Tag savedTag = tagRepository.save(tag);
-        return tagRepository.findById(savedTag.getId())
-                .orElseThrow(() -> new RuntimeException("태그 생성 실패"));
+    public Tag createTag(Tag tag){
+
+        /*태그의 이름은 고유해야 한다.*/
+        if(tagRepository.findByname(tag.getName()).isPresent()){
+            throw new RuntimeException("이미 태그가 존재합니다");
+        }
+
+        return tagRepository.save(tag);
     }
 
     @Override
@@ -55,10 +75,16 @@ public class TagServiceImpl implements TagService{
 
     // ISSUE: 제대로 업데이트 됬는지 확인하고 싶은데 어떻게 해야 깔끔하게 할 수 있을까요? 아니면 굳이 검증을 해서 반환을 할 필요가 없을까요?
     @Override
-    public Tag UpdateTag(Tag tag){
+    public Tag updateTag(Tag tag){
+
+        /*태그의 이름은 고유해야 한다.*/
+        if(tagRepository.findByname(tag.getName()).isPresent()){
+            throw new RuntimeException("이미 태그가 존재합니다.");
+        }
         Tag savedTag = tagRepository.save(tag);
 
-        Tag updated = tagRepository.findById(savedTag.getId()).get();
+        Tag updated = tagRepository.findById(savedTag.getId())
+                .orElseThrow(() -> new RuntimeException("변경할 태그가 없습니다."));
 
         if(updated.equals(tag)){
             return updated;
@@ -69,17 +95,16 @@ public class TagServiceImpl implements TagService{
 
     // ISSUE: 이것도 제대로 삭제됬는지 검증하는 절차가 필요할까요?
     @Override
-    public void DeleteById(Long id){
+    public void deleteById(Long id){
         tagRepository.deleteById(id);
     }
 
     /******태그-코스 ******/
-    /*TODO: 코스 도메인 엔티티, 서비스레이어 완성시 연결 및 검증*/
 
     // ISSUE: 코스에 맞는 태그들을 추가하는 메소드 입니다. 이때 어떤 반환값을 주는게 좋을까요?
     // 추가적으로, 태그가 제대로 추가됬는지 검증하는 로직이 필요할까요?
     @Override
-    public void AddTagsByCourse(Long courseId, List<Long> tagIds){
+    public void addTagsByCourse(Long courseId, List<Long> tagIds){
         CourseTag courseTag = new CourseTag();
 
         if(tagIds.isEmpty()){
@@ -98,36 +123,47 @@ public class TagServiceImpl implements TagService{
         }
     }
 
+
     @Override
     public List<Tag> findAllByCourseId(Long courseId){
         List<CourseTag> courseTags = courseTagRepository.findAllByCourseId(courseId);
-        List<Tag> tags = new ArrayList<>();
 
         // CourseTag에서 태그 추출
-        for(CourseTag courseTag : courseTags){
-            tags.add(courseTag.getTag());
-        }
+        List<Tag> tags = courseTags
+                .stream()
+                .map(CourseTag::getTag)
+                .collect(Collectors.toList());
 
         return tags;
     }
 
-    // 특정 태그에 맞는 코스 검색
     @Override
-    public List<TravelCourse> findAllCourseByTagId(Long tagId){
-        List<TravelCourse> courses = new ArrayList<>();
-        List<CourseTag> courseTags = courseTagRepository.findAllByTagId(tagId);
+    public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds){
 
-        for(CourseTag courseTag : courseTags){
-            courses.add(courseTag.getCourse());
+        BooleanBuilder condition = new BooleanBuilder();
+
+        /*다중검색*/
+        for(Long id : tagIds) {
+            condition.or(courseTag.tag.id.eq(id));
         }
+
+        Set<TravelCourse> duplicate = new HashSet<>();
+
+        List<TravelCourse> courses = queryFactory
+                .select(courseTag)
+                .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
+                .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
+                .where(condition)// 다중태그
+                .fetch()
+                .stream()
+                .map(CourseTag::getCourse)
+                .filter(n-> !duplicate.add(n))
+                .collect(Collectors.toList());
 
         return courses;
     }
 
-    // 동적쿼리 사용?
-    @Override
-    public void findCourseByTags(Long courseId, List<Tag> tags){
-    }
+
 
     @Override
     public void deleteTagByCourse(Long courseId, List<Tag> tags){
@@ -136,7 +172,6 @@ public class TagServiceImpl implements TagService{
             throw new RuntimeException("태그가 없습니다.");
         }
 
-        // TODO: 코스 도메인 서비스레이어 완성시 연결
         // 코스에 태그들 삭제
         for (Tag tag : tags) {
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tag.getId()).isPresent()){
@@ -154,7 +189,7 @@ public class TagServiceImpl implements TagService{
 
     /******태그-여행지 ******/
     @Override
-    public void AddTagsByDestination(Long destinationId, List<Long> tagIds){
+    public void addTagsByDestination(Long destinationId, List<Long> tagIds){
         DestinationTag destinationTag = new DestinationTag();
 
         if(tagIds.isEmpty()){
@@ -179,30 +214,40 @@ public class TagServiceImpl implements TagService{
         List<Tag> tags = new ArrayList<>();
 
         // CourseTag에서 태그 추출
-        for(DestinationTag destinationTag : destinationTags){
-            tags.add(destinationTag.getTag());
-        }
+        tags = destinationTags
+                .stream()
+                .map(DestinationTag::getTag)
+                .collect(Collectors.toList());
 
         return tags;
     }
 
-    // 특정 태그에 맞는 코스 검색
-    @Override
-    public List<Destination> findAllDestinationByTagId(Long tagId){
-        List<Destination> destinations = new ArrayList<>();
-        List<DestinationTag> courseTags = destinationTagRepository.findAllByTagId(tagId);
 
-        for(DestinationTag destinationTag : courseTags){
-            destinations.add(destinationTag.getDestination());
+    @Override
+    public List<Destination> findAllDestinationByTagIds(List<Long> tagIds){
+        BooleanBuilder condition = new BooleanBuilder();
+
+        /*다중검색*/
+        for(Long id : tagIds) {
+            condition.or(destinationTag.tag.id.eq(id));
         }
+
+        Set<Destination> duplicate = new HashSet<>();
+
+        List<Destination> destinations = queryFactory
+                .select(destinationTag)
+                .from(destinationTag)// 코스태그에서 선택(코스에는 FK가 없음)
+                .leftJoin(destinationTag.destination, destination)// 코스-코스태그 조인
+                .where(condition)// 다중태그
+                .fetch()
+                .stream()
+                .map(DestinationTag::getDestination)
+                .filter(n-> !duplicate.add(n))
+                .collect(Collectors.toList());
 
         return destinations;
     }
 
-    // 동적쿼리 사용?
-    @Override
-    public void findDestinationByTags(Long destinationId, List<Tag> tags){
-    }
 
     @Override
     public void deleteTagByDestination(Long destinationId, List<Tag> tags){
