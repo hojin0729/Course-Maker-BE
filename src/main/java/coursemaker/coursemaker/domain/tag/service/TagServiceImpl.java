@@ -92,7 +92,7 @@ public class TagServiceImpl implements TagService{
                     .getId()
                     .equals(tag.getId())
             ){
-                throw new RuntimeException("이미 태그가 존재합니다");
+                throw new RuntimeException("이미 태그가 존재합니다(중복)");
             }
         }
 

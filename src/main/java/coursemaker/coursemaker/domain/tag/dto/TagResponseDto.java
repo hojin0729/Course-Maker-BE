@@ -1,20 +1,19 @@
 package coursemaker.coursemaker.domain.tag.dto;
 
 import coursemaker.coursemaker.domain.tag.entity.Tag;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
-public class TagDto {
+public class TagResponseDto {
+    private Long id;
     private String name;
     private String description;
 
-    public static Tag toEntity(TagDto dto){
+    public Tag toEntity(){
         Tag tag = new Tag();
-        tag.setName(dto.getName());
-        tag.setDescription(dto.getDescription());
+        tag.setId(this.getId());
+        tag.setName(this.getName());
+        tag.setDescription(this.getDescription());
         return tag;
     }
 }
