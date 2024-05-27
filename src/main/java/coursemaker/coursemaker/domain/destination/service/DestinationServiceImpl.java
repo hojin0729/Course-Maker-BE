@@ -1,21 +1,30 @@
 package coursemaker.coursemaker.domain.destination.service;
 
+import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
+import coursemaker.coursemaker.domain.tag.dto.TagDto;
+import coursemaker.coursemaker.domain.tag.entity.Tag;
+import coursemaker.coursemaker.domain.tag.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DestinationServiceImpl implements DestinationService {
     private final DestinationRepository destinationRepository;
+    private final TagService tagService;
 
     @Autowired
-    public DestinationServiceImpl(DestinationRepository destinationRepository) {
+    public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService) {
         this.destinationRepository = destinationRepository;
+        this.tagService = tagService;
     }
 
     @Override
@@ -92,5 +101,64 @@ public class DestinationServiceImpl implements DestinationService {
         } else {
             throw new RuntimeException("해당하는 여행지를 찾을수 없습니다." + destinationId);
         }
+    }
+
+    @Override
+    @Transactional
+    public Destination saveDto(DestinationDto destinationDto) {
+        // DTO를 엔티티로 변환
+        Destination destination = DestinationDto.toEntity(destinationDto);
+
+        // 엔티티를 저장
+        Destination savedDestination = destinationRepository.save(destination);
+
+        // 태그들을 저장
+        tagService.AddTagsByDestination(
+                savedDestination.getId(),
+                destinationDto.getTags().stream()
+                        .map(TagDto::toEntity)
+                        .map(Tag::getId)
+                        .collect(Collectors.toList())
+        );
+
+        return savedDestination;
+    }
+
+    // Id로 여행지를 조회하고, DTO로 변환하여 반환
+    @Override
+    public DestinationDto findDtoById(Long id) {
+        // Id로 여행지를 조회
+        Destination destination = findById(id);
+        // 태그 목록을 조회
+        List<TagDto> tagDtos = findTagsByDestinationId(id);
+        // 엔티티를 DTO로 변환하여 반환
+        return DestinationDto.toDto(destination, tagDtos);
+    }
+
+    // 저장된 모든 여행지를 DTO 리스트로 변환하여 반환
+    @Override
+    public List<DestinationDto> findAllDtos() {
+        return destinationRepository.findAll().stream()
+                .map(destination -> {
+                    // 각 여행지의 태그 목록을 조회
+                    List<TagDto> tagDtos = findTagsByDestinationId(destination.getId());
+                    // 엔티티를 DTO로 변환
+                    return DestinationDto.toDto(destination, tagDtos);
+                })
+                // 변환된 DTO 리스트를 반환
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TagDto> findTagsByDestinationId(Long destinationId) {
+        // 여행지 ID로 태그 리스트를 조회
+        List<Tag> tags = tagService.findAllByDestinationId(destinationId);
+        return tags.stream().map(tag -> {
+            TagDto dto = new TagDto();
+            dto.setName(tag.getName());
+            dto.setDescription(tag.getDescription());
+            // 태그를 DTO로 변환
+            return dto;
+        }).collect(Collectors.toList()); // 변환된 DTO 리스트를 반환
     }
 }

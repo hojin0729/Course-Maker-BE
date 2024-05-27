@@ -27,6 +27,9 @@ public class Destination extends BaseEntity {
     @Column(name = "pictureLink", length = 300)
     private String pictureLink;
 
+    @Column(name = "views")
+    private Integer views;
+
     @Column(name = "content", columnDefinition = "MEDIUMTEXT")
     private String content;
 
@@ -38,8 +41,4 @@ public class Destination extends BaseEntity {
 
     @Column(name = "latitude", precision = 15, scale = 13)
     private BigDecimal latitude;
-
-    //Todo: BaseEntity에 있는 createdAt 교체 해야함
-//    @Column(name = "createdAt")
-//    private Timestamp createdAt;
 }
