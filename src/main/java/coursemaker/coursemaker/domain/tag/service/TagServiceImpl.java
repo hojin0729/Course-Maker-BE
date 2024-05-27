@@ -72,24 +72,31 @@ public class TagServiceImpl implements TagService{
                 .orElseThrow(() -> new RuntimeException("태그가 없습니다"));
     }
 
+    @Override
+    public List<Tag> findAllTags(){
+        return tagRepository.findAll();
+    }
+
     // ISSUE: 제대로 업데이트 됬는지 확인하고 싶은데 어떻게 해야 깔끔하게 할 수 있을까요? 아니면 굳이 검증을 해서 반환을 할 필요가 없을까요?
     @Override
     public Tag updateTag(Tag tag){
 
-        /*태그의 이름은 고유해야 한다.*/
+        /*변경할 타겟 태그를 못찾음.*/
+        if(tagRepository.findById(tag.getId()).isEmpty()){
+            throw new RuntimeException("변경할 태그가 없습니다.");
+        }
+
+        /*태그의 이름 중복 확인*/
         if(tagRepository.findByname(tag.getName()).isPresent()){
-            throw new RuntimeException("이미 태그가 존재합니다.");
+            if(!tagRepository.findByname(tag.getName()).get()
+                    .getId()
+                    .equals(tag.getId())
+            ){
+                throw new RuntimeException("이미 태그가 존재합니다");
+            }
         }
-        Tag savedTag = tagRepository.save(tag);
 
-        Tag updated = tagRepository.findById(savedTag.getId())
-                .orElseThrow(() -> new RuntimeException("변경할 태그가 없습니다."));
-
-        if(updated.equals(tag)){
-            return updated;
-        }else{
-            throw new RuntimeException("태그 변경 실패");
-        }
+        return tagRepository.save(tag);
     }
 
     // ISSUE: 이것도 제대로 삭제됬는지 검증하는 절차가 필요할까요?
