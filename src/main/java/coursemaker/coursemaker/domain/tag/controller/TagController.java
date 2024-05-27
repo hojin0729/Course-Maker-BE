@@ -73,6 +73,8 @@ public class TagController {
                 .stream()
                 .map(Tag::toResponseDto)
                 .toList();
+
+        return ResponseEntity.ok().body(response);
     }
 
 
