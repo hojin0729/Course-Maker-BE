@@ -1,9 +1,7 @@
 package coursemaker.coursemaker.domain.destination.service;
 
-import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.tag.dto.TagDto;
 
 import java.util.List;
 
@@ -34,17 +32,5 @@ public interface DestinationService {
 
     // 위치 정보 메서드
     Destination getLocation(Long destinationId, LocationDto locationDto);
-
-    // DestinationDto를 받아 여행지를 저장하는 메서드
-    Destination saveDto(DestinationDto destinationDto);
-
-    // Id를 기반으로 여행지를 조회하고, DestinationDto로 변환하여 반환하는 메서드
-    DestinationDto findDtoById(Long id);
-
-    // 모든 여행지를 조회하고, DestinationDto 리스트로 변환하여 반환하는 메서드
-    List<DestinationDto> findAllDtos();
-
-    // 여행지 Id로 태그 리스트를 조회하는 메서드
-    List<TagDto> findTagsByDestinationId(Long destinationId);
 
 }

@@ -25,7 +25,6 @@ public class DestinationDto {
     // DestinationDto를 Destination 엔티티로 변환하는 메서드
     public static Destination toEntity(DestinationDto dto) {
         Destination destination = new Destination();
-        destination.setId(dto.getId());
         destination.setName(dto.getName());
         destination.setPictureLink(dto.getPictureLink());
         destination.setContent(dto.getContent());
@@ -38,6 +37,7 @@ public class DestinationDto {
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
     public static DestinationDto toDto(Destination destination, List<TagDto> tagDtos) {
         DestinationDto dto = new DestinationDto();
+        dto.setId(destination.getId());
         dto.setName(destination.getName());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
