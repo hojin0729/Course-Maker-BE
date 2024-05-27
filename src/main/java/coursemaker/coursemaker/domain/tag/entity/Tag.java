@@ -1,6 +1,6 @@
 package coursemaker.coursemaker.domain.tag.entity;
 
-import coursemaker.coursemaker.domain.tag.dto.TagDto;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,4 +18,12 @@ public class Tag {
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    public TagResponseDto toResponseDto() {
+        TagResponseDto dto = new TagResponseDto();
+        dto.setId(this.getId());
+        dto.setName(this.getName());
+        dto.setDescription(this.getDescription());
+        return dto;
+    }
 }
