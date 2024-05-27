@@ -33,7 +33,6 @@ import static coursemaker.coursemaker.domain.tag.entity.QDestinationTag.destinat
 /*
  *TODO:
  * 메소드 실패시 커스텀 예외처리 하기
- * 여행지, 코스 도메인 서비스레이어 완성시 테스트 및 검증 진행
  * */
 @Service
 @Transactional
@@ -96,6 +95,11 @@ public class TagServiceImpl implements TagService{
     // ISSUE: 이것도 제대로 삭제됬는지 검증하는 절차가 필요할까요?
     @Override
     public void deleteById(Long id){
+        /*태그와 연결된 여행지, 코스 연관관계 삭제*/
+        courseTagRepository.deleteAllByTagId(id);
+        destinationTagRepository.deleteAllByTagId(id);
+
+        /*태그 삭제*/
         tagRepository.deleteById(id);
     }
 

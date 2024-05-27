@@ -16,6 +16,7 @@ public interface CourseTagRepository extends JpaRepository<CourseTag, Long> {
 
     Optional<CourseTag> findByCourseIdAndTagId(Long courseId, Long tagId);// 해당 코스에 태그가 포함되 있는지 확인
 
-    void deleteByCourseIdAndTagId(Long courseId, Long id);// 해해당 코스에 있는 태그를 삭제함
+    void deleteByCourseIdAndTagId(Long courseId, Long id);// 해당 코스에 있는 태그를 삭제함
     void deleteAllByCourseId(Long courseId);
+    void deleteAllByTagId(Long tagId);
 }

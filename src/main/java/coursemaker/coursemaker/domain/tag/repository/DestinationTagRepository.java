@@ -20,4 +20,6 @@ public interface DestinationTagRepository extends JpaRepository<DestinationTag, 
     void deleteByDestinationIdAndTagId(Long destinationId, Long id);// 해당 여행지에 있는 태그를 삭제함
 
     void deleteAllByDestinationId(Long destinationId);
+
+    void deleteAllByTagId(Long tagId);
 }
