@@ -14,6 +14,8 @@ public interface TagService {
 
     Tag findByTagName(String name);
 
+    List<Tag> findAllTags();
+
     // ISSUE: 제대로 업데이트 됬는지 확인하고 싶은데 어떻게 해야 깔끔하게 할 수 있을까요? 아니면 굳이 검증을 해서 반환을 할 필요가 없을까요?
     Tag updateTag(Tag tag);
 
