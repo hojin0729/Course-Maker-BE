@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.tag.service;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public interface TagService {
 
     List<Tag> findAllByCourseId(Long courseId);
 
-    List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds);
+    List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy);
 
     void deleteTagByCourse(Long courseId, List<Tag> tags);
 
@@ -47,7 +48,7 @@ public interface TagService {
     List<Tag> findAllByDestinationId(Long destinationId);
 
     // 특정 태그에 맞는 여행지 검색
-    List<Destination> findAllDestinationByTagIds(List<Long> tagIds);
+    List<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy); ;
 
 
     void deleteTagByDestination(Long destinationId, List<Tag> tags);
