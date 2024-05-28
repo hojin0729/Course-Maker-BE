@@ -1,7 +1,7 @@
 package coursemaker.coursemaker.domain.destination.dto;
 
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.tag.dto.TagDto;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ import java.util.List;
 public class DestinationDto {
     private Long id; // 여행지 id
     private String name; // 여행지 이름
-    private List<TagDto> tags; // 태그 리스트
+    private List<TagResponseDto> tags; // 태그 리스트
     private String location; // 위치 이름
     private BigDecimal latitude; // 위도
     private BigDecimal longitude; // 경도
@@ -35,7 +35,7 @@ public class DestinationDto {
     }
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
-    public static DestinationDto toDto(Destination destination, List<TagDto> tagDtos) {
+    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setName(destination.getName());
