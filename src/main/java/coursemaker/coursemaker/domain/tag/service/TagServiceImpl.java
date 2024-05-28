@@ -1,6 +1,8 @@
 package coursemaker.coursemaker.domain.tag.service;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
@@ -15,6 +17,7 @@ import coursemaker.coursemaker.domain.tag.repository.DestinationTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -148,9 +151,26 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds){
+    public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
         BooleanBuilder condition = new BooleanBuilder();
+        OrderSpecifier<?> orderBySpecifier = null;
+
+        // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
+        switch(orderBy) {
+            case VIEWS:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                break;
+            case NEWEST:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.createdAt);
+                break;
+            case POPULAR:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                break;
+            case RATING:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                break;
+        }
 
         /*다중검색*/
         for(Long id : tagIds) {
@@ -159,11 +179,15 @@ public class TagServiceImpl implements TagService{
 
         Set<TravelCourse> duplicate = new HashSet<>();
 
+        // FIXME: 페이지네이션시 데이터 양 일관성 문제 해결(중복값이 제거되면서 데이터 양이 일관되지 않음)
         List<TravelCourse> courses = queryFactory
                 .select(courseTag)
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(condition)// 다중태그
+                .orderBy(orderBySpecifier)// 정렬 조건 설정
+                .offset(pageable.getOffset())// 페이지네이션
+                .limit(pageable.getPageSize())
                 .fetch()
                 .stream()
                 .map(CourseTag::getCourse)
@@ -235,8 +259,25 @@ public class TagServiceImpl implements TagService{
 
 
     @Override
-    public List<Destination> findAllDestinationByTagIds(List<Long> tagIds){
+    public List<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy) {
         BooleanBuilder condition = new BooleanBuilder();
+        OrderSpecifier<?> orderBySpecifier = null;
+
+        // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
+        switch(orderBy) {
+            case VIEWS:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                break;
+            case NEWEST:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.createdAt);
+                break;
+            case POPULAR:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                break;
+            case RATING:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                break;
+        }
 
         /*다중검색*/
         for(Long id : tagIds) {
@@ -245,15 +286,19 @@ public class TagServiceImpl implements TagService{
 
         Set<Destination> duplicate = new HashSet<>();
 
+        // FIXME: 페이지네이션시 데이터 양 일관성 문제 해결(중복값이 제거되면서 데이터 양이 일관되지 않음)
         List<Destination> destinations = queryFactory
                 .select(destinationTag)
                 .from(destinationTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 코스-코스태그 조인
-                .where(condition)// 다중태그
-                .fetch()
-                .stream()
-                .map(DestinationTag::getDestination)
-                .filter(n-> !duplicate.add(n))
+                .where(condition)// 다중태그 조건 검색
+                .orderBy(orderBySpecifier)// 정렬 조건 설정
+                .offset(pageable.getOffset())// 페이지네이션
+                .limit(pageable.getPageSize())
+                .fetch()// 쿼리 실행
+                .stream()// 리스트 -> 스트림으로 처리
+                .map(DestinationTag::getDestination)// 코스태그 -> 코스 변환
+                .filter(n-> !duplicate.add(n))// 중복값 추출
                 .collect(Collectors.toList());
 
         return destinations;
