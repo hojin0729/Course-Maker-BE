@@ -112,11 +112,9 @@ public class TagServiceImpl implements TagService{
 
     /******태그-코스 ******/
 
-    // ISSUE: 코스에 맞는 태그들을 추가하는 메소드 입니다. 이때 어떤 반환값을 주는게 좋을까요?
-    // 추가적으로, 태그가 제대로 추가됬는지 검증하는 로직이 필요할까요?
+
     @Override
     public void addTagsByCourse(Long courseId, List<Long> tagIds){
-        CourseTag courseTag = new CourseTag();
 
         if(tagIds.isEmpty()){
             throw new RuntimeException("태그가 없습니다.");
@@ -124,6 +122,7 @@ public class TagServiceImpl implements TagService{
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
+            CourseTag courseTag = new CourseTag();
             Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new RuntimeException("태그가 없습니다."));
 
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tagId).isEmpty()){
@@ -199,9 +198,9 @@ public class TagServiceImpl implements TagService{
 
 
     /******태그-여행지 ******/
+
     @Override
     public void addTagsByDestination(Long destinationId, List<Long> tagIds){
-        DestinationTag destinationTag = new DestinationTag();
 
         if(tagIds.isEmpty()){
             throw new RuntimeException("태그가 없습니다.");
@@ -209,6 +208,7 @@ public class TagServiceImpl implements TagService{
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
+            DestinationTag destinationTag = new DestinationTag();
             Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new RuntimeException("태그가 없습니다."));
 
             if(destinationTagRepository.findByDestinationIdAndTagId(destinationId, tagId).isEmpty()){
