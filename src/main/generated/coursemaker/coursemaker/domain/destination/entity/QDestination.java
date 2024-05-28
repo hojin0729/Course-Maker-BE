@@ -28,6 +28,8 @@ public class QDestination extends EntityPathBase<Destination> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final NumberPath<Integer> views = createNumber("views", Integer.class);
+
     public final NumberPath<java.math.BigDecimal> latitude = createNumber("latitude", java.math.BigDecimal.class);
 
     public final StringPath location = createString("location");
