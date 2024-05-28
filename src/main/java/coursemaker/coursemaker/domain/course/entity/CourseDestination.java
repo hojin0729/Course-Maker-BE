@@ -18,6 +18,9 @@ public class CourseDestination {
     @Column(name = "visitOrder", nullable = false)
     private short visitOrder;
 
+    @Column(name = "date", nullable = false)
+    private short date;
+
     @ManyToOne
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
@@ -27,15 +30,15 @@ public class CourseDestination {
     private Destination destination;
 
     @Builder
-    public CourseDestination(short visitOrder, TravelCourse travelCourse, Destination destination) {
+    public CourseDestination(short visitOrder, short date, Destination destination) {
         this.visitOrder = visitOrder;
-        this.travelCourse = travelCourse;
+        this.date = date;
         this.destination = destination;
     }
 
-    public void update(short visitOrder, TravelCourse travelCourse, Destination destination) {
+    public void update(short visitOrder, short date, Destination destination) {
         this.visitOrder = visitOrder;
-        this.travelCourse = travelCourse;
+        this.date = date;
         this.destination = destination;
     }
 }
