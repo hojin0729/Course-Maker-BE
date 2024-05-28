@@ -78,6 +78,7 @@ public class CourseApiController {
                     content = @Content(schema = @Schema(implementation = TravelCourseResponse.class)))
     })
     /*********스웨거 어노테이션**********/
+    @GetMapping
     public ResponseEntity<Page<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 20);
         Page<TravelCourse> travelCourses = courseService.findAllOrderByViewsDesc(pageable);
