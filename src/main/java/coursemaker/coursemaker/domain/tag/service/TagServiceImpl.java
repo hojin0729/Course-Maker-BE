@@ -112,10 +112,9 @@ public class TagServiceImpl implements TagService{
 
     /******태그-코스 ******/
 
-    // FIXME: 태그 리스트가 추가 안되는 부분 수정
+
     @Override
     public void addTagsByCourse(Long courseId, List<Long> tagIds){
-        CourseTag courseTag = new CourseTag();
 
         if(tagIds.isEmpty()){
             throw new RuntimeException("태그가 없습니다.");
@@ -123,6 +122,7 @@ public class TagServiceImpl implements TagService{
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
+            CourseTag courseTag = new CourseTag();
             Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new RuntimeException("태그가 없습니다."));
 
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tagId).isEmpty()){
@@ -199,10 +199,8 @@ public class TagServiceImpl implements TagService{
 
     /******태그-여행지 ******/
 
-    // FIXME: 태그 리스트가 추가 안되는 부분 수정
     @Override
     public void addTagsByDestination(Long destinationId, List<Long> tagIds){
-        DestinationTag destinationTag = new DestinationTag();
 
         if(tagIds.isEmpty()){
             throw new RuntimeException("태그가 없습니다.");
@@ -210,6 +208,7 @@ public class TagServiceImpl implements TagService{
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
+            DestinationTag destinationTag = new DestinationTag();
             Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new RuntimeException("태그가 없습니다."));
 
             if(destinationTagRepository.findByDestinationIdAndTagId(destinationId, tagId).isEmpty()){
