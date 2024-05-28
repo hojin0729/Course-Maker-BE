@@ -112,8 +112,7 @@ public class TagServiceImpl implements TagService{
 
     /******태그-코스 ******/
 
-    // ISSUE: 코스에 맞는 태그들을 추가하는 메소드 입니다. 이때 어떤 반환값을 주는게 좋을까요?
-    // 추가적으로, 태그가 제대로 추가됬는지 검증하는 로직이 필요할까요?
+    // FIXME: 태그 리스트가 추가 안되는 부분 수정
     @Override
     public void addTagsByCourse(Long courseId, List<Long> tagIds){
         CourseTag courseTag = new CourseTag();
@@ -199,6 +198,8 @@ public class TagServiceImpl implements TagService{
 
 
     /******태그-여행지 ******/
+
+    // FIXME: 태그 리스트가 추가 안되는 부분 수정
     @Override
     public void addTagsByDestination(Long destinationId, List<Long> tagIds){
         DestinationTag destinationTag = new DestinationTag();
