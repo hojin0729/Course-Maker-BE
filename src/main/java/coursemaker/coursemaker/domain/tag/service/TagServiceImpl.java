@@ -179,6 +179,7 @@ public class TagServiceImpl implements TagService{
 
         Set<TravelCourse> duplicate = new HashSet<>();
 
+        // FIXME: 페이지네이션시 데이터 양 일관성 문제 해결(중복값이 제거되면서 데이터 양이 일관되지 않음)
         List<TravelCourse> courses = queryFactory
                 .select(courseTag)
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
@@ -285,6 +286,7 @@ public class TagServiceImpl implements TagService{
 
         Set<Destination> duplicate = new HashSet<>();
 
+        // FIXME: 페이지네이션시 데이터 양 일관성 문제 해결(중복값이 제거되면서 데이터 양이 일관되지 않음)
         List<Destination> destinations = queryFactory
                 .select(destinationTag)
                 .from(destinationTag)// 코스태그에서 선택(코스에는 FK가 없음)
