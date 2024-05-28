@@ -9,12 +9,12 @@ import lombok.Getter;
 public class CourseDestinationResponse {
 
     private final short visitOrder;
-    private final TravelCourse travelCourse;
+    private final short date;
     private final Destination destination;
 
     public CourseDestinationResponse(CourseDestination courseDestination) {
         this.visitOrder = courseDestination.getVisitOrder();
-        this.travelCourse = courseDestination.getTravelCourse();
+        this.date = courseDestination.getDate();
         this.destination = courseDestination.getDestination();
     }
 }

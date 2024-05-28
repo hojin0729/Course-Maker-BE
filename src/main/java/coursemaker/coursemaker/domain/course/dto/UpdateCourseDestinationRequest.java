@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class UpdateCourseDestinationRequest {
+
     private short visitOrder;
-    private TravelCourse travelCourse;
+    private short date;
     private Destination destination;
 }

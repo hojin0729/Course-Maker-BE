@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.course.entity.CourseDestination;
+import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,16 +19,27 @@ public class AddTravelCourseRequest {
     private int duration;
     private int travelerCount;
     private int travelType;
+    private String pictureLink;
+    private List<CourseDestination> courseDestinations;
+
 //    private Member member;
 
+
+
     public TravelCourse toEntity() {
-        return TravelCourse.builder()
+        TravelCourse travelCourse = TravelCourse.builder()
                 .title(title)
                 .content(content)
                 .duration(duration)
                 .travelerCount(travelerCount)
                 .travelType(travelType)
+                .pictureLink(pictureLink)
                 /*.member(member)*/
                 .build();
+
+        for (CourseDestination courseDestination : courseDestinations) {
+            travelCourse.addCourseDestination(courseDestination);
+        }
+        return travelCourse;
     }
 }
