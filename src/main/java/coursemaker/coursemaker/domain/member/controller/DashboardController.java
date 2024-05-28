@@ -16,9 +16,9 @@ public class DashboardController {
 		return "/user";
 	}
 
-	@GetMapping(value="/manager")
+	@GetMapping(value="/traveler")
 	public String manager() {
-		return "/manager";
+		return "/traveler";
 	}
 
 	@GetMapping(value="/admin")
