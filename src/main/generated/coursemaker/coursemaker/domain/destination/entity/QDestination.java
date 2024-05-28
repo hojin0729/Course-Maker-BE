@@ -43,6 +43,8 @@ public class QDestination extends EntityPathBase<Destination> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
+    public final NumberPath<Integer> views = createNumber("views", Integer.class);
+
     public QDestination(String variable) {
         super(Destination.class, forVariable(variable));
     }
