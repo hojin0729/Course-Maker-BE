@@ -13,16 +13,19 @@ import lombok.NoArgsConstructor;
 public class AddCourseDestinationRequest {
 
     private short visitOrder;
-    private TravelCourse travelCourse;
+    private short date;
     private Destination destination;
 
     public CourseDestination toEntity() {
         return CourseDestination.builder()
                 .visitOrder(visitOrder)
-                .travelCourse(travelCourse)
+                .date(date)
                 .destination(destination)
                 .build();
     }
 
-}
+    // 코스를 만들려는 시점에서는 travelcourse가 없다.
+    // post 요청 시점에 course가 있다는건 말이 안 된다.
+    // 그래서 travel course가 없어야한다.
 
+}
