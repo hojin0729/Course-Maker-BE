@@ -2,6 +2,8 @@ package coursemaker.coursemaker.domain.destination.service;
 
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -14,6 +16,9 @@ public interface DestinationService {
 
     // 모든 여행지를 조회하는 메서드
     List<Destination> findAll();
+
+    // 페이징을 지원하는 모든 여행지 조회 메서드
+    Page<Destination> findAll(Pageable pageable);
 
     // id 기반으로 여행지를 삭제하는 메서드
     void deleteById(Long id);
