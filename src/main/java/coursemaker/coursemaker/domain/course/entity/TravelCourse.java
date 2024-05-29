@@ -75,6 +75,11 @@ public class TravelCourse extends BaseEntity {
         courseDestination.setTravelCourse(this);
     }
 
+    public void updateCourseDestination(CourseDestination courseDestination) {
+        courseDestinations.add(courseDestination);
+        courseDestination.setTravelCourse(this);
+    }
+
     public void incrementViews() {
         this.views++;
     }
