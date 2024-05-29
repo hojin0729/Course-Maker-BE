@@ -20,7 +20,7 @@ public class AddTravelCourseRequest {
     private int travelerCount;
     private int travelType;
     private String pictureLink;
-    private List<CourseDestination> courseDestinations;
+    private List<AddCourseDestinationRequest> courseDestinations;
 
 //    private Member member;
 
@@ -37,8 +37,8 @@ public class AddTravelCourseRequest {
                 /*.member(member)*/
                 .build();
 
-        for (CourseDestination courseDestination : courseDestinations) {
-            travelCourse.addCourseDestination(courseDestination);
+        for (AddCourseDestinationRequest courseDestination : courseDestinations) {
+            travelCourse.addCourseDestination(courseDestination.toEntity());
         }
         return travelCourse;
     }
