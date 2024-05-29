@@ -177,21 +177,19 @@ public class TagServiceImpl implements TagService{
             condition.or(courseTag.tag.id.eq(id));
         }
 
-        Set<TravelCourse> duplicate = new HashSet<>();
-
-        // FIXME: 페이지네이션시 데이터 양 일관성 문제 해결(중복값이 제거되면서 데이터 양이 일관되지 않음)
         List<TravelCourse> courses = queryFactory
-                .select(courseTag)
+                .select(courseTag, courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(condition)// 다중태그
+                .groupBy(courseTag.course)// 코스로 묶어서
+                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .offset(pageable.getOffset())// 페이지네이션
                 .limit(pageable.getPageSize())
                 .fetch()
                 .stream()
-                .map(CourseTag::getCourse)
-                .filter(n-> !duplicate.add(n))
+                .map(n -> n.get(courseTag).getCourse())
                 .collect(Collectors.toList());
 
         return courses;
@@ -284,21 +282,20 @@ public class TagServiceImpl implements TagService{
             condition.or(destinationTag.tag.id.eq(id));
         }
 
-        Set<Destination> duplicate = new HashSet<>();
 
-        // FIXME: 페이지네이션시 데이터 양 일관성 문제 해결(중복값이 제거되면서 데이터 양이 일관되지 않음)
         List<Destination> destinations = queryFactory
-                .select(destinationTag)
-                .from(destinationTag)// 코스태그에서 선택(코스에는 FK가 없음)
+                .select(destinationTag, destinationTag.destination.count())
+                .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 코스-코스태그 조인
                 .where(condition)// 다중태그 조건 검색
+                .groupBy(destinationTag.destination)// 여행지로 묶어서
+                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .offset(pageable.getOffset())// 페이지네이션
                 .limit(pageable.getPageSize())
                 .fetch()// 쿼리 실행
                 .stream()// 리스트 -> 스트림으로 처리
-                .map(DestinationTag::getDestination)// 코스태그 -> 코스 변환
-                .filter(n-> !duplicate.add(n))// 중복값 추출
+                .map(n -> n.get(destinationTag).getDestination())// 여행지태그 -> 여행지 변환
                 .collect(Collectors.toList());
 
         return destinations;
