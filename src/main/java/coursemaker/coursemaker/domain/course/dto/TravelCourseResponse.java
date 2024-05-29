@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class TravelCourseResponse {
     private final int travelType;
     private final String pictureLink;
     private final List<CourseDestinationResponse> courseDestinations;
+    private final List<TagResponseDto> courseTags;
 //    private final Member member;
 
     public TravelCourseResponse(TravelCourse travelCourse) {
@@ -32,6 +34,16 @@ public class TravelCourseResponse {
         this.courseDestinations = travelCourse.getCourseDestinations().stream()
                 .map(CourseDestinationResponse::new)
                 .collect(Collectors.toList());
+        this.courseTags = travelCourse.getCourseTags().stream()
+                .map(courseTag -> {
+                    TagResponseDto tagResponseDto = new TagResponseDto();
+                    tagResponseDto.setId(courseTag.getTag().getId());
+                    tagResponseDto.setName(courseTag.getTag().getName());
+                    tagResponseDto.setDescription(courseTag.getTag().getDescription());
+                    return tagResponseDto;
+                })
+                .collect(Collectors.toList());
+
 //        this.member = travelCourse.getMember();
     }
 }

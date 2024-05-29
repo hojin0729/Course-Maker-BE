@@ -1,11 +1,10 @@
 package coursemaker.coursemaker.domain.course.entity;
 
 import coursemaker.coursemaker.BaseEntity;
+import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -47,6 +46,9 @@ public class TravelCourse extends BaseEntity {
 
     @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseDestination> courseDestinations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
     public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink/*, Member member*/) {
