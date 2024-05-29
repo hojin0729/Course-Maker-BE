@@ -1,12 +1,9 @@
 package coursemaker.coursemaker.domain.course.service;
 
-import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
-import coursemaker.coursemaker.domain.course.dto.UpdateCourseDestinationRequest;
+import coursemaker.coursemaker.domain.course.dto.*;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
 
-import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
-import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
 
@@ -22,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +43,11 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
+    public Page<TravelCourse> getAllOrderByViewsDesc(Pageable pageable) {
+        return travelCourseRepository.findAllByOrderByViewsDesc(pageable);
+    }
+
+    @Override
     public TravelCourse findById(long id) {
         return travelCourseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Travel course not found with id: " + id));
@@ -64,6 +67,20 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
+    public List<CourseDestinationResponse> findAllCourseDestinations() {
+        return courseDestinationRepository.findAll().stream()
+                .map(CourseDestinationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CourseDestinationResponse findCourseDestinationById(long id) {
+        CourseDestination courseDestination = courseDestinationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
+        return new CourseDestinationResponse(courseDestination);
+    }
+
+    @Override
     public CourseDestination addCourseDestination(AddCourseDestinationRequest request) {
         CourseDestination courseDestination = request.toEntity();
         return courseDestinationRepository.save(courseDestination);
@@ -80,11 +97,6 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public void deleteCourseDestination(long id) {
         courseDestinationRepository.deleteById(id);
-    }
-
-    @Override
-    public Page<TravelCourse> findAllOrderByViewsDesc(Pageable pageable) {
-        return travelCourseRepository.findAllByOrderByViewsDesc(pageable);
     }
 
     @Override
