@@ -1,11 +1,9 @@
 package coursemaker.coursemaker.domain.course.dto;
 
-import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +19,7 @@ public class TravelCourseResponse {
     private final String pictureLink;
     private final List<CourseDestinationResponse> courseDestinations;
     private final List<TagResponseDto> courseTags;
-//    private final Member member;
+    private final CourseMemberResponse member;
 
     public TravelCourseResponse(TravelCourse travelCourse) {
         this.title = travelCourse.getTitle();
@@ -31,6 +29,7 @@ public class TravelCourseResponse {
         this.travelerCount = travelCourse.getTravelerCount();
         this.travelType = travelCourse.getTravelType();
         this.pictureLink = travelCourse.getPictureLink();
+        this.member = new CourseMemberResponse(travelCourse.getMember());
         this.courseDestinations = travelCourse.getCourseDestinations().stream()
                 .map(CourseDestinationResponse::new)
                 .collect(Collectors.toList());
@@ -44,6 +43,5 @@ public class TravelCourseResponse {
                 })
                 .collect(Collectors.toList());
 
-//        this.member = travelCourse.getMember();
     }
 }

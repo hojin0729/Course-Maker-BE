@@ -3,12 +3,9 @@ package coursemaker.coursemaker.domain.course.service;
 import coursemaker.coursemaker.domain.course.dto.*;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
-
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
 
-import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,5 +101,4 @@ public class CourseServiceImpl implements CourseService{
         travelCourse.incrementViews();
         return travelCourseRepository.save(travelCourse);
     }
-
 }

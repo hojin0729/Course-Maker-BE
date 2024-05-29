@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.course.entity;
 
 import coursemaker.coursemaker.BaseEntity;
 import coursemaker.coursemaker.domain.tag.entity.CourseTag;
+import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,9 +41,9 @@ public class TravelCourse extends BaseEntity {
     @Column(name = "pictureLink", length = 300)
     private String pictureLink;
 
-//    @ManyToOne
-//    @JoinColumn(name = "memberId", nullable = false)
-//    private Member member;
+    @ManyToOne
+    @JoinColumn(name = "memberId")
+    private Member member;
 
     @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseDestination> courseDestinations = new ArrayList<>();
@@ -51,7 +52,7 @@ public class TravelCourse extends BaseEntity {
     private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
-    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink/*, Member member*/) {
+    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {
         this.title = title;
         this.content = content;
         this.views = 0;
@@ -59,17 +60,15 @@ public class TravelCourse extends BaseEntity {
         this.travelerCount = travelerCount;
         this.travelType = travelType;
         this.pictureLink = pictureLink;
-//        this.member = member;
     }
 
-    public void update(String title, String content, int duration, int travelerCount, int travelType, String pictureLink/*, Member member*/) {
+    public void update(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {
         this.title = title;
         this.content = content;
         this.duration = duration;
         this.travelerCount = travelerCount;
         this.travelType = travelType;
         this.pictureLink = pictureLink;
-//        this.member = member;
     }
 
     public void addCourseDestination(CourseDestination courseDestination) {
@@ -85,5 +84,4 @@ public class TravelCourse extends BaseEntity {
     public void incrementViews() {
         this.views++;
     }
-
 }
