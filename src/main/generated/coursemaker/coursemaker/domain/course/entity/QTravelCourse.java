@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -23,12 +24,16 @@ public class QTravelCourse extends EntityPathBase<TravelCourse> {
 
     public final StringPath content = createString("content");
 
+    public final ListPath<CourseDestination, QCourseDestination> courseDestinations = this.<CourseDestination, QCourseDestination>createList("courseDestinations", CourseDestination.class, QCourseDestination.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Integer> duration = createNumber("duration", Integer.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final StringPath pictureLink = createString("pictureLink");
 
     public final StringPath title = createString("title");
 
@@ -38,6 +43,8 @@ public class QTravelCourse extends EntityPathBase<TravelCourse> {
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    public final NumberPath<Integer> views = createNumber("views", Integer.class);
 
     public QTravelCourse(String variable) {
         super(TravelCourse.class, forVariable(variable));

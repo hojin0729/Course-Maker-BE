@@ -22,6 +22,8 @@ public class QCourseDestination extends EntityPathBase<CourseDestination> {
 
     public static final QCourseDestination courseDestination = new QCourseDestination("courseDestination");
 
+    public final NumberPath<Short> date = createNumber("date", Short.class);
+
     public final coursemaker.coursemaker.domain.destination.entity.QDestination destination;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
