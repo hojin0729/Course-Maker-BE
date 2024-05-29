@@ -22,6 +22,8 @@ public class QCourseDestination extends EntityPathBase<CourseDestination> {
 
     public static final QCourseDestination courseDestination = new QCourseDestination("courseDestination");
 
+    public final NumberPath<Short> date = createNumber("date", Short.class);
+
     public final coursemaker.coursemaker.domain.destination.entity.QDestination destination;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -48,7 +50,7 @@ public class QCourseDestination extends EntityPathBase<CourseDestination> {
 
     public QCourseDestination(Class<? extends CourseDestination> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.destination = inits.isInitialized("destination") ? new coursemaker.coursemaker.domain.destination.entity.QDestination(forProperty("destination")) : null;
+        this.destination = inits.isInitialized("destination") ? new coursemaker.coursemaker.domain.destination.entity.QDestination(forProperty("destination"), inits.get("destination")) : null;
         this.travelCourse = inits.isInitialized("travelCourse") ? new QTravelCourse(forProperty("travelCourse")) : null;
     }
 
