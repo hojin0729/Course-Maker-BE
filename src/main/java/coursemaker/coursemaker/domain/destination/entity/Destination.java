@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.destination.entity;
 
 import coursemaker.coursemaker.BaseEntity;
+import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +18,9 @@ public class Destination extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "memberId")
-//    private Member member;
+    @ManyToOne
+    @JoinColumn(name = "memberId")
+    private Member member;
 
     @Column(name = "name", length = 50)
     private String name;

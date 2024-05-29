@@ -4,11 +4,12 @@ import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DestinationServiceImpl implements DestinationService {
@@ -36,6 +37,11 @@ public class DestinationServiceImpl implements DestinationService {
     public List<Destination> findAll() {
         // 저장된 모든 여행지를 리스트로 반환
         return destinationRepository.findAll();
+    }
+
+    @Override
+    public Page<Destination> findAll(Pageable pageable) {
+        return destinationRepository.findAll(pageable);
     }
 
     @Override
