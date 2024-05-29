@@ -75,17 +75,4 @@ public class TagController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "해당 코스id에 포함된 태그 조회")
-    @GetMapping("/courses/{courseId}")
-    public ResponseEntity<List<TagResponseDto>> getTagsByCourse(@PathVariable(name = "courseId") Long courseId) {
-        List<TagResponseDto> response = tagService.findAllByCourseId(courseId)
-                .stream()
-                .map(Tag::toResponseDto)
-                .toList();
-
-        return ResponseEntity.ok().body(response);
-    }
-
-
-
 }
