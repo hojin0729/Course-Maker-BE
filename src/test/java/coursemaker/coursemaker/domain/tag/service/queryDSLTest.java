@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.tag.service;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
@@ -104,23 +105,39 @@ public class queryDSLTest {
             condition.or(courseTag.tag.id.eq(id));
         }
 
-        Set<TravelCourse> duplicate = new HashSet<>();
+        Set<TravelCourse> duplicate = new HashSet<>();// group by로 묶어서 count 때려서 하면 됨
         System.out.println("-----------query----------");
+//        List<TravelCourse> course2 = jpaQueryFactory
+//                .select(courseTag)// 코스 형태로 반환
+//                .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
+//                .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
+//                .where(condition)// 다중태그
+//                .groupBy(courseTag)
+////                .having(courseTag.course.count().gt(1))
+//                .fetch()
+//                .stream()
+//                .map((n) -> n.getCourse())
+////                .filter(n-> !duplicate.add(n))
+//                .collect(Collectors.toList());
+
+
         List<TravelCourse> course2 = jpaQueryFactory
-                .select(courseTag)// 코스 형태로 반환
+                .select(courseTag, courseTag.course.count())// 코스 형태로 반환
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(condition)// 다중태그
+                .groupBy(courseTag.course)
+                .having(courseTag.course.count().gt(searchList.size()-1))
                 .fetch()
                 .stream()
-                .map(CourseTag::getCourse)
-                .filter(n-> !duplicate.add(n))
+                .map(n -> n.get(courseTag).getCourse())
                 .collect(Collectors.toList());
+
         System.out.println("-----------query----------");
         
         // 검색 조건에 맞는 코스 이름을 출력
         for(TravelCourse travelCourse : course2) {
-            System.out.println("===============================================================travelCourse.getTitle() = " + travelCourse.getTitle());
+            System.out.println("===============================================================travelCourse.getTitle() = " + travelCourse.getTitle() );
         }
     }
 }
