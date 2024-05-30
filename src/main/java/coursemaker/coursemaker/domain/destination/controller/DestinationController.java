@@ -38,7 +38,7 @@ public class DestinationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "전체 여행지 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = Destination.class))),
+                    content = @Content(schema = @Schema(implementation = DestinationDto.class))),
     })
     @Parameter(name = "record", description = "한 페이지 당 표시할 데이터 수")
     @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1 페이지 부터 시작합니다.)")
