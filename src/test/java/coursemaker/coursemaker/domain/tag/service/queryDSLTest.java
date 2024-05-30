@@ -125,7 +125,7 @@ public class queryDSLTest {
                 .select(courseTag, courseTag.course.count())// 코스 형태로 반환
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
-                .where(condition)// 다중태그
+                .where(courseTag.tag.id.in(searchList))// 다중태그 <- 확인해보기!!!!!
                 .groupBy(courseTag.course)
                 .having(courseTag.course.count().gt(searchList.size()-1))
                 .fetch()
