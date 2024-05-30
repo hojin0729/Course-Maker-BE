@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.member.controller;
 
+import coursemaker.coursemaker.domain.member.dto.AccountCreateDto;
 import coursemaker.coursemaker.domain.member.dto.AccountDto;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
@@ -15,15 +16,12 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @PostMapping(value="/signup")
-    public String signup(AccountDto accountDto) {
-
-        ModelMapper mapper = new ModelMapper();
-        Member member = mapper.map(accountDto, Member.class);
-        member.setPassword(passwordEncoder.encode(accountDto.getPassword()));
-        memberService.createMember(member);
-
+    public String signup(AccountCreateDto accountCreateDto) {
+        accountCreateDto.setPassword(passwordEncoder.encode(accountCreateDto.getPassword()));
+        memberService.createMember(accountCreateDto);
         return "redirect:/";
     }
 }
