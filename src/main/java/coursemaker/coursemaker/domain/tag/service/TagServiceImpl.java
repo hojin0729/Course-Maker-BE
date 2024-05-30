@@ -153,7 +153,10 @@ public class TagServiceImpl implements TagService{
     @Override
     public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
-        BooleanBuilder condition = new BooleanBuilder();
+        if(tagIds == null){
+            throw new RuntimeException("태그가 없습니다.");
+        }
+
         OrderSpecifier<?> orderBySpecifier = null;
 
         // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
@@ -172,16 +175,11 @@ public class TagServiceImpl implements TagService{
                 break;
         }
 
-        /*다중검색*/
-        for(Long id : tagIds) {
-            condition.or(courseTag.tag.id.eq(id));
-        }
-
         List<TravelCourse> courses = queryFactory
                 .select(courseTag, courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
-                .where(condition)// 다중태그
+                .where(courseTag.tag.id.in(tagIds))// 다중태그
                 .groupBy(courseTag.course)// 코스로 묶어서
                 .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
@@ -224,7 +222,7 @@ public class TagServiceImpl implements TagService{
     @Override
     public void addTagsByDestination(Long destinationId, List<Long> tagIds){
 
-        if(tagIds.isEmpty()){
+        if(tagIds == null){
             throw new RuntimeException("태그가 없습니다.");
         }
 
@@ -258,7 +256,11 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public List<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy) {
-        BooleanBuilder condition = new BooleanBuilder();
+
+        if(tagIds == null ||tagIds.isEmpty()){
+            throw new RuntimeException("태그가 없습니다.");
+        }
+
         OrderSpecifier<?> orderBySpecifier = null;
 
         // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
@@ -277,17 +279,12 @@ public class TagServiceImpl implements TagService{
                 break;
         }
 
-        /*다중검색*/
-        for(Long id : tagIds) {
-            condition.or(destinationTag.tag.id.eq(id));
-        }
-
 
         List<Destination> destinations = queryFactory
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 코스-코스태그 조인
-                .where(condition)// 다중태그 조건 검색
+                .where(destinationTag.tag.id.in(tagIds))// 다중태그 조건 검색
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
                 .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
