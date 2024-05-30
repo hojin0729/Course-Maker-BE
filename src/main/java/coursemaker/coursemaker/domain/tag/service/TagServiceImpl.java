@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.tag.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.sun.jdi.request.DuplicateRequestException;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
@@ -12,9 +13,12 @@ import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.QDestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
+import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
+import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.repository.CourseTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.DestinationTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.TagRepository;
+import coursemaker.coursemaker.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,10 +37,7 @@ import static coursemaker.coursemaker.domain.destination.entity.QDestination.des
 import static coursemaker.coursemaker.domain.tag.entity.QCourseTag.courseTag;
 import static coursemaker.coursemaker.domain.tag.entity.QDestinationTag.destinationTag;
 
-/*
- *TODO:
- * 메소드 실패시 커스텀 예외처리 하기
- * */
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -56,8 +57,9 @@ public class TagServiceImpl implements TagService{
     public Tag createTag(Tag tag){
 
         /*태그의 이름은 고유해야 한다.*/
-        if(tagRepository.findByname(tag.getName()).isPresent()){
-            throw new RuntimeException("이미 태그가 존재합니다");
+        if(tagRepository.findByname(tag.getName()).isPresent())
+        {
+            throw new TagDuplicatedException("이미 존재하는 태그입니다.", "tag name: " + tag.getName() );
         }
 
         return tagRepository.save(tag);
@@ -66,13 +68,13 @@ public class TagServiceImpl implements TagService{
     @Override
     public Tag findById(Long id){
         return tagRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("태그가 없습니다"));
+                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag id: " + id ));
     }
 
     @Override
     public Tag findByTagName(String name){
         return tagRepository.findByname(name)
-                .orElseThrow(() -> new RuntimeException("태그가 없습니다"));
+                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag name: " + name ));
     }
 
     @Override
@@ -80,29 +82,25 @@ public class TagServiceImpl implements TagService{
         return tagRepository.findAll();
     }
 
-    // ISSUE: 제대로 업데이트 됬는지 확인하고 싶은데 어떻게 해야 깔끔하게 할 수 있을까요? 아니면 굳이 검증을 해서 반환을 할 필요가 없을까요?
     @Override
     public Tag updateTag(Tag tag){
 
         /*변경할 타겟 태그를 못찾음.*/
-        if(tagRepository.findById(tag.getId()).isEmpty()){
-            throw new RuntimeException("변경할 태그가 없습니다.");
-        }
+        tagRepository.findById(tag.getId()).orElseThrow(() ->
+                new TagNotFoundException("변경할 태그를 찾지 못했습니다.",
+                        "tag id: " + tag.getId() ));
 
         /*태그의 이름 중복 확인*/
-        if(tagRepository.findByname(tag.getName()).isPresent()){
-            if(!tagRepository.findByname(tag.getName()).get()
-                    .getId()
-                    .equals(tag.getId())
-            ){
-                throw new RuntimeException("이미 태그가 존재합니다(중복)");
-            }
+        if(tagRepository.findByname(tag.getName()).isPresent())
+        {
+            throw new TagDuplicatedException("이미 존재하는 태그 이름입니다.", "tag name: " + tag.getName() );
         }
+
 
         return tagRepository.save(tag);
     }
 
-    // ISSUE: 이것도 제대로 삭제됬는지 검증하는 절차가 필요할까요?
+
     @Override
     public void deleteById(Long id){
         /*태그와 연결된 여행지, 코스 연관관계 삭제*/
@@ -115,18 +113,19 @@ public class TagServiceImpl implements TagService{
 
     /******태그-코스 ******/
 
-
     @Override
     public void addTagsByCourse(Long courseId, List<Long> tagIds){
 
-        if(tagIds.isEmpty()){
-            throw new RuntimeException("태그가 없습니다.");
+        if(tagIds == null || tagIds.isEmpty()){
+            throw new IllegalArgumentException("추가할 태그가 없습니다.");
         }
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
             CourseTag courseTag = new CourseTag();
-            Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new RuntimeException("태그가 없습니다."));
+            Tag tag = tagRepository.findById(tagId).orElseThrow(() ->
+                    new TagNotFoundException("추가할 태그가 존재하지 않습니다.", 
+                            "tag id: " + tagId ));
 
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tagId).isEmpty()){
                 courseTag.setTag(tag);
@@ -154,7 +153,7 @@ public class TagServiceImpl implements TagService{
     public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
         if(tagIds == null){
-            throw new RuntimeException("태그가 없습니다.");
+            throw new IllegalArgumentException("태그가 없습니다.");
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
@@ -223,7 +222,7 @@ public class TagServiceImpl implements TagService{
     public void addTagsByDestination(Long destinationId, List<Long> tagIds){
 
         if(tagIds == null){
-            throw new RuntimeException("태그가 없습니다.");
+            throw new IllegalArgumentException("태그가 없습니다.");
         }
 
         // 중복된 태그를 제외하고 추가함
@@ -302,8 +301,8 @@ public class TagServiceImpl implements TagService{
     @Override
     public void deleteTagByDestination(Long destinationId, List<Tag> tags){
 
-        if(tags.isEmpty()){
-            throw new RuntimeException("태그가 없습니다.");
+        if(tags==null || tags.isEmpty()){
+            throw new IllegalArgumentException("태그가 없습니다.");
         }
 
         // 여행지에 포함된 태그들 삭제
