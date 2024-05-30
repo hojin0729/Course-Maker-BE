@@ -32,15 +32,6 @@ public class TagController {
         return ResponseEntity.ok().body(response);
     }
 
-    /*특정 태그 조회*/
-    @Operation(summary = "id에 맞는 태그 조회")
-    @GetMapping("/{id}")
-    public ResponseEntity<TagResponseDto> getTag(@PathVariable(name = "id" ) Long id) {
-        TagResponseDto response = tagService.findById(id).toResponseDto();
-
-        return ResponseEntity.ok().body(response);
-    }
-
     /*태그 생성*/
     @Operation(summary = "태그 생성")
     @ApiResponse(responseCode = "201", description = "헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다.")
