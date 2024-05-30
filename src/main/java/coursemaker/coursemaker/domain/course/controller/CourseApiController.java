@@ -1,11 +1,6 @@
 package coursemaker.coursemaker.domain.course.controller;
 
-import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
-import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
-import coursemaker.coursemaker.domain.course.dto.UpdateCourseDestinationRequest;
-import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.service.CourseService;
-import coursemaker.coursemaker.domain.course.service.CourseServiceImpl;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
@@ -28,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.net.URI;
 
 @RequiredArgsConstructor
@@ -61,7 +55,7 @@ public class CourseApiController {
 
         return (savedTravelCourse != null) ?
                 // ResponseEntity.status(HttpStatus.CREATED).body(savedTravelCourse) :
-                ResponseEntity.created(URI.create("/v1/course/" + savedTravelCourse.getId())).build() :
+                ResponseEntity.created(URI.create("/courses/" + savedTravelCourse.getId())).build() :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -82,8 +76,8 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @GetMapping
-    public ResponseEntity<Page<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "0", name = "record") int record,
-                                                                          @RequestParam(name = "page") int page) {
+    public ResponseEntity<Page<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") int record,
+                                                                          @RequestParam(defaultValue = "1", name = "page") int page) {
         Pageable pageable = PageRequest.of(page-1, record);
         Page<TravelCourse> travelCourses = courseService.getAllOrderByViewsDesc(pageable);
         Page<TravelCourseResponse> response = travelCourses.map(TravelCourseResponse::new);
@@ -149,14 +143,7 @@ public class CourseApiController {
                 .build();
     }
 
-
-
-
     // CourseDestination -------
-
-
-
-
 
 //    @Operation(summary = "코스에 여행지 추가", description = "유저가 특정 코스에 여행지를 추가합니다.")
 //    @ApiResponses(value = {
@@ -178,7 +165,7 @@ public class CourseApiController {
 //        courseDestination.setTravelCourse(travelCourse);
 //        CourseDestination savedCourseDestination = courseService.addCourseDestination(request);
 //        // return ResponseEntity.status(HttpStatus.CREATED).body(savedCourseDestination);
-//        return ResponseEntity.created(URI.create("/v1/course/" + travelCourse.getId() + "destinations")).build();
+//        return ResponseEntity.created(URI.create("/courses/" + travelCourse.getId() + "destinations")).build();
 //    }
 
 //    @Operation(summary = "모든 코스 여행지 조회", description = "모든 코스의 여행지를 조회합니다.")
@@ -236,5 +223,4 @@ public class CourseApiController {
 //        courseService.deleteCourseDestination(destinationId);
 //        return ResponseEntity.noContent().build();
 //    }
-
 }

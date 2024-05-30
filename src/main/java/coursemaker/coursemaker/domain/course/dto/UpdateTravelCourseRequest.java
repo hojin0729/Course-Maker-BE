@@ -1,13 +1,10 @@
 package coursemaker.coursemaker.domain.course.dto;
 
-import coursemaker.coursemaker.domain.course.entity.CourseDestination;
-import coursemaker.coursemaker.domain.course.dto.UpdateCourseDestinationRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -21,7 +18,6 @@ public class UpdateTravelCourseRequest {
     private int travelType;
     private String pictureLink;
     private List<UpdateCourseDestinationRequest> courseDestinations;
-//    private Member member;
 
     public TravelCourse toEntity() {
         TravelCourse travelCourse = TravelCourse.builder()
@@ -31,7 +27,6 @@ public class UpdateTravelCourseRequest {
                 .travelerCount(travelerCount)
                 .travelType(travelType)
                 .pictureLink(pictureLink)
-                /*.member(member)*/
                 .build();
 
         for (UpdateCourseDestinationRequest courseDestination : courseDestinations) {
