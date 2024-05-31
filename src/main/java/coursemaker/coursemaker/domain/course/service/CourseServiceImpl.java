@@ -67,38 +67,38 @@ public class CourseServiceImpl implements CourseService{
         travelCourseRepository.deleteById(id);
     }
 
-    @Override
-    public List<CourseDestinationResponse> findAllCourseDestinations() {
-        return courseDestinationRepository.findAll().stream()
-                .map(courseDestinationService::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public CourseDestinationResponse findCourseDestinationById(long id) {
-        CourseDestination courseDestination = courseDestinationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
-        return courseDestinationService.toResponse(courseDestination);
-    }
-
-    @Override
-    public CourseDestination addCourseDestination(AddCourseDestinationRequest request) {
-        CourseDestination courseDestination = request.toEntity();
-        return courseDestinationRepository.save(courseDestination);
-    }
-
-    @Override
-    public CourseDestination updateCourseDestination(long id, UpdateCourseDestinationRequest request) {
-        CourseDestination courseDestination = courseDestinationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
-        courseDestination.update(request.getVisitOrder(), request.getDate(), request.getDestination());
-        return courseDestinationRepository.save(courseDestination);
-    }
-
-    @Override
-    public void deleteCourseDestination(long id) {
-        courseDestinationRepository.deleteById(id);
-    }
+//    @Override
+//    public List<CourseDestinationResponse> findAllCourseDestinations() {
+//        return courseDestinationRepository.findAll().stream()
+//                .map(courseDestinationService::toResponse)
+//                .collect(Collectors.toList());
+//    }
+//
+//    @Override
+//    public CourseDestinationResponse findCourseDestinationById(long id) {
+//        CourseDestination courseDestination = courseDestinationRepository.findById(id)
+//                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
+//        return courseDestinationService.toResponse(courseDestination);
+//    }
+//
+//    @Override
+//    public CourseDestination addCourseDestination(AddCourseDestinationRequest request) {
+//        CourseDestination courseDestination = request.toEntity();
+//        return courseDestinationRepository.save(courseDestination);
+//    }
+//
+//    @Override
+//    public CourseDestination updateCourseDestination(long id, UpdateCourseDestinationRequest request) {
+//        CourseDestination courseDestination = courseDestinationRepository.findById(id)
+//                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
+//        courseDestination.update(request.getVisitOrder(), request.getDate(), request.getDestination());
+//        return courseDestinationRepository.save(courseDestination);
+//    }
+//
+//    @Override
+//    public void deleteCourseDestination(long id) {
+//        courseDestinationRepository.deleteById(id);
+//    }
 
     @Override
     public TravelCourse incrementViews(long id) {

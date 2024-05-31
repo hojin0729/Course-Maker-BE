@@ -20,10 +20,10 @@ public interface CourseService {
     TravelCourse findById(long id);
     TravelCourse update(long id, UpdateTravelCourseRequest request);
     void delete(long id);
-    List<CourseDestinationResponse> findAllCourseDestinations();
-    CourseDestinationResponse findCourseDestinationById(long id);
-    CourseDestination addCourseDestination(AddCourseDestinationRequest request);
-    CourseDestination updateCourseDestination(long id, UpdateCourseDestinationRequest request);
-    void deleteCourseDestination(long id);
+//    List<CourseDestinationResponse> findAllCourseDestinations();
+//    CourseDestinationResponse findCourseDestinationById(long id);
+//    CourseDestination addCourseDestination(AddCourseDestinationRequest request);
+//    CourseDestination updateCourseDestination(long id, UpdateCourseDestinationRequest request);
+//    void deleteCourseDestination(long id);
     TravelCourse incrementViews(long id);
 }
