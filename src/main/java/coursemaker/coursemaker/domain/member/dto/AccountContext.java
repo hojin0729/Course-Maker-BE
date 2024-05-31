@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-public class AccountContext implements UserDetails {
+public class AccountContext implements UserDetails { //UserDetails 구현체
     private AccountDto accountDto;
     private final List<GrantedAuthority> roles;
 

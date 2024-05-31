@@ -5,7 +5,6 @@ import coursemaker.coursemaker.domain.member.dto.AccountDto;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper modelMapper;
 
     @PostMapping(value="/signup")
     public String signup(AccountCreateDto accountCreateDto) {

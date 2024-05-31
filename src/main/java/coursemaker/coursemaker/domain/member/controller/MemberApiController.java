@@ -21,10 +21,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/member")
-public class RestApiController {
+public class MemberApiController {
     private final MemberService memberService;
 
-    public RestApiController(MemberService memberService) {
+    public MemberApiController(MemberService memberService) {
         this.memberService = memberService;
     }
 

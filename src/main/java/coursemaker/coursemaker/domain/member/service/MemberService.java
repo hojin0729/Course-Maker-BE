@@ -3,7 +3,6 @@ package coursemaker.coursemaker.domain.member.service;
 import coursemaker.coursemaker.domain.member.dto.AccountCreateDto;
 import coursemaker.coursemaker.domain.member.dto.AccountDto;
 import coursemaker.coursemaker.domain.member.dto.AccountUpdateDto;
-import coursemaker.coursemaker.domain.member.entity.Member;
 
 import java.util.List;
 
