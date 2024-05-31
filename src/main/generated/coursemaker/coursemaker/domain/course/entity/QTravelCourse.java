@@ -18,6 +18,8 @@ public class QTravelCourse extends EntityPathBase<TravelCourse> {
 
     private static final long serialVersionUID = -914351763L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QTravelCourse travelCourse = new QTravelCourse("travelCourse");
 
     public final coursemaker.coursemaker.QBaseEntity _super = new coursemaker.coursemaker.QBaseEntity(this);
@@ -26,12 +28,16 @@ public class QTravelCourse extends EntityPathBase<TravelCourse> {
 
     public final ListPath<CourseDestination, QCourseDestination> courseDestinations = this.<CourseDestination, QCourseDestination>createList("courseDestinations", CourseDestination.class, QCourseDestination.class, PathInits.DIRECT2);
 
+    public final ListPath<coursemaker.coursemaker.domain.tag.entity.CourseTag, coursemaker.coursemaker.domain.tag.entity.QCourseTag> courseTags = this.<coursemaker.coursemaker.domain.tag.entity.CourseTag, coursemaker.coursemaker.domain.tag.entity.QCourseTag>createList("courseTags", coursemaker.coursemaker.domain.tag.entity.CourseTag.class, coursemaker.coursemaker.domain.tag.entity.QCourseTag.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Integer> duration = createNumber("duration", Integer.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final coursemaker.coursemaker.domain.member.entity.QMember member;
 
     public final StringPath pictureLink = createString("pictureLink");
 
@@ -47,15 +53,24 @@ public class QTravelCourse extends EntityPathBase<TravelCourse> {
     public final NumberPath<Integer> views = createNumber("views", Integer.class);
 
     public QTravelCourse(String variable) {
-        super(TravelCourse.class, forVariable(variable));
+        this(TravelCourse.class, forVariable(variable), INITS);
     }
 
     public QTravelCourse(Path<? extends TravelCourse> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QTravelCourse(PathMetadata metadata) {
-        super(TravelCourse.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QTravelCourse(PathMetadata metadata, PathInits inits) {
+        this(TravelCourse.class, metadata, inits);
+    }
+
+    public QTravelCourse(Class<? extends TravelCourse> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.member = inits.isInitialized("member") ? new coursemaker.coursemaker.domain.member.entity.QMember(forProperty("member")) : null;
     }
 
 }
