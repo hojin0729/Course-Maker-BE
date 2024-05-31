@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.domain.course.service;
 
+import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
 import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
 import org.junit.jupiter.api.Test;
@@ -26,13 +28,10 @@ import static org.mockito.Mockito.*;
 class CourseServiceImplTest {
 
     @Mock
-    private CourseDestinationRepository courseDestinationRepository;
-
-    @Mock
     private TravelCourseRepository travelCourseRepository;
 
     @Mock
-    private CourseDestinationService courseDestinationService;
+    private CourseDestinationRepository courseDestinationRepository;
 
     @InjectMocks
     private CourseServiceImpl courseService;
@@ -43,109 +42,185 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void testSave() {
+    void save_shouldSaveTravelCourse() {
         AddTravelCourseRequest request = new AddTravelCourseRequest(
-                "Test Title",
-                "Test Content",
+                "Test Course",
+                "This is a test course.",
                 5,
-                3,
+                2,
                 1,
-                "test.jpg",
+                "http://example.com/picture.jpg",
                 new ArrayList<>()
         );
 
-        TravelCourse travelCourse = request.toEntity();
-        when(travelCourseRepository.save(any(TravelCourse.class))).thenReturn(travelCourse);
+        when(travelCourseRepository.findByTitle(anyString())).thenReturn(Optional.empty());
+        when(travelCourseRepository.save(any(TravelCourse.class))).thenReturn(request.toEntity());
 
         TravelCourse savedCourse = courseService.save(request);
 
         assertNotNull(savedCourse);
-        assertEquals("Test Title", savedCourse.getTitle());
+        assertEquals(request.getTitle(), savedCourse.getTitle());
+        verify(travelCourseRepository, times(1)).findByTitle(anyString());
         verify(travelCourseRepository, times(1)).save(any(TravelCourse.class));
     }
 
     @Test
-    void testFindAll() {
+    void save_shouldThrowExceptionWhenDuplicateCourse() {
+        AddTravelCourseRequest request = new AddTravelCourseRequest(
+                "Test Course",
+                "This is a test course.",
+                5,
+                2,
+                1,
+                "http://example.com/picture.jpg",
+                new ArrayList<>()
+        );
+
+        when(travelCourseRepository.findByTitle(anyString())).thenReturn(Optional.of(request.toEntity()));
+
+        assertThrows(TravelCourseDuplicatedException.class, () -> courseService.save(request));
+        verify(travelCourseRepository, times(1)).findByTitle(anyString());
+        verify(travelCourseRepository, never()).save(any(TravelCourse.class));
+    }
+
+    @Test
+    void findAll_shouldReturnAllTravelCourses() {
         List<TravelCourse> travelCourses = new ArrayList<>();
-        travelCourses.add(new TravelCourse("title", "content", 5, 3, 1, "pictureLink"));
+        travelCourses.add(new TravelCourse("Test Course 1", "Content 1", 5, 2, 1, "http://example.com/picture1.jpg"));
+        travelCourses.add(new TravelCourse("Test Course 2", "Content 2", 5, 2, 1, "http://example.com/picture2.jpg"));
+
         when(travelCourseRepository.findAll()).thenReturn(travelCourses);
 
         List<TravelCourse> result = courseService.findAll();
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         verify(travelCourseRepository, times(1)).findAll();
     }
 
     @Test
-    void testGetAllOrderByViewsDesc() {
+    void getAllOrderByViewsDesc_shouldReturnOrderedTravelCourses() {
         List<TravelCourse> travelCourses = new ArrayList<>();
-        travelCourses.add(new TravelCourse("title", "content", 5, 3, 1, "pictureLink"));
-        Page<TravelCourse> page = new PageImpl<>(travelCourses);
+        TravelCourse course1 = new TravelCourse("Test Course 1", "Content 1", 5, 2, 1, "http://example.com/picture1.jpg");
+        TravelCourse course2 = new TravelCourse("Test Course 2", "Content 2", 5, 2, 1, "http://example.com/picture2.jpg");
+        course1.setViews(10);
+        course2.setViews(20);
+        travelCourses.add(course1);
+        travelCourses.add(course2);
         Pageable pageable = PageRequest.of(0, 10);
+        Page<TravelCourse> page = new PageImpl<>(travelCourses, pageable, travelCourses.size());
+
         when(travelCourseRepository.findAllByOrderByViewsDesc(pageable)).thenReturn(page);
 
         Page<TravelCourse> result = courseService.getAllOrderByViewsDesc(pageable);
 
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
+        assertEquals(2, result.getTotalElements());
         verify(travelCourseRepository, times(1)).findAllByOrderByViewsDesc(pageable);
     }
 
     @Test
-    void testFindById() {
-        TravelCourse travelCourse = new TravelCourse("title", "content", 5, 3, 1, "pictureLink");
+    void findById_shouldReturnTravelCourse() {
+        TravelCourse travelCourse = new TravelCourse("Test Course", "Content", 5, 2, 1, "http://example.com/picture.jpg");
+
         when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.of(travelCourse));
 
         TravelCourse result = courseService.findById(1L);
 
         assertNotNull(result);
+        assertEquals(travelCourse.getTitle(), result.getTitle());
         verify(travelCourseRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    void testUpdate() {
-        TravelCourse travelCourse = new TravelCourse("title", "content", 5, 3, 1, "pictureLink");
-        when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.of(travelCourse));
-        when(travelCourseRepository.save(any(TravelCourse.class))).thenReturn(travelCourse);
+    void findById_shouldThrowExceptionWhenCourseNotFound() {
+        when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
+        assertThrows(TravelCourseNotFoundException.class, () -> courseService.findById(1L));
+        verify(travelCourseRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void update_shouldUpdateTravelCourse() {
+        TravelCourse travelCourse = new TravelCourse("Old Title", "Old Content", 5, 2, 1, "http://example.com/old_picture.jpg");
         UpdateTravelCourseRequest request = new UpdateTravelCourseRequest(
-                "Updated Title",
-                "Updated Content",
+                "New Title",
+                "Updated content",
                 10,
-                5,
+                3,
                 2,
-                "updated.jpg",
+                "http://example.com/new_picture.jpg",
                 new ArrayList<>()
         );
 
+        when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.of(travelCourse));
+        when(travelCourseRepository.save(any(TravelCourse.class))).thenReturn(travelCourse);
+
         TravelCourse updatedCourse = courseService.update(1L, request);
 
-        assertNotNull(updatedCourse);
-        assertEquals("Updated Title", updatedCourse.getTitle());
+        assertEquals(request.getTitle(), updatedCourse.getTitle());
         verify(travelCourseRepository, times(1)).findById(anyLong());
         verify(travelCourseRepository, times(1)).save(any(TravelCourse.class));
     }
 
     @Test
-    void testDelete() {
+    void update_shouldThrowExceptionWhenCourseNotFound() {
+        UpdateTravelCourseRequest request = new UpdateTravelCourseRequest(
+                "New Title",
+                "Updated content",
+                10,
+                3,
+                2,
+                "http://example.com/new_picture.jpg",
+                new ArrayList<>()
+        );
+
+        when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(TravelCourseNotFoundException.class, () -> courseService.update(1L, request));
+        verify(travelCourseRepository, times(1)).findById(anyLong());
+        verify(travelCourseRepository, never()).save(any(TravelCourse.class));
+    }
+
+    @Test
+    void delete_shouldDeleteTravelCourse() {
+        when(travelCourseRepository.existsById(anyLong())).thenReturn(true);
         doNothing().when(travelCourseRepository).deleteById(anyLong());
 
         courseService.delete(1L);
 
+        verify(travelCourseRepository, times(1)).existsById(anyLong());
         verify(travelCourseRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
-    void testIncrementViews() {
-        TravelCourse travelCourse = new TravelCourse("title", "content", 5, 3, 1, "pictureLink");
+    void delete_shouldThrowExceptionWhenCourseNotFound() {
+        when(travelCourseRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrows(TravelCourseNotFoundException.class, () -> courseService.delete(1L));
+        verify(travelCourseRepository, times(1)).existsById(anyLong());
+        verify(travelCourseRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void incrementViews_shouldIncrementViews() {
+        TravelCourse travelCourse = new TravelCourse("Test Course", "Content", 5, 2, 1, "http://example.com/picture.jpg");
+        travelCourse.setViews(5);
+
         when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.of(travelCourse));
         when(travelCourseRepository.save(any(TravelCourse.class))).thenReturn(travelCourse);
 
-        TravelCourse result = courseService.incrementViews(1L);
+        TravelCourse updatedCourse = courseService.incrementViews(1L);
 
-        assertNotNull(result);
+        assertEquals(6, updatedCourse.getViews());
         verify(travelCourseRepository, times(1)).findById(anyLong());
         verify(travelCourseRepository, times(1)).save(any(TravelCourse.class));
+    }
+
+    @Test
+    void incrementViews_shouldThrowExceptionWhenCourseNotFound() {
+        when(travelCourseRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(TravelCourseNotFoundException.class, () -> courseService.incrementViews(1L));
+        verify(travelCourseRepository, times(1)).findById(anyLong());
+        verify(travelCourseRepository, never()).save(any(TravelCourse.class));
     }
 }
