@@ -25,6 +25,7 @@ public class DestinationDto {
     // DestinationDto를 Destination 엔티티로 변환하는 메서드
     public static Destination toEntity(DestinationDto dto) {
         Destination destination = new Destination();
+        destination.setId(dto.getId());
         destination.setName(dto.getName());
         destination.setPictureLink(dto.getPictureLink());
         destination.setContent(dto.getContent());

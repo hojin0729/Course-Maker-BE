@@ -24,9 +24,6 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public Destination save(Destination destination) {
-        if (destinationRepository.existsById(destination.getId())) {
-            throw new DestinationDuplicatedException("해당 여행지가 이미 존재합니다.", "Destination id: " + destination.getId());
-        }
         // 여행지 엔티티를 저장
         return destinationRepository.save(destination);
     }
