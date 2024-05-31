@@ -104,7 +104,7 @@ public class DestinationController {
     /*********스웨거 어노테이션**********/
     // 여행지를 새로 생성함.
     @PostMapping
-    public ResponseEntity<Void> createDestination(@RequestBody DestinationDto request) {
+    public ResponseEntity<DestinationDto> createDestination(@RequestBody DestinationDto request) {
         Destination destination = DestinationDto.toEntity(request);
         Destination savedDestination = destinationService.save(destination);
 
@@ -113,13 +113,11 @@ public class DestinationController {
                     .stream()
                     .map(TagResponseDto::getId)
                     .toList();
-            for (Long tagId : tagIds) {
-                System.out.println("tagId = " + tagId);
-            }
             tagService.addTagsByDestination(savedDestination.getId(), tagIds);
         }
 
-        return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).build();
+        DestinationDto response = DestinationDto.toDto(savedDestination, request.getTags());
+        return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
 
 
