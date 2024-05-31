@@ -37,9 +37,9 @@ public class Destination extends BaseEntity {
     @Column(name = "location", length = 50)
     private String location;
 
-    @Column(name = "longitude", precision = 15, scale = 13)
+    @Column(name = "longitude", precision = 15, scale = 12)
     private BigDecimal longitude;
 
-    @Column(name = "latitude", precision = 15, scale = 13)
+    @Column(name = "latitude", precision = 15, scale = 12)
     private BigDecimal latitude;
 }

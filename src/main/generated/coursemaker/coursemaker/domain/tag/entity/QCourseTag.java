@@ -46,7 +46,7 @@ public class QCourseTag extends EntityPathBase<CourseTag> {
 
     public QCourseTag(Class<? extends CourseTag> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.course = inits.isInitialized("course") ? new coursemaker.coursemaker.domain.course.entity.QTravelCourse(forProperty("course")) : null;
+        this.course = inits.isInitialized("course") ? new coursemaker.coursemaker.domain.course.entity.QTravelCourse(forProperty("course"), inits.get("course")) : null;
         this.tag = inits.isInitialized("tag") ? new QTag(forProperty("tag")) : null;
     }
 
