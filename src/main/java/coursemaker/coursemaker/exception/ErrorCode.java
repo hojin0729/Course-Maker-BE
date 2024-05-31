@@ -12,6 +12,7 @@ public enum ErrorCode {
     /*Destination 도메인 예외*/
     INVALID_DESTINATION(HttpStatus.NOT_FOUND, "해당하는 여행지가 없습니다.", "DEST-001"),
     DUPLICATED_DESTINATION(HttpStatus.CONFLICT, "해당 여행지가 이미 존재합니다.", "DEST-002"),
+    PICTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 사진이 없습니다.", "PICTURE-001"),
 
     /*Course 도메인 예외*/
     INVALID_COURSE(HttpStatus.NOT_FOUND, "해당하는 코스가 없습니다.", "COURSE-001"),
