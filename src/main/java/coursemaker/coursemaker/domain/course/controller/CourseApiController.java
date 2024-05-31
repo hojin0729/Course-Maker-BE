@@ -6,12 +6,8 @@ import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
-import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 
-import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
-import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -21,7 +17,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +32,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v1/courses")
 public class CourseApiController {
-
 
     private final CourseService courseService;
 
