@@ -1,11 +1,17 @@
 package coursemaker.coursemaker.domain.course.controller;
 
+import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.tag.entity.Tag;
+import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 
+import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -24,14 +30,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/courses")
+@RequestMapping("/v1/courses")
 public class CourseApiController {
 
-    @Autowired
+
     private final CourseService courseService;
+
+    private final CourseDestinationService courseDestinationService;
 
     // POST
     /*********스웨거 어노테이션**********/
@@ -55,7 +65,7 @@ public class CourseApiController {
 
         return (savedTravelCourse != null) ?
                 // ResponseEntity.status(HttpStatus.CREATED).body(savedTravelCourse) :
-                ResponseEntity.created(URI.create("/courses/" + savedTravelCourse.getId())).build() :
+                ResponseEntity.created(URI.create("/v1/courses/" + savedTravelCourse.getId())).build() :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -80,7 +90,12 @@ public class CourseApiController {
                                                                           @RequestParam(defaultValue = "1", name = "page") int page) {
         Pageable pageable = PageRequest.of(page-1, record);
         Page<TravelCourse> travelCourses = courseService.getAllOrderByViewsDesc(pageable);
-        Page<TravelCourseResponse> response = travelCourses.map(TravelCourseResponse::new);
+        Page<TravelCourseResponse> response = travelCourses.map(travelCourse -> {
+            List<CourseDestinationResponse> courseDestinationResponses = travelCourse.getCourseDestinations().stream()
+                    .map(courseDestinationService::toResponse)
+                    .collect(Collectors.toList());
+            return new TravelCourseResponse(travelCourse, courseDestinationResponses);
+        });
         return ResponseEntity.ok(response);
     }
 
@@ -98,7 +113,10 @@ public class CourseApiController {
     public ResponseEntity<TravelCourseResponse> findTravelCourseById(@PathVariable long id) {
         TravelCourse travelCourse = courseService.findById(id);
         travelCourse = courseService.incrementViews(id);
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse));
+        List<CourseDestinationResponse> courseDestinationResponses = travelCourse.getCourseDestinations().stream()
+                .map(courseDestinationService::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses));
     }
 
     // PUT

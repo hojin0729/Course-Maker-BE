@@ -21,7 +21,7 @@ public class TravelCourseResponse {
     private final List<TagResponseDto> courseTags;
     private final CourseMemberResponse member;
 
-    public TravelCourseResponse(TravelCourse travelCourse) {
+    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses) {
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
         this.views = travelCourse.getViews();
@@ -30,9 +30,7 @@ public class TravelCourseResponse {
         this.travelType = travelCourse.getTravelType();
         this.pictureLink = travelCourse.getPictureLink();
         this.member = new CourseMemberResponse(travelCourse.getMember());
-        this.courseDestinations = travelCourse.getCourseDestinations().stream()
-                .map(CourseDestinationResponse::new)
-                .collect(Collectors.toList());
+        this.courseDestinations = courseDestinationResponses;
         this.courseTags = travelCourse.getCourseTags().stream()
                 .map(courseTag -> {
                     TagResponseDto tagResponseDto = new TagResponseDto();
@@ -42,6 +40,5 @@ public class TravelCourseResponse {
                     return tagResponseDto;
                 })
                 .collect(Collectors.toList());
-
     }
 }
