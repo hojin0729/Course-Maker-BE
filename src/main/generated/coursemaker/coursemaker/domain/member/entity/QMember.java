@@ -30,7 +30,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-
     public final EnumPath<Member.LoginType> loginType = createEnum("loginType", Member.LoginType.class);
 
     public final StringPath name = createString("name");
