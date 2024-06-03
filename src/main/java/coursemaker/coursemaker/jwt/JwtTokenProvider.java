@@ -20,7 +20,7 @@ public class JwtTokenProvider {
     private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
 
-    @Value("${key.salt}")
+    @Value("${spring.jwt.salt}")
     private String salt;
     private Key secretKey;
 
