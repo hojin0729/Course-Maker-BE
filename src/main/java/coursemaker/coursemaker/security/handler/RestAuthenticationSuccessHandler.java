@@ -1,7 +1,6 @@
 package coursemaker.coursemaker.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import coursemaker.coursemaker.domain.member.dto.AccountDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;

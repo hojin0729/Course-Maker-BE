@@ -1,7 +1,6 @@
 package coursemaker.coursemaker.security.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import coursemaker.coursemaker.domain.member.dto.AccountDto;
 import coursemaker.coursemaker.security.token.RestAuthenticationToken;
 import coursemaker.coursemaker.util.WebUtil;
 import jakarta.servlet.http.HttpServletRequest;

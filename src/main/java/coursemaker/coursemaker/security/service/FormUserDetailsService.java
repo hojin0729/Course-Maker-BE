@@ -1,7 +1,5 @@
 package coursemaker.coursemaker.security.service;
 
-import coursemaker.coursemaker.domain.member.dto.AccountContext;
-import coursemaker.coursemaker.domain.member.dto.AccountDto;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

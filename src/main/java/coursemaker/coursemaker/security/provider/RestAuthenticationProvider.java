@@ -1,6 +1,5 @@
 package coursemaker.coursemaker.security.provider;
 
-import coursemaker.coursemaker.domain.member.dto.AccountContext;
 import coursemaker.coursemaker.security.token.RestAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
