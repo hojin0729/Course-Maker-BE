@@ -24,7 +24,7 @@ import java.util.HashMap;
 @Component
 @Getter
 public class KakaoOauth {
-    @Value("${kakao.api_key}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoApiKey;
 
     private final String kakaoLoginRedirectUri = "http://localhost:8080/login/oauth2/code/kakao";
