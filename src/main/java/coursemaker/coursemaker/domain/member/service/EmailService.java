@@ -16,7 +16,7 @@ import java.util.Random;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-class EmailService {
+public class EmailService {
     // private final RedisUtil redisUtil; // TODO: Redis 추가 후 주석 해제
     private final JavaMailSender javaMailSender;
     private final MemberRepository memberRepository;

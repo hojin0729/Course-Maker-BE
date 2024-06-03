@@ -1,11 +1,15 @@
 package coursemaker.coursemaker.domain.member.controller;
 
+import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.service.EmailService;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Member", description = "Member API")
 @RestController
 @RequestMapping("/v1/member")
+@RequiredArgsConstructor
 @Slf4j
 public class MemberApiController {
     private final MemberService memberService;
+    private final EmailService emailService;
 
-    public MemberApiController(MemberService memberService) {
-        this.memberService = memberService;
-    }
 
     @Operation(summary = "Create User API", description = "기본 회원가입 후 유저를 생성한다.")
     @PostMapping
@@ -58,14 +61,14 @@ public class MemberApiController {
     @Operation(summary = "User MyPage API", description = "마이페이지에 필요한 정보를 조회한다.")
     @GetMapping(value = "/my-page")
     public ResponseEntity<MyPageResponse> showMyPage(@Valid @RequestParam("userId") Long userId) {
-        MyPageResponse myPageResponse = userService.showMyPage(userId);
+        MyPageResponse myPageResponse = memberService.showMyPage(userId);
         return ResponseEntity.ok(myPageResponse);
     }
 
     @Operation(summary = "Validate Nickname", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
     @PostMapping(value = "/validate-nickname")
     public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
-        ValidateNicknameResponse validateNicknameResponse = userService.isValid(validateNicknameRequest);
+        ValidateNicknameResponse validateNicknameResponse = memberService.isValid(validateNicknameRequest);
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
