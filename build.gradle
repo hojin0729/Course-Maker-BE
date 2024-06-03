@@ -27,6 +27,7 @@ dependencies {
 	// Security
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
@@ -47,15 +48,20 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 
 	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
 
 	// S3
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.152'
 
 	//이메일인증
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.6.3'
+	implementation 'com.sun.mail:jakarta.mail:2.0.1'
+
 
 	//임시
 	implementation 'org.modelmapper:modelmapper:3.1.0'//객체 간의 필드 매핑을 자동으로 처리
