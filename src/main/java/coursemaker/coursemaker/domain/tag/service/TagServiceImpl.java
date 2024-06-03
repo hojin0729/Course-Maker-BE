@@ -13,6 +13,7 @@ import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.QDestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
+import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.repository.CourseTagRepository;
@@ -55,9 +56,12 @@ public class TagServiceImpl implements TagService{
     public Tag createTag(Tag tag){
 
         /*태그의 이름은 고유해야 한다.*/
-        if(tagRepository.findByname(tag.getName()).isPresent())
-        {
+        if(tagRepository.findByname(tag.getName()).isPresent()) {
             throw new TagDuplicatedException("이미 존재하는 태그입니다.", "tag name: " + tag.getName() );
+        }
+
+        if(tag.getDescription() == null || tag.getDescription().isEmpty()) {
+            throw new IllegalTagArgumentException("태그에 대한 설명이 없습니다.", "tag name: " + tag.getName() );
         }
 
         return tagRepository.save(tag);
@@ -96,6 +100,10 @@ public class TagServiceImpl implements TagService{
             throw new TagDuplicatedException("이미 존재하는 태그 이름입니다.", "tag name: " + tag.getName() );
         }
 
+        /*태그 설명 존재여부 확인*/
+        if(tag.getDescription() == null || tag.getDescription().isEmpty()) {
+            throw new IllegalTagArgumentException("태그에 대한 설명이 없습니다.", "tag name: " + tag.getName() );
+        }
 
         return tagRepository.save(tag);
     }
@@ -103,6 +111,10 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public void deleteById(Long id){
+        /*삭제할 태그가 존재하는지 확인*/
+        tagRepository.findById(id).orElseThrow(() ->
+                new TagNotFoundException("삭제할 태그가 존재하지 않습니다.", "tag id: " + id ));
+
         /*태그와 연결된 여행지, 코스 연관관계 삭제*/
         courseTagRepository.deleteAllByTagId(id);
         destinationTagRepository.deleteAllByTagId(id);
@@ -117,7 +129,7 @@ public class TagServiceImpl implements TagService{
     public void addTagsByCourse(Long courseId, List<Long> tagIds){
 
         if(tagIds == null || tagIds.isEmpty()){
-            throw new IllegalArgumentException("추가할 태그가 없습니다.");
+            throw new IllegalTagArgumentException("코스에 추가할 태그가 없습니다.", "course id: " + courseId );
         }
 
         // TODO: 쿼리 최적화
@@ -161,7 +173,7 @@ public class TagServiceImpl implements TagService{
         for (Long tagId : tagIds) {
             CourseTag courseTag = new CourseTag();
             Tag tag = tagRepository.findById(tagId).orElseThrow(() ->
-                    new TagNotFoundException("추가할 태그가 존재하지 않습니다.",
+                    new TagNotFoundException("해당 태그가 존재하지 않습니다.",
                             "tag id: " + tagId ));
 
             if(courseTagRepository.findByCourseIdAndTagId(courseId, tagId).isEmpty()){
@@ -189,8 +201,12 @@ public class TagServiceImpl implements TagService{
     @Override
     public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
-        if(tagIds == null){
-            throw new IllegalArgumentException("태그가 없습니다.");
+        /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
+        if(tagIds == null || tagIds.isEmpty()){
+            tagIds = tagRepository.findAll()
+                    .stream()
+                    .map(Tag::getId)
+                    .collect(Collectors.toList());
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
@@ -234,8 +250,8 @@ public class TagServiceImpl implements TagService{
     @Override
     public void deleteTagByCourse(Long courseId, List<Tag> tags){
 
-        if(tags.isEmpty()){
-            throw new RuntimeException("태그가 없습니다.");
+        if(tags==null || tags.isEmpty()){
+            throw new IllegalTagArgumentException("코스에서 삭제할 태그가 없습니다.", "course id: " + courseId );
         }
 
         // 코스에 태그들 삭제
@@ -257,8 +273,8 @@ public class TagServiceImpl implements TagService{
     @Override
     public void addTagsByDestination(Long destinationId, List<Long> tagIds){
 
-        if(tagIds == null){
-            throw new IllegalArgumentException("태그가 없습니다.");
+        if(tagIds == null || tagIds.isEmpty()){
+            throw new IllegalTagArgumentException("여행지에 추가할 태그가 없습니다.", "destination id: " + destinationId );
         }
 
         // TODO: 쿼리 최적화
@@ -300,7 +316,7 @@ public class TagServiceImpl implements TagService{
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
             DestinationTag destinationTag = new DestinationTag();
-            Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new RuntimeException("태그가 없습니다."));
+            Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag id: " + tagId ));
 
             if(destinationTagRepository.findByDestinationIdAndTagId(destinationId, tagId).isEmpty()){// JOIN 걸어서 하기
                 destinationTag.setTag(tag);
@@ -328,8 +344,12 @@ public class TagServiceImpl implements TagService{
     @Override
     public List<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy) {
 
-        if(tagIds == null ||tagIds.isEmpty()){
-            throw new RuntimeException("태그가 없습니다.");
+        /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
+        if(tagIds == null || tagIds.isEmpty()){
+            tagIds = tagRepository.findAll()
+                    .stream()
+                    .map(Tag::getId)
+                    .collect(Collectors.toList());
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
@@ -374,7 +394,7 @@ public class TagServiceImpl implements TagService{
     public void deleteTagByDestination(Long destinationId, List<Tag> tags){
 
         if(tags==null || tags.isEmpty()){
-            throw new IllegalArgumentException("태그가 없습니다.");
+            throw new IllegalTagArgumentException("삭제할 태그가 없습니다.", "destination id: " + destinationId );
         }
 
         queryFactory
