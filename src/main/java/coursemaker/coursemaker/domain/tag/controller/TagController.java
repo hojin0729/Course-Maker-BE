@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.tag.controller;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
+import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
@@ -43,6 +44,9 @@ public class TagController {
             responseCode = "201", description = "헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."
     )
     @ApiResponse(
+            responseCode = "400", description = "생성하려는 태그의 인자값이 올바르지 않을때 반환합니다.", content = @Content
+    )
+    @ApiResponse(
             responseCode = "409", description = "생성하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content
     )
     @PostMapping
@@ -57,6 +61,9 @@ public class TagController {
     @Operation(summary = "태그 수정")
     @ApiResponse(
             responseCode = "200", description = "태그가 제대로 변경됩니다."
+    )
+    @ApiResponse(
+            responseCode = "400", description = "수정하려는 태그의 인자값이 올바르지 않을때 반환합니다.", content = @Content
     )
     @ApiResponse(
             responseCode = "404", description = "수정하려는 태그의 id를 찾지 못할때 반환합니다.", content = @Content
@@ -81,6 +88,9 @@ public class TagController {
     @ApiResponse(
             responseCode = "200", description = "태그가 제대로 삭제됩니다."
     )
+    @ApiResponse(
+            responseCode = "404", description = "삭제하려는 태그의 id를 찾지 못할때 반환합니다.", content = @Content
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable(name = "id") Long id) {
         tagService.deleteById(id);
@@ -99,6 +109,13 @@ public class TagController {
     public ResponseEntity<String> handleTagNotFoundException(TagNotFoundException e) {
         return ResponseEntity
                 .status(ErrorCode.INVALID_TAG.getStatus())
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalTagArgumentException.class)
+    public ResponseEntity<String> handleIllegalTagArgumentException(IllegalTagArgumentException e) {
+        return ResponseEntity
+                .status(ErrorCode.ILLEGAL_TAG_ARGUMENT.getStatus())
                 .body(e.getMessage());
     }
 
