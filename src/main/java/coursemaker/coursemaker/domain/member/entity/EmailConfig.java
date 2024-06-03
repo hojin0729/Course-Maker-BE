@@ -15,10 +15,10 @@ public class EmailConfig {
 
     private int port = 587;
 
-    @Value("${mail.google.username}")
+    @Value("${mail.username}")
     private String username;
 
-    @Value("${mail.google.password}")
+    @Value("${mail.password}")
     private String password;
 
     private boolean auth = true;
