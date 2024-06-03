@@ -50,8 +50,8 @@ public class QCourseDestination extends EntityPathBase<CourseDestination> {
 
     public QCourseDestination(Class<? extends CourseDestination> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.destination = inits.isInitialized("destination") ? new coursemaker.coursemaker.domain.destination.entity.QDestination(forProperty("destination")) : null;
-        this.travelCourse = inits.isInitialized("travelCourse") ? new QTravelCourse(forProperty("travelCourse")) : null;
+        this.destination = inits.isInitialized("destination") ? new coursemaker.coursemaker.domain.destination.entity.QDestination(forProperty("destination"), inits.get("destination")) : null;
+        this.travelCourse = inits.isInitialized("travelCourse") ? new QTravelCourse(forProperty("travelCourse"), inits.get("travelCourse")) : null;
     }
 
 }
