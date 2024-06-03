@@ -1,7 +1,7 @@
 package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.ValidateEmailResponse;
-import coursemaker.coursemaker.domain.member.entity.EmailConfig;
+import coursemaker.coursemaker.config.EmailConfig;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
