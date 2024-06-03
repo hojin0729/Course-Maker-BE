@@ -1,4 +1,5 @@
 package coursemaker.coursemaker.security.provider;
+
 import coursemaker.coursemaker.domain.member.dto.AccountContext;
 import coursemaker.coursemaker.security.details.FormWebAuthenticationDetails;
 import coursemaker.coursemaker.security.exception.SecretException;

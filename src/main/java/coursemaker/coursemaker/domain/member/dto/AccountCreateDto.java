@@ -2,8 +2,10 @@ package coursemaker.coursemaker.domain.member.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountCreateDto {
     private String username;
     private String name;

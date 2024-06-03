@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 //커스텀 순서 AF -> AM -> AP -> US
 @Service("userDetailsService")
 @RequiredArgsConstructor

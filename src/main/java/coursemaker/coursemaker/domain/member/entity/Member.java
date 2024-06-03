@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.member.entity;
 
+import coursemaker.coursemaker.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +30,7 @@ public class Member implements Serializable {
     @Column(nullable = false)
     private String nickname; // 회원 닉네임
 
-    @Column(nullable = false, length = 15)
+    @Column(nullable = true, length = 15)
     private String phoneNumber; // 회원 전화번호
 
     @Column(nullable = false)
