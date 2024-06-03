@@ -29,6 +29,15 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
+    public Destination update(Destination destination) {
+        // 여행지 엔티티를 업데이트
+        if (!destinationRepository.existsById(destination.getId())) {
+            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destination.getId());
+        }
+        return destinationRepository.save(destination);
+    }
+
+    @Override
     public Destination findById(Long id) {
         // ID로 여행지를 찾고, 없으면 예외처리
         return destinationRepository.findById(id)
