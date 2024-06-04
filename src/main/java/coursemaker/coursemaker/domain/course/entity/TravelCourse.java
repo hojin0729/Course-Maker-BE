@@ -52,7 +52,7 @@ public class TravelCourse extends BaseEntity {
     private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
-    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {
+    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member) {
         this.title = title;
         this.content = content;
         this.views = 0;
@@ -60,6 +60,7 @@ public class TravelCourse extends BaseEntity {
         this.travelerCount = travelerCount;
         this.travelType = travelType;
         this.pictureLink = pictureLink;
+        this.member = member;
     }
 
     public void update(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {

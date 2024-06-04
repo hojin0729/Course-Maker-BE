@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.course.service;
 
 import coursemaker.coursemaker.domain.course.dto.*;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
+import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
@@ -39,9 +40,42 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public TravelCourse save(AddTravelCourseRequest request) {
         Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
+        if (request.getTitle() == null || request.getTitle().isEmpty()) {
+            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "");
+        }
+
         if (existingCourse.isPresent()) {
             throw new TravelCourseDuplicatedException("이미 존재하는 코스입니다. ", "코스 이름: " + request.getTitle());
         }
+
+        if (request.getContent() == null || request.getContent().isEmpty()) {
+            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "");
+        }
+
+        if (request.getDuration() == null || request.getDuration() == 0) {
+            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "");
+        }
+
+        if (request.getDuration() > 3) {
+            throw new IllegalTravelCourseArgumentException("여행 기간은 최대 3일입니다.", "");
+        }
+
+        if (request.getTravelerCount() == null || request.getTravelerCount() == 0) {
+            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "");
+        }
+
+        if (request.getTravelType() == null) {
+            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "");
+        }
+
+        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
+            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "");
+        }
+
+        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
+            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "");
+        }
+
         return travelCourseRepository.save(request.toEntity());
     }
 
@@ -84,37 +118,4 @@ public class CourseServiceImpl implements CourseService{
         travelCourse.incrementViews();
         return travelCourseRepository.save(travelCourse);
     }
-
-//    @Override
-//    public List<CourseDestinationResponse> findAllCourseDestinations() {
-//        return courseDestinationRepository.findAll().stream()
-//                .map(courseDestinationService::toResponse)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    public CourseDestinationResponse findCourseDestinationById(long id) {
-//        CourseDestination courseDestination = courseDestinationRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
-//        return courseDestinationService.toResponse(courseDestination);
-//    }
-//
-//    @Override
-//    public CourseDestination addCourseDestination(AddCourseDestinationRequest request) {
-//        CourseDestination courseDestination = request.toEntity();
-//        return courseDestinationRepository.save(courseDestination);
-//    }
-//
-//    @Override
-//    public CourseDestination updateCourseDestination(long id, UpdateCourseDestinationRequest request) {
-//        CourseDestination courseDestination = courseDestinationRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("Course destination not found with id: " + id));
-//        courseDestination.update(request.getVisitOrder(), request.getDate(), request.getDestination());
-//        return courseDestinationRepository.save(courseDestination);
-//    }
-//
-//    @Override
-//    public void deleteCourseDestination(long id) {
-//        courseDestinationRepository.deleteById(id);
-//    }
 }

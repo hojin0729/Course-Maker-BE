@@ -5,14 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
+@Data
 public class UpdateTravelCourseRequest {
     @NotBlank(message = "Title is mandatory")
     private String title;
@@ -21,13 +20,13 @@ public class UpdateTravelCourseRequest {
     private String content;
 
     @Min(value = 1, message = "Duration should not be less than 1")
-    private int duration;
+    private Integer duration;
 
     @Min(value = 1, message = "Traveler count should not be less than 1")
-    private int travelerCount;
+    private Integer travelerCount;
 
     @Min(value = 0, message = "Travel type should not be negative")
-    private int travelType;
+    private Integer travelType;
 
     @NotBlank(message = "Picture link is mandatory")
     private String pictureLink;

@@ -2,20 +2,22 @@ package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
+@Data
 public class TravelCourseResponse {
 
     private final String title;
     private final String content;
-    private final int views;
-    private final int duration;
-    private final int travelerCount;
-    private final int travelType;
+    private final Integer views;
+    private final Integer duration;
+    private final Integer travelerCount;
+    private final Integer travelType;
     private final String pictureLink;
     private final List<CourseDestinationResponse> courseDestinations;
     private final List<TagResponseDto> courseTags;
