@@ -1,4 +1,4 @@
-package coursemaker.coursemaker.domain.member.entity;
+package coursemaker.coursemaker.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +36,7 @@ public class EmailConfig {
     @Bean
     public JavaMailSender mailSender() { // Java MailSender 인터페이스를 구현한 객체를 빈으로 등록한다
 
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl(); // Java MailSender 구현체를 생성 및 정의하낟
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl(); // Java MailSender 구현체를 생성 및 정의한다
         mailSender.setHost(host);
         mailSender.setPort(port);
         mailSender.setUsername(username);

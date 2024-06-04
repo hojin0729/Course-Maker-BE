@@ -23,7 +23,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true)
     private String username; // 회원 id
 
     @Column(name = "name", columnDefinition = "VARCHAR(10)")
@@ -41,7 +41,7 @@ public class Member extends BaseEntity {
     @Column(name = "password", columnDefinition = "VARCHAR(100)")
     private String password; // 회원 비밀번호
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'ROLE_USER'")
     private String roles; // 회원 등급
 
     @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
@@ -60,7 +60,7 @@ public class Member extends BaseEntity {
     }
 
     @Builder(builderMethodName = "addMemberBuilder")
-    public Member(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl, String profileDescription) {
+    public Member(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl, String profileDescription, String roles) {
         this.email = email;
         this.loginType = loginType;
         this.name = name;
@@ -68,5 +68,6 @@ public class Member extends BaseEntity {
         this.password = password;
         this.profileImgUrl = profileImgUrl;
         this.profileDescription = profileDescription;
+        this.roles = roles != null ? roles : "ROLE_USER";
     }
 }

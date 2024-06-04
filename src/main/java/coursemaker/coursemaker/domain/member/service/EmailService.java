@@ -1,7 +1,7 @@
 package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.ValidateEmailResponse;
-import coursemaker.coursemaker.domain.member.entity.EmailConfig;
+import coursemaker.coursemaker.config.EmailConfig;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
@@ -54,9 +54,9 @@ public class EmailService {
 
     public ValidateEmailResponse sendValidateSignupMail(String toEmail) throws MessagingException {
         String authCode = generateAuthCode();
-        String title = "UStory 회원가입 인증코드입니다.";
+        String title = "CourseMaker 회원가입 인증코드입니다.";
         String content =
-                "Ustory에 방문해주셔서 감사합니다.<br><br>"
+                "CourseMaker 방문해주셔서 감사합니다.<br><br>"
                         + "인증 코드는 <code>" + authCode + "</code>입니다.<br>"
                         + "인증 코드를 바르게 입력해주세요."
                 ;
