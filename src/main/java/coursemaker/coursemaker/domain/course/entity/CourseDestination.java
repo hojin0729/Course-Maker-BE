@@ -7,7 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CourseDestination {
 
     @Id
@@ -25,7 +25,7 @@ public class CourseDestination {
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "destinationId")
     private Destination destination;
 

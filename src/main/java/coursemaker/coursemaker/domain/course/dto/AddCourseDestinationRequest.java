@@ -10,13 +10,7 @@ public class AddCourseDestinationRequest {
 
     private Short visitOrder;
     private Short date;
-    private Destination destination;
+    private DestinationDto destination;
 
-    public CourseDestination toEntity() {
-        return CourseDestination.builder()
-                .visitOrder(visitOrder)
-                .date(date)
-                .destination(destination)
-                .build();
-    }
+
 }

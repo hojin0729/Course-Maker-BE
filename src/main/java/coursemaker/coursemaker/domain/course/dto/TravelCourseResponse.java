@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Data
 public class TravelCourseResponse {
 
+    private Long id;
     private final String title;
     private final String content;
     private final Integer views;
@@ -24,6 +25,7 @@ public class TravelCourseResponse {
     private final CourseMemberResponse member;
 
     public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses) {
+        this.id = travelCourse.getId();
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
         this.views = travelCourse.getViews();
