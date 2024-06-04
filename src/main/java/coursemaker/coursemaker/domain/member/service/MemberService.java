@@ -32,13 +32,14 @@ public class MemberService {
     public Member signUp(SignUpRequest signUpRequest) {
 
         String email = signUpRequest.getEmail();
-        Member.LoginType loginType = Member.LoginType.BASIC;
+        Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
         String rawPassword = signUpRequest.getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
         String profileImg = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
+        String roles = "ROLE_USER"; // 기본값
 
         Member builtUser = Member.addMemberBuilder()
                 .email(email)
@@ -48,6 +49,7 @@ public class MemberService {
                 .password(encodedPassword)
                 .profileImgUrl(profileImg)
                 .profileDescription(profileDescription)
+                .roles(roles)
                 .build();
 
         Member newUser = memberRepository.save(builtUser);
