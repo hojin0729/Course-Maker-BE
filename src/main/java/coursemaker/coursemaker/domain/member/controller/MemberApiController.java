@@ -71,6 +71,13 @@ public class MemberApiController {
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
+    @Operation(summary = "이메일 중복 확인", description = "회원가입 및 회원정보 수정 시, 이메일 중복 여부를 검증한다.")
+    @PostMapping(value = "/validate-email")
+    public ResponseEntity<ValidateEmailResponse> validateEmail(@Valid @RequestBody ValidateEmailRequest validateEmailRequest) {
+        ValidateEmailResponse validateEmailResponse = memberService.isEmailValid(validateEmailRequest);
+        return ResponseEntity.ok(validateEmailResponse);
+    }
+
     @Operation(summary = "이메일 검증", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
     @PostMapping("/send-validate")
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
