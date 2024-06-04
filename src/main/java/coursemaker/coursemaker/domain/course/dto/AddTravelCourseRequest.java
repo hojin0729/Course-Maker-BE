@@ -1,13 +1,11 @@
 package coursemaker.coursemaker.domain.course.dto;
 
 
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import jakarta.validation.constraints.*;
 import lombok.*;
-
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.member.entity.Member;
-
 import java.util.List;
+
 
 @Data
 public class AddTravelCourseRequest {
@@ -32,22 +30,9 @@ public class AddTravelCourseRequest {
     private List<AddCourseDestinationRequest> courseDestinations;
 
     @NotNull(message = "Member is mandatory")
-    private Member member;
+    private String nickname;// 유저 닉네임
+    
+    // 태그를 빼먹어여?! 대가리 박고있죠ㅇㅇ
+    private List<TagResponseDto> tags;
 
-    public TravelCourse toEntity() {
-        TravelCourse travelCourse = TravelCourse.builder()
-                .title(title)
-                .content(content)
-                .duration(duration)
-                .travelerCount(travelerCount)
-                .travelType(travelType)
-                .pictureLink(pictureLink)
-                .member(member)
-                .build();
-
-        for (AddCourseDestinationRequest courseDestination : courseDestinations) {
-            travelCourse.addCourseDestination(courseDestination.toEntity());
-        }
-        return travelCourse;
-    }
 }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class TravelCourse extends BaseEntity {
 
     @Id
@@ -45,8 +45,8 @@ public class TravelCourse extends BaseEntity {
     @JoinColumn(name = "memberId")
     private Member member;
 
-    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseDestination> courseDestinations = new ArrayList<>();
+//    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<CourseDestination> courseDestinations = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseTag> courseTags = new ArrayList<>();
@@ -72,15 +72,15 @@ public class TravelCourse extends BaseEntity {
         this.pictureLink = pictureLink;
     }
 
-    public void addCourseDestination(CourseDestination courseDestination) {
-        courseDestinations.add(courseDestination);
-        courseDestination.setTravelCourse(this);
-    }
-
-    public void updateCourseDestination(CourseDestination courseDestination) {
-        courseDestinations.add(courseDestination);
-        courseDestination.setTravelCourse(this);
-    }
+//    public void addCourseDestination(CourseDestination courseDestination) {
+//        courseDestinations.add(courseDestination);
+//        courseDestination.setTravelCourse(this);
+//    }
+//
+//    public void updateCourseDestination(CourseDestination courseDestination) {
+//        courseDestinations.add(courseDestination);
+//        courseDestination.setTravelCourse(this);
+//    }
 
     public void incrementViews() {
         this.views++;

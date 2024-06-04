@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,15 +55,14 @@ public class CourseApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201",
                     description = "코스 등록 성공, 헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식")
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content)
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<TravelCourse> createTravelCourse(@RequestBody AddTravelCourseRequest request) {
+    public ResponseEntity<Void> createTravelCourse(@RequestBody AddTravelCourseRequest request) {
         TravelCourse savedTravelCourse = courseService.save(request);
 
         return (savedTravelCourse != null) ?
-                // ResponseEntity.status(HttpStatus.CREATED).body(savedTravelCourse) :
                 ResponseEntity.created(URI.create("/v1/courses/" + savedTravelCourse.getId())).build() :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
@@ -74,8 +74,8 @@ public class CourseApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
     })
     @Parameters({
             @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", schema = @Schema(type = "integer", defaultValue = "0")),
@@ -83,16 +83,25 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @GetMapping
-    public ResponseEntity<Page<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") int record,
-                                                                          @RequestParam(defaultValue = "1", name = "page") int page) {
+    public ResponseEntity<List<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                          @RequestParam(defaultValue = "1", name = "page") Integer page) {
+        List<TravelCourseResponse> response = new ArrayList<>();
+
         Pageable pageable = PageRequest.of(page-1, record);
-        Page<TravelCourse> travelCourses = courseService.getAllOrderByViewsDesc(pageable);
-        Page<TravelCourseResponse> response = travelCourses.map(travelCourse -> {
-            List<CourseDestinationResponse> courseDestinationResponses = travelCourse.getCourseDestinations().stream()
+        List<TravelCourse> travelCourses = courseService.getAllOrderByViewsDesc(pageable);
+
+        /*DTO - entity 변환*/
+        for (TravelCourse travelCourse : travelCourses) {
+
+            /*TODO: ROW MAPPER로 DTO-entity 변환*/
+            List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
+                    .stream()
                     .map(courseDestinationService::toResponse)
-                    .collect(Collectors.toList());
-            return new TravelCourseResponse(travelCourse, courseDestinationResponses);
-        });
+                    .toList();
+
+            response.add(new TravelCourseResponse(travelCourse, courseDestinationResponses));
+        }
+
         return ResponseEntity.ok(response);
     }
 
@@ -101,17 +110,19 @@ public class CourseApiController {
     @Operation(summary = "ID로 여행 코스 조회", description = "ID를 사용하여 특정 여행 코스를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
     })
-    @Parameter(name = "id", description = "조회할 여행 코스의 ID")
     /*********스웨거 어노테이션**********/
     @GetMapping("/{id}")
-    public ResponseEntity<TravelCourseResponse> findTravelCourseById(@PathVariable long id) {
-        TravelCourse travelCourse = courseService.findById(id);
-        travelCourse = courseService.incrementViews(id);
-        List<CourseDestinationResponse> courseDestinationResponses = travelCourse.getCourseDestinations().stream()
+    public ResponseEntity<TravelCourseResponse> findTravelCourseById(@PathVariable("id") Long id) {
+        TravelCourse travelCourse = courseService.incrementViews(id);
+        
+        /*TODO: ROW MAPPER로 DTO-entity 변환*/
+        List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
+                .stream()
                 .map(courseDestinationService::toResponse)
-                .collect(Collectors.toList());
+                .toList();
+
         return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses));
     }
 
@@ -120,19 +131,25 @@ public class CourseApiController {
     @Operation(summary = "코스 수정", description = "유저가 등록한 코스를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
-    })
-    @Parameters({
-            @Parameter(name = "id", description = "업데이트할 여행 코스의 ID")
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
-    public ResponseEntity<TravelCourse> updateTravelCourse(@PathVariable long id, @RequestBody UpdateTravelCourseRequest request) {
+    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @RequestBody AddTravelCourseRequest request) {
+        System.out.println("---------------------------------------------------id = " + id);
         TravelCourse updatedTravelCourse = courseService.update(id, request);
 
+        /*TODO: ROW MAPPER로 DTO-entity 변환*/
+        List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(updatedTravelCourse)
+                .stream()
+                .map(courseDestinationService::toResponse)
+                .toList();
+
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses);
+
         return (updatedTravelCourse != null) ?
-                ResponseEntity.status(HttpStatus.OK).body(updatedTravelCourse) :
+                ResponseEntity.status(HttpStatus.OK).body(response) :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -141,36 +158,38 @@ public class CourseApiController {
     @Operation(summary = "여행 코스 삭제", description = "ID를 사용하여 특정 여행 코스를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
     })
-    @Parameter(name = "id", description = "삭제할 코스의 ID")
     /*********스웨거 어노테이션**********/
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTravelCourse(@PathVariable long id) {
+    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id) {
         courseService.delete(id);
 
         return ResponseEntity.ok()
                 .build();
     }
 
+
+
     @ExceptionHandler(TravelCourseDuplicatedException.class)
-    public ResponseEntity<String> handleTagDuplicatedException(TagDuplicatedException e) {
+    public ResponseEntity<String> handleTagDuplicatedException(TravelCourseNotFoundException e) {
         return ResponseEntity
                 .status(ErrorCode.DUPLICATED_COURSE.getStatus())
                 .body(e.getMessage());
     }
 
     @ExceptionHandler(TravelCourseNotFoundException.class)
-    public ResponseEntity<String> handleTagNotFoundException(TagNotFoundException e) {
+    public ResponseEntity<String> handleTagNotFoundException(TravelCourseNotFoundException e) {
         return ResponseEntity
                 .status(ErrorCode.INVALID_COURSE.getStatus())
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler(IllegalTagArgumentException.class)
+    @ExceptionHandler(IllegalTravelCourseArgumentException.class)
     public ResponseEntity<String> handleIllegalTravelCourseArgumentException(IllegalTravelCourseArgumentException e) {
         return ResponseEntity
                 .status(ErrorCode.ILLEGAL_COURSE_ARGUMENT.getStatus())
                 .body(e.getMessage());
     }
+
 }
