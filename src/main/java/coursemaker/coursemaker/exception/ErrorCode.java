@@ -23,6 +23,9 @@ public enum ErrorCode {
     DUPLICATED_COURSE(HttpStatus.CONFLICT, "해당 코스가 이미 존재합니다.", "COURSE-002"),
     ILLEGAL_COURSE_ARGUMENT(HttpStatus.BAD_REQUEST, "코스에 알맞은 인자값이 아닙니다.", "COURSE-003");
 
+//    /*Member 도메인 예외*/
+//    VALIDATION_MEMBER(HttpStatus.)
+
 
     private String description;
     private HttpStatus  status;
