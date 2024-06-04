@@ -25,7 +25,7 @@ public class CourseDestination {
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "destinationId")
     private Destination destination;
 
