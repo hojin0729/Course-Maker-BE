@@ -1,9 +1,11 @@
 package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.member.entity.Member;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+@Data
 public class CourseMemberResponse {
     private final Long id;
     private final String username;
