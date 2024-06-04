@@ -56,11 +56,6 @@ public class CourseApiController {
                     description = "코스 등록 성공, 헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 형식")
     })
-    @Parameter(
-            name = "request",
-            description = "등록할 코스의 세부 정보. 여기에는 코스의 이름(title), 내용(content), 조회수(views), 여행기간(duration), 여행인원(travelerCount), " +
-                            "여행 타입(차, 대중교통, 도보 등)(travelType), 대표 이미지(pictureLink), 목적지 리스트(List<CourseDestination>) 등이 포함됩니다."
-    )
 /*********스웨거 어노테이션**********/
     @PostMapping
     public ResponseEntity<TravelCourse> createTravelCourse(@RequestBody AddTravelCourseRequest request) {

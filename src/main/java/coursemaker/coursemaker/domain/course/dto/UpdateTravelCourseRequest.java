@@ -1,6 +1,8 @@
 package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
