@@ -105,18 +105,12 @@ public class DestinationController {
     // 여행지를 새로 생성함.
     @PostMapping
     public ResponseEntity<DestinationDto> createDestination(@RequestBody DestinationDto request) {
-        Destination destination = DestinationDto.toEntity(request);
-        Destination savedDestination = destinationService.save(destination);
-
-        if (!request.getTags().isEmpty()) {
-            List<Long> tagIds = request.getTags()
-                    .stream()
-                    .map(TagResponseDto::getId)
-                    .toList();
-            tagService.addTagsByDestination(savedDestination.getId(), tagIds);
-        }
-
-        DestinationDto response = DestinationDto.toDto(savedDestination, request.getTags());
+        Destination savedDestination = destinationService.save(request);
+        List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId())
+                .stream()
+                .map(Tag::toResponseDto)
+                .toList();
+        DestinationDto response = DestinationDto.toDto(savedDestination, tags);
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
 
@@ -152,7 +146,7 @@ public class DestinationController {
         // 4. 기존 여행지 id로 설정해서 엔티티 id를 유지한다.
         updatedDestination.setId(destination.getId());
         // 5. 업데이트 된 여행지를 저장한다.
-        Destination savedDestination = destinationService.update(updatedDestination);
+        Destination savedDestination = destinationService.update(request);
 
         // 6. 요청된 태그리스트가 비어 있지 않으면 태그를 업데이트 한다.
         if (!request.getTags().isEmpty()) {

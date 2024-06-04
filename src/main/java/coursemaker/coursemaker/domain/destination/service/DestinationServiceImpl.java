@@ -1,39 +1,85 @@
 package coursemaker.coursemaker.domain.destination.service;
 
+import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.exception.DestinationDuplicatedException;
 import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
+import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import coursemaker.coursemaker.domain.tag.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 
 @Service
 public class DestinationServiceImpl implements DestinationService {
     private final DestinationRepository destinationRepository;
+    private final TagService tagService;
 
     @Autowired
-    public DestinationServiceImpl(DestinationRepository destinationRepository) {
+    public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService) {
         this.destinationRepository = destinationRepository;
+        this.tagService = tagService;
     }
 
     @Override
-    public Destination save(Destination destination) {
+    public Destination save(DestinationDto destinationDto) {
+
+        if (destinationDto.getLocation().isEmpty()) {
+            throw new IllegalArgumentException("위치 정보가 없습니다.");
+        }
+        if (destinationDto.getLatitude() == null) {
+            throw new IllegalArgumentException("위도 정보가 없습니다.");
+        }
+        if (destinationDto.getLongitude() == null) {
+            throw new IllegalArgumentException("경도 정보가 없습니다.");
+        }
+        if (destinationDto.getPictureLink().isEmpty()) {
+            throw new IllegalArgumentException("사진 링크가 없습니다.");
+        }
+        if (destinationDto.getContent().isEmpty()) {
+            throw new IllegalArgumentException("내용이 없습니다.");
+        }
+        // 태그 검사
+        if (destinationDto.getTags().isEmpty()) {
+            throw new TagNotFoundException("태그가 없습니다.", "Destination id: " + destinationDto.getId());
+        }
+        Set<Long> tagIds = new HashSet<>();
+        for (TagResponseDto tag : destinationDto.getTags()) {
+            if (!tagIds.add(tag.getId())) {
+                throw new TagDuplicatedException("태그가 중복되었습니다.", "Tag id: " + tag.getId());
+            }
+        }
+        // DTO를 엔티티로 변환
+        Destination destination = DestinationDto.toEntity(destinationDto);
+
+        // 여행지 엔티티를 저장
+        Destination savedDestination = destinationRepository.save(destination);
+
+        // 태그를 추가
+        tagService.addTagsByDestination(savedDestination.getId(), tagIds.stream().toList());
+
         // 여행지 엔티티를 저장
         return destinationRepository.save(destination);
     }
 
     @Override
-    public Destination update(Destination destination) {
+    public Destination update(DestinationDto destinationDto) {
         // 여행지 엔티티를 업데이트
-        if (!destinationRepository.existsById(destination.getId())) {
-            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destination.getId());
+        if (!destinationRepository.existsById(destinationDto.getId())) {
+            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationDto.getId());
         }
+        Destination destination = DestinationDto.toEntity(destinationDto);
         return destinationRepository.save(destination);
     }
 
