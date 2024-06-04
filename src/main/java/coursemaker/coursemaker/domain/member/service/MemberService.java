@@ -29,6 +29,10 @@ public class MemberService {
         return memberRepository.findById(userId).orElseThrow();
     }
 
+    public Member findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).orElseThrow();
+    }
+
     public Member signUp(SignUpRequest signUpRequest) {
 
         String email = signUpRequest.getEmail();
@@ -172,17 +176,32 @@ public class MemberService {
         // 중복 여부 확인(false면 합격)
         Boolean isDuplicate = memberRepository.findByNickname(nickname).isPresent();
 
-        // 조건 불일치 여부 확인(false면 합격)
+        // 조건 불일치 여부 확인
         String regex = "[a-zA-Z가-힣]{2,10}";
         Boolean isInappropriate = !nickname.matches(regex);
 
-        // 최종, 닉네임 유효 여부 반환
+        // 닉네임 유효 여부 반환
         ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
                 .isDuplicate(isDuplicate)
                 .isInappropriate(isInappropriate)
                 .build();
 
         return validateNicknameResponse;
+    }
+
+    //TODO: 작성중
+    public ValidateEmailResponse isEmailValid(ValidateEmailRequest validateEmailRequest) {
+        String email = validateEmailRequest.getEmail();
+
+        // 이메일 중복 여부 확인
+        Boolean isDuplicate = memberRepository.findByEmail(email).isPresent();
+
+        // 최종, 이메일 유효 여부 반환
+        ValidateEmailResponse validateEmailResponse = ValidateEmailResponse.builder()
+                .isDuplicate(isDuplicate)
+                .build();
+
+        return validateEmailResponse;
     }
 
 }
