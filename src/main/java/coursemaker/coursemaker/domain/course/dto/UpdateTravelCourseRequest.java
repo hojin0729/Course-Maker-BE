@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -29,19 +30,21 @@ public class UpdateTravelCourseRequest {
     private String pictureLink;
     private List<UpdateCourseDestinationRequest> courseDestinations;
 
-    public TravelCourse toEntity() {
-        TravelCourse travelCourse = TravelCourse.builder()
-                .title(title)
-                .content(content)
-                .duration(duration)
-                .travelerCount(travelerCount)
-                .travelType(travelType)
-                .pictureLink(pictureLink)
-                .build();
+    private List<TagResponseDto> tags;
 
-        for (UpdateCourseDestinationRequest courseDestination : courseDestinations) {
-            travelCourse.updateCourseDestination(courseDestination.toEntity());
-        }
-        return travelCourse;
-    }
+//    public TravelCourse toEntity() {
+//        TravelCourse travelCourse = TravelCourse.builder()
+//                .title(title)
+//                .content(content)
+//                .duration(duration)
+//                .travelerCount(travelerCount)
+//                .travelType(travelType)
+//                .pictureLink(pictureLink)
+//                .build();
+//
+//        for (UpdateCourseDestinationRequest courseDestination : courseDestinations) {
+//            travelCourse.updateCourseDestination(courseDestination.toEntity());
+//        }
+//        return travelCourse;
+//    }
 }
