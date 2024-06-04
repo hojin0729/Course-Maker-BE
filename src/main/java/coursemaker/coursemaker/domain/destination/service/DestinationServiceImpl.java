@@ -76,15 +76,15 @@ public class DestinationServiceImpl implements DestinationService {
         return destinationRepository.save(destination);
     }
 
-    @Override
-    public Destination update(DestinationDto destinationDto) {
-        // 여행지 엔티티를 업데이트
-        if (!destinationRepository.existsById(destinationDto.getId())) {
-            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationDto.getId());
-        }
-        Destination destination = DestinationDto.toEntity(destinationDto);
-        return destinationRepository.save(destination);
-    }
+//    @Override
+//    public Destination update(DestinationDto destinationDto) {
+//        // 여행지 엔티티를 업데이트
+//        if (!destinationRepository.existsById(destinationDto.getId())) {
+//            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationDto.getId());
+//        }
+//        Destination destination = DestinationDto.toEntity(destinationDto);
+//        return destinationRepository.save(destination);
+//    }
 
     @Override
     public Destination findById(Long id) {

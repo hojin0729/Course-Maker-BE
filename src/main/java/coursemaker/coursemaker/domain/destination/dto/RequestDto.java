@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class RequestDto {
-    private String username; // 유저 이름
+    private String nickname; // 유저 이름
     private String name; // 여행지 이름
     private List<TagResponseDto> tags; // 태그 리스트
     private String location; // 위치 이름

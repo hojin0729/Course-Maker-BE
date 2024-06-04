@@ -129,7 +129,7 @@ public class DestinationController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = DestinationDto.class),
                             examples = @ExampleObject(
-                                    value = "{\"id\": 1, \"username\": \"코스메이커\", \"name\": \"부산광역시\", \"tags\": [{\"id\": 1, \"name\": \"애견\", \"description\": \"강아지와 같이 여행하기 너무 좋아요.\"}, {\"id\": 2, \"name\": \"자연\", \"description\": \"자연이 너무 아름다워요.\"}], \"location\": \"부산\", \"latitude\": 30.8968, \"longitude\": -14.5828, \"pictureLink\": \"http://example.com/coursemaker.jpg\", \"content\": \"강아지와 함께 여행을 했는데 주위 자연이 너무 아름다웠어요.\"}"
+                                    value = "{\"id\": 1, \"nickname\": \"코스메이커\", \"name\": \"부산광역시\", \"tags\": [{\"id\": 1, \"name\": \"애견\", \"description\": \"강아지와 같이 여행하기 너무 좋아요.\"}, {\"id\": 2, \"name\": \"자연\", \"description\": \"자연이 너무 아름다워요.\"}], \"location\": \"부산\", \"latitude\": 30.8968, \"longitude\": -14.5828, \"pictureLink\": \"http://example.com/coursemaker.jpg\", \"content\": \"강아지와 함께 여행을 했는데 주위 자연이 너무 아름다웠어요.\"}"
                             )
                     )),
     })
@@ -138,7 +138,7 @@ public class DestinationController {
     // Id에 해당하는 여행지의 정보를 수정합니다.
     @PatchMapping("/{id}")
     public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id,
-                                                            @RequestBody  DestinationDto request) {
+                                                            @RequestBody  RequestDto request) {
         // 1. id로 여행지를 찾는다.
         Destination destination = destinationService.findById(id);
         if (destination == null) {
@@ -150,7 +150,7 @@ public class DestinationController {
         // 4. 기존 여행지 id로 설정해서 엔티티 id를 유지한다.
         updatedDestination.setId(destination.getId());
         // 5. 업데이트 된 여행지를 저장한다.
-        Destination savedDestination = destinationService.update(request);
+        Destination savedDestination = destinationService.save(request);
 
         // 6. 요청된 태그리스트가 비어 있지 않으면 태그를 업데이트 한다.
         if (!request.getTags().isEmpty()) {
