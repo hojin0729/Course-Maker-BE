@@ -26,13 +26,13 @@ public class Member extends BaseEntity {
     @Column(nullable = true)
     private String username; // 회원 id
 
-    @Column(name = "name", columnDefinition = "VARCHAR(10)")
+    @Column(name = "name", columnDefinition = "VARCHAR(50)")
     private String name; // 회원 이름
 
-    @Column(name = "email", columnDefinition = "VARCHAR(20) UNIQUE")
+    @Column(name = "email", columnDefinition = "VARCHAR(100) UNIQUE")
     private String email; // 회원 이메일
 
-    @Column(unique = true, columnDefinition = "VARCHAR(10) UNIQUE")
+    @Column(unique = true, columnDefinition = "VARCHAR(100) UNIQUE")
     private String nickname; // 회원 닉네임
 
     @Column(nullable = true, length = 15)
