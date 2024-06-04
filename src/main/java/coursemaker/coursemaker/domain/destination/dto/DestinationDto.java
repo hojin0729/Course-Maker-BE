@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// 프론트가 우리에게 데이터를 보내는 값
 @Data
 public class DestinationDto {
     private Long id;

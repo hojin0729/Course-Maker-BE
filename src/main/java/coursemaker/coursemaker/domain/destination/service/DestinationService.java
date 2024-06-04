@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.destination.service;
 
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
+import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface DestinationService {
     // 여행지를 저장하는 메서드
-    Destination save(DestinationDto destinationDto);
+    Destination save(RequestDto requestDto);
 
     // 여행지를 업데이트하는 메서드
     Destination update(DestinationDto destinationDto);
