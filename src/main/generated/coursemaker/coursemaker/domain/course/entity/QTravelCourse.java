@@ -26,8 +26,6 @@ public class QTravelCourse extends EntityPathBase<TravelCourse> {
 
     public final StringPath content = createString("content");
 
-    public final ListPath<CourseDestination, QCourseDestination> courseDestinations = this.<CourseDestination, QCourseDestination>createList("courseDestinations", CourseDestination.class, QCourseDestination.class, PathInits.DIRECT2);
-
     public final ListPath<coursemaker.coursemaker.domain.tag.entity.CourseTag, coursemaker.coursemaker.domain.tag.entity.QCourseTag> courseTags = this.<coursemaker.coursemaker.domain.tag.entity.CourseTag, coursemaker.coursemaker.domain.tag.entity.QCourseTag>createList("courseTags", coursemaker.coursemaker.domain.tag.entity.CourseTag.class, coursemaker.coursemaker.domain.tag.entity.QCourseTag.class, PathInits.DIRECT2);
 
     //inherited

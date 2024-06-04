@@ -5,12 +5,12 @@ import coursemaker.coursemaker.exception.RootException;
 import lombok.Getter;
 
 @Getter
-public class TravelCourseDuplicatedException extends RootException {
+public class IllegalTravelCourseArgumentException extends RootException {
 
     String message;
 
-    public TravelCourseDuplicatedException(String message, String logMessage) {
-        super(ErrorCode.DUPLICATED_COURSE, logMessage);
+    public IllegalTravelCourseArgumentException(String message, String logMessage) {
+        super(ErrorCode.ILLEGAL_TAG_ARGUMENT, logMessage);
 
         this.message = message;
     }

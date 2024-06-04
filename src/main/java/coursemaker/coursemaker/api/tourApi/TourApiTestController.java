@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.api.tourApi;
 
+import coursemaker.coursemaker.api.tourApi.entity.AreaTourResponse;
 import coursemaker.coursemaker.api.tourApi.service.TourApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,9 +15,16 @@ public class TourApiTestController {
 
     private final TourApiService tourApiService;
 
+//    @GetMapping
+//    public String test(Model model) {
+//        String response = tourApiService.getByArea();
+//        model.addAttribute("response", response);
+//        return "tour-api-test";
+//    }
+
     @GetMapping
-    public String test(Model model) {
-        String response = tourApiService.getByArea();
+    public String test2(Model model) {
+        AreaTourResponse response = tourApiService.getAreaTourList();
         model.addAttribute("response", response);
         return "tour-api-test";
     }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class TravelCourse extends BaseEntity {
 
     @Id
@@ -45,14 +45,14 @@ public class TravelCourse extends BaseEntity {
     @JoinColumn(name = "memberId")
     private Member member;
 
-    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseDestination> courseDestinations = new ArrayList<>();
+//    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<CourseDestination> courseDestinations = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
-    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {
+    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member) {
         this.title = title;
         this.content = content;
         this.views = 0;
@@ -60,6 +60,7 @@ public class TravelCourse extends BaseEntity {
         this.travelerCount = travelerCount;
         this.travelType = travelType;
         this.pictureLink = pictureLink;
+        this.member = member;
     }
 
     public void update(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {
@@ -71,15 +72,15 @@ public class TravelCourse extends BaseEntity {
         this.pictureLink = pictureLink;
     }
 
-    public void addCourseDestination(CourseDestination courseDestination) {
-        courseDestinations.add(courseDestination);
-        courseDestination.setTravelCourse(this);
-    }
-
-    public void updateCourseDestination(CourseDestination courseDestination) {
-        courseDestinations.add(courseDestination);
-        courseDestination.setTravelCourse(this);
-    }
+//    public void addCourseDestination(CourseDestination courseDestination) {
+//        courseDestinations.add(courseDestination);
+//        courseDestination.setTravelCourse(this);
+//    }
+//
+//    public void updateCourseDestination(CourseDestination courseDestination) {
+//        courseDestinations.add(courseDestination);
+//        courseDestination.setTravelCourse(this);
+//    }
 
     public void incrementViews() {
         this.views++;

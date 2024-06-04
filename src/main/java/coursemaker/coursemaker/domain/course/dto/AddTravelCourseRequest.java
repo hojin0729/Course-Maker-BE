@@ -1,38 +1,38 @@
 package coursemaker.coursemaker.domain.course.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import jakarta.validation.constraints.*;
+import lombok.*;
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
+
+@Data
 public class AddTravelCourseRequest {
 
     private String title;
     private String content;
-    private int duration;
-    private int travelerCount;
-    private int travelType;
+
+
+    @Min(value = 1, message = "Duration should not be less than 1")
+    @Max(value = 3)
+    private Integer duration;
+
+    @Min(value = 1, message = "Traveler count should not be less than 1")
+    private Integer travelerCount;
+
+    @Min(value = 0, message = "Travel type should not be negative")
+    private Integer travelType;
+
+    @NotBlank(message = "Picture link is mandatory")
+
     private String pictureLink;
     private List<AddCourseDestinationRequest> courseDestinations;
 
-    public TravelCourse toEntity() {
-        TravelCourse travelCourse = TravelCourse.builder()
-                .title(title)
-                .content(content)
-                .duration(duration)
-                .travelerCount(travelerCount)
-                .travelType(travelType)
-                .pictureLink(pictureLink)
-                .build();
+    @NotNull(message = "Member is mandatory")
+    private String nickname;// 유저 닉네임
+    
+    // 태그를 빼먹어여?! 대가리 박고있죠ㅇㅇ
+    private List<TagResponseDto> tags;
 
-        for (AddCourseDestinationRequest courseDestination : courseDestinations) {
-            travelCourse.addCourseDestination(courseDestination.toEntity());
-        }
-        return travelCourse;
-    }
 }

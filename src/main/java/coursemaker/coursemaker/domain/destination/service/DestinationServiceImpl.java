@@ -2,8 +2,10 @@ package coursemaker.coursemaker.domain.destination.service;
 
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
+import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
+import coursemaker.coursemaker.domain.destination.exception.IllegalDestinationArgumentException;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
 
 @Service
@@ -33,35 +36,35 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
-    public Destination save(DestinationDto destinationDto) {
+    public Destination save(RequestDto requestDto) {
 
-        if (destinationDto.getLocation().isEmpty()) {
-            throw new IllegalArgumentException("위치 정보가 없습니다.");
+        if (requestDto.getLocation() == null || requestDto.getLocation().isEmpty()) {
+            throw new IllegalDestinationArgumentException("위치 정보가 없습니다.", "Destination Location: " + requestDto.getLocation());
         }
-        if (destinationDto.getLatitude() == null) {
-            throw new IllegalArgumentException("위도 정보가 없습니다.");
+        if (requestDto.getLatitude() == null) {
+            throw new IllegalDestinationArgumentException("위도 정보가 없습니다.", "Destination Latitude: " + requestDto.getLatitude());
         }
-        if (destinationDto.getLongitude() == null) {
-            throw new IllegalArgumentException("경도 정보가 없습니다.");
+        if (requestDto.getLongitude() == null) {
+            throw new IllegalDestinationArgumentException("경도 정보가 없습니다.", "Destination Longitude: " + requestDto.getLongitude());
         }
-        if (destinationDto.getPictureLink().isEmpty()) {
-            throw new IllegalArgumentException("사진 링크가 없습니다.");
+        if (requestDto.getPictureLink() == null || requestDto.getPictureLink().isEmpty()) {
+            throw new PictureNotFoundException("사진 링크가 없습니다.", "Destination PictureLink: " + requestDto.getPictureLink());
         }
-        if (destinationDto.getContent().isEmpty()) {
-            throw new IllegalArgumentException("내용이 없습니다.");
+        if (requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
+            throw new IllegalDestinationArgumentException("내용이 없습니다.", "Destination Content: " + requestDto.getContent());
         }
         // 태그 검사
-        if (destinationDto.getTags().isEmpty()) {
-            throw new TagNotFoundException("태그가 없습니다.", "Destination id: " + destinationDto.getId());
+        if (requestDto.getTags() == null || requestDto.getTags().isEmpty()) {
+            throw new TagNotFoundException("태그가 없습니다.", "Destination name: " + requestDto.getName());
         }
         Set<Long> tagIds = new HashSet<>();
-        for (TagResponseDto tag : destinationDto.getTags()) {
+        for (TagResponseDto tag : requestDto.getTags()) {
             if (!tagIds.add(tag.getId())) {
                 throw new TagDuplicatedException("태그가 중복되었습니다.", "Tag id: " + tag.getId());
             }
         }
         // DTO를 엔티티로 변환
-        Destination destination = DestinationDto.toEntity(destinationDto);
+        Destination destination = requestDto.toEntity();
 
         // 여행지 엔티티를 저장
         Destination savedDestination = destinationRepository.save(destination);
@@ -73,15 +76,15 @@ public class DestinationServiceImpl implements DestinationService {
         return destinationRepository.save(destination);
     }
 
-    @Override
-    public Destination update(DestinationDto destinationDto) {
-        // 여행지 엔티티를 업데이트
-        if (!destinationRepository.existsById(destinationDto.getId())) {
-            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationDto.getId());
-        }
-        Destination destination = DestinationDto.toEntity(destinationDto);
-        return destinationRepository.save(destination);
-    }
+//    @Override
+//    public Destination update(DestinationDto destinationDto) {
+//        // 여행지 엔티티를 업데이트
+//        if (!destinationRepository.existsById(destinationDto.getId())) {
+//            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationDto.getId());
+//        }
+//        Destination destination = DestinationDto.toEntity(destinationDto);
+//        return destinationRepository.save(destination);
+//    }
 
     @Override
     public Destination findById(Long id) {
