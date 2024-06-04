@@ -1,18 +1,15 @@
 package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
+import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
+@Data
 public class UpdateCourseDestinationRequest {
 
-    private short visitOrder;
-    private short date;
+    private Short visitOrder;
+    private Short date;
     private Destination destination;
 
     public CourseDestination toEntity() {
