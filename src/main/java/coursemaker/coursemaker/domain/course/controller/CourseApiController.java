@@ -11,6 +11,7 @@ import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 
+
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
@@ -33,13 +34,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/courses")
@@ -64,10 +63,11 @@ public class CourseApiController {
     )
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<TravelCourse> createTravelCourse(@Valid @RequestBody AddTravelCourseRequest request) {
+    public ResponseEntity<TravelCourse> createTravelCourse(@RequestBody AddTravelCourseRequest request) {
         TravelCourse savedTravelCourse = courseService.save(request);
 
         return (savedTravelCourse != null) ?
+                // ResponseEntity.status(HttpStatus.CREATED).body(savedTravelCourse) :
                 ResponseEntity.created(URI.create("/v1/courses/" + savedTravelCourse.getId())).build() :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
@@ -88,9 +88,9 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @GetMapping
-    public ResponseEntity<Page<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20") @Min(1) int record,
-                                                                          @RequestParam(defaultValue = "1") @Min(1) int page) {
-        Pageable pageable = PageRequest.of(page - 1, record);
+    public ResponseEntity<Page<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") int record,
+                                                                          @RequestParam(defaultValue = "1", name = "page") int page) {
+        Pageable pageable = PageRequest.of(page-1, record);
         Page<TravelCourse> travelCourses = courseService.getAllOrderByViewsDesc(pageable);
         Page<TravelCourseResponse> response = travelCourses.map(travelCourse -> {
             List<CourseDestinationResponse> courseDestinationResponses = travelCourse.getCourseDestinations().stream()
@@ -133,7 +133,7 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
-    public ResponseEntity<TravelCourse> updateTravelCourse(@PathVariable long id, @Valid @RequestBody UpdateTravelCourseRequest request) {
+    public ResponseEntity<TravelCourse> updateTravelCourse(@PathVariable long id, @RequestBody UpdateTravelCourseRequest request) {
         TravelCourse updatedTravelCourse = courseService.update(id, request);
 
         return (updatedTravelCourse != null) ?

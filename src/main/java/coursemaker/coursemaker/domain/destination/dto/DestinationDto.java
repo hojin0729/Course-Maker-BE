@@ -10,11 +10,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// 프론트가 우리에게 데이터를 보내는 값
 @Data
 public class DestinationDto {
     private Long id;
-    private String username; // 유저 이름
+    private String nickname; // 유저 이름
     private String name; // 여행지 이름
     private List<TagResponseDto> tags; // 태그 리스트
     private String location; // 위치 이름
@@ -26,7 +25,7 @@ public class DestinationDto {
     private LocalDateTime updatedAt; // 수정 날짜
 
     // DestinationDto를 Destination 엔티티로 변환하는 메서드
-    public static Destination toEntity(DestinationDto dto) {
+    public static Destination toEntity(RequestDto dto) {
         Destination destination = new Destination();
         destination.setName(dto.getName());
         destination.setPictureLink(dto.getPictureLink());
@@ -41,7 +40,7 @@ public class DestinationDto {
     public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
-//        dto.setUsername(destination.getMember().getUsername()); // 누가 만들었는지 설정
+//        dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
         dto.setName(destination.getName());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
