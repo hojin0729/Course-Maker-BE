@@ -2,40 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>투어 API 테스트</title>
+    <title>투어 api 테스트</title>
 </head>
 <body>
-<h1>투어 API 테스트</h1>
-<h2>Response:</h2>
-<div th:if="${response != null}">
-    <div th:each="tour : ${response.response.body.items.item}">
-        <ul>
-            <li><strong>주소 1:</strong> <span th:text="${tour.addr1}">주소 1</span></li>
-            <li><strong>주소 2:</strong> <span th:text="${tour.addr2}">주소 2</span></li>
-            <li><strong>지역 코드:</strong> <span th:text="${tour.areacode}">지역 코드</span></li>
-            <li><strong>투어 예약 가능:</strong> <span th:text="${tour.booktour}">투어 예약 가능</span></li>
-            <li><strong>카테고리 1:</strong> <span th:text="${tour.cat1}">카테고리 1</span></li>
-            <li><strong>카테고리 2:</strong> <span th:text="${tour.cat2}">카테고리 2</span></li>
-            <li><strong>카테고리 3:</strong> <span th:text="${tour.cat3}">카테고리 3</span></li>
-            <li><strong>컨텐츠 ID:</strong> <span th:text="${tour.contentid}">컨텐츠 ID</span></li>
-            <li><strong>컨텐츠 타입 ID:</strong> <span th:text="${tour.contenttypeid}">컨텐츠 타입 ID</span></li>
-            <li><strong>생성 시간:</strong> <span th:text="${tour.createdtime}">생성 시간</span></li>
-            <li><strong>첫 번째 이미지:</strong> <img th:src="${tour.firstimage}" alt="첫 번째 이미지"/></li>
-            <li><strong>두 번째 이미지:</strong> <img th:src="${tour.firstimage2}" alt="두 번째 이미지"/></li>
-            <li><strong>저작권 코드:</strong> <span th:text="${tour.cpyrhtDivCd}">저작권 코드</span></li>
-            <li><strong>지도 X:</strong> <span th:text="${tour.mapx}">지도 X</span></li>
-            <li><strong>지도 Y:</strong> <span th:text="${tour.mapy}">지도 Y</span></li>
-            <li><strong>레벨:</strong> <span th:text="${tour.mlevel}">레벨</span></li>
-            <li><strong>수정 시간:</strong> <span th:text="${tour.modifiedtime}">수정 시간</span></li>
-            <li><strong>시군구 코드:</strong> <span th:text="${tour.sigungucode}">시군구 코드</span></li>
-            <li><strong>전화 번호:</strong> <span th:text="${tour.tel}">전화 번호</span></li>
-            <li><strong>제목:</strong> <span th:text="${tour.title}">제목</span></li>
-            <li><strong>우편 번호:</strong> <span th:text="${tour.zipcode}">우편 번호</span></li>
-        </ul>
-    </div>
-</div>
-<p th:if="${response == null}">
-    No response received.
-</p>
+<h1>투어 api 테스트</h1>
+<h2>response: </h2>
+<p th:text="${response}"></p>
 </body>
 </html>
