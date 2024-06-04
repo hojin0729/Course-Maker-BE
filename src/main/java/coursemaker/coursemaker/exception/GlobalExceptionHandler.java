@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(400)
-                .body("예상치 못한 오류가 발생했습니다.\n 오류: " + e.getMessage());
+                .body("예상치 못한 오류가 발생했습니다.\n오류: " + e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
@@ -28,6 +28,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(400)
-                .body("예상치 못한 쌈@뽕한 예외가 발생했습니다.\n 오류: " + e.getMessage());
+                .body("예상치 못한 쌈@뽕한 예외가 발생했습니다. \n오류: " + e.getMessage());
     }
 }
