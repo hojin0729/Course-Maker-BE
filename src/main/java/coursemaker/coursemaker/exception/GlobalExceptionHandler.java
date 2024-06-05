@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RootException.class)
     public ResponseEntity<String> handleRootException(RootException e) {
         return ResponseEntity
-                .status(400)
+                .status(e.getErrorCode().getStatus())
                 .body(e.getMessage());
     }
 
