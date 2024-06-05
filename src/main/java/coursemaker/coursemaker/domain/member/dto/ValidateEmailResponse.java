@@ -10,5 +10,6 @@ public class ValidateEmailResponse {
     String toMail;
     String title;
     String authCode;
+    Boolean isDuplicate;
 }
 

@@ -139,6 +139,7 @@ public class DestinationController {
     /*********스웨거 어노테이션**********/
     // Id에 해당하는 여행지의 정보를 수정합니다.
     @PatchMapping("/{id}")
+
     public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @RequestBody RequestDto request) {
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId())
