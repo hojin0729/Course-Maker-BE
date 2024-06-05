@@ -39,10 +39,6 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
     }
 
-    public Member findByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname).orElseThrow();
-    }
-
     public Member signUp(SignUpRequest signUpRequest) {
         if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
