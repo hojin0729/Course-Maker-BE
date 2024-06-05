@@ -29,7 +29,7 @@ public class Member extends BaseEntity {
     @Column(name = "name", columnDefinition = "VARCHAR(50)")
     private String name; // 회원 이름
 
-    @Column(name = "email", columnDefinition = "VARCHAR(100) UNIQUE")
+    @Column(name = "email", columnDefinition = "VARCHAR(255) UNIQUE")
     private String email; // 회원 이메일
 
     @Column(unique = true, columnDefinition = "VARCHAR(100) UNIQUE")
@@ -60,12 +60,13 @@ public class Member extends BaseEntity {
     }
 
     @Builder(builderMethodName = "addMemberBuilder")
-    public Member(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl, String profileDescription, String roles) {
+    public Member(String email, LoginType loginType, String name, String nickname, String password, String phoneNumber, String profileImgUrl, String profileDescription, String roles) {
         this.email = email;
         this.loginType = loginType;
         this.name = name;
         this.nickname = nickname;
         this.password = password;
+        this.phoneNumber = phoneNumber;
         this.profileImgUrl = profileImgUrl;
         this.profileDescription = profileDescription;
         this.roles = roles != null ? roles : "ROLE_USER";
