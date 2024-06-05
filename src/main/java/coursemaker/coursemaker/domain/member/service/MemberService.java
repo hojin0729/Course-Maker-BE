@@ -3,11 +3,11 @@ package coursemaker.coursemaker.domain.member.service;
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.exception.IllegalUserArgumentException;
+import coursemaker.coursemaker.domain.member.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
-import coursemaker.coursemaker.jwt.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +30,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenService refreshTokenService;
 
     public Member findById(Long userId){
         return memberRepository.findById(userId)
@@ -133,12 +132,8 @@ public class MemberService {
         log.info("[getSignInResult] Id : {}", id);
 
         if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            loginResponse.builder()
-                    //TODO: 틀릴 경우엔 어떤 에러를 보낼까
-                    .accessToken(null)
-                    .refreshToken(null)
-                    .build();
-            return loginResponse;
+            log.error("[getSignInResult] 패스워드 불일치");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.", "Password: " + rawPassword);
         }
         log.info("[getLogInResult] 패스워드 일치");
         log.info("[getLogInResult] LogInResponse 객체 생성");
@@ -167,29 +162,29 @@ public class MemberService {
 
     }
 
-    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키 만료 시작
-        Cookie cookieForExpire = new Cookie("Authorization", null);
-        cookieForExpire.setPath("/");
-        cookieForExpire.setMaxAge(0);
-        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
-        //쿠키 만료 끝
-
-        //리프레시 토큰 삭제 시작
-        Cookie currentCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> "Authorization".equals(cookie.getName()))
-                .findFirst().orElseThrow();
-        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        refreshTokenService.removeTokenInfo(token);
-        //리프레시 토큰 삭제 끝
-
-        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
-        return logoutResponse;
-    }
+//    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
+//        // 쿠키 만료 시작
+//        Cookie cookieForExpire = new Cookie("Authorization", null);
+//        cookieForExpire.setPath("/");
+//        cookieForExpire.setMaxAge(0);
+//        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
+//        //쿠키 만료 끝
+//
+//        //리프레시 토큰 삭제 시작
+//        Cookie currentCookie = Arrays.stream(request.getCookies())
+//                .filter(cookie -> "Authorization".equals(cookie.getName()))
+//                .findFirst().orElseThrow();
+//        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+//        if (token.startsWith("Bearer ")) {
+//            token = token.substring(7);
+//        }
+//
+//        refreshTokenService.removeTokenInfo(token);
+//        //리프레시 토큰 삭제 끝
+//
+//        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
+//        return logoutResponse;
+//    }
 
 
     public MyPageResponse showMyPage(Long userId) {
