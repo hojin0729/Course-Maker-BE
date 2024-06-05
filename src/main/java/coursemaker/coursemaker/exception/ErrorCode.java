@@ -28,7 +28,7 @@ public enum ErrorCode {
     DUPLICATED_MEMBER(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다.", "MEMBER-001"),
     WRONG_PASSWORD(HttpStatus.OK, "비밀번호가 잘못되었습니다.", "MEMBER-002"),
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원 정보가 없습니다.", "MEMBER-003"),
-    ILLEGAL_MEMBER_ARGUMENT(HttpStatus.BAD_REQUEST, "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004");
+    ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004");
 
 
 

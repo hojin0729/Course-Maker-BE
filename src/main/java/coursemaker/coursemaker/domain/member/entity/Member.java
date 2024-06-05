@@ -29,7 +29,7 @@ public class Member extends BaseEntity {
     @Column(name = "name", columnDefinition = "VARCHAR(50)")
     private String name; // 회원 이름
 
-    @Column(name = "email", columnDefinition = "VARCHAR(100) UNIQUE")
+    @Column(name = "email", columnDefinition = "VARCHAR(255) UNIQUE")
     private String email; // 회원 이메일
 
     @Column(unique = true, columnDefinition = "VARCHAR(100) UNIQUE")

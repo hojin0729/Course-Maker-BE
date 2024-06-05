@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.IllegalUserArgumentException;
 import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
@@ -42,7 +43,9 @@ public class MemberService {
         if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
         }
-
+        if(signUpRequest.getEmail() == null) {
+            throw new IllegalUserArgumentException("올바른 값을 ", "");
+        }
         String email = signUpRequest.getEmail();
         Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
         String name = signUpRequest.getName();
