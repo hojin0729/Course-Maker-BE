@@ -146,7 +146,8 @@ public class DestinationController {
             return ResponseEntity.notFound().build();
         }
         // 3. Dto를 엔티티로 변환한다.
-        Destination updatedDestination = DestinationDto.toEntity(request);
+//        Destination updatedDestination = RequestDto.toEntity(request);
+        Destination updatedDestination = request.toEntity();
         // 4. 기존 여행지 id로 설정해서 엔티티 id를 유지한다.
         updatedDestination.setId(destination.getId());
         // 5. 업데이트 된 여행지를 저장한다.

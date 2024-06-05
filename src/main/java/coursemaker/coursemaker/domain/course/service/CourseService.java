@@ -16,10 +16,10 @@ public interface CourseService {
 
     TravelCourse save(AddTravelCourseRequest request);
     List<TravelCourse> findAll();
-    Page<TravelCourse> getAllOrderByViewsDesc(Pageable pageable);
-    TravelCourse findById(long id);
-    TravelCourse update(long id, UpdateTravelCourseRequest request);
-    void delete(long id);
-    TravelCourse incrementViews(long id);
+    List<TravelCourse> getAllOrderByViewsDesc(Pageable pageable);
+    TravelCourse findById(Long id);
+    TravelCourse update(Long id, AddTravelCourseRequest request);
+    void delete(Long id);
+    TravelCourse incrementViews(Long id);
 
 }
