@@ -7,16 +7,20 @@ import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
+import coursemaker.coursemaker.jwt.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 
 @Slf4j
@@ -26,7 +30,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-//    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
 
     public Member findById(Long userId){
         return memberRepository.findById(userId)
@@ -156,13 +160,37 @@ public class MemberService {
         cookie1.setMaxAge(60 * 60);
         response.addCookie(cookie1);
 
-//        RefreshToken refreshToken1 = new RefreshToken(String.valueOf(loginUser.getId()), refreshToken, accessToken);
-//        refreshTokenRepository.save(refreshToken1);
-//        RefreshToken foundTokenInfo = refreshTokenRepository.findByAccessToken(accessToken)
-//                .orElseThrow();
-//        log.info("redis안의 토큰: {}", foundTokenInfo.getRefreshToken());
+//        refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
+
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
         return loginResponse;
+
     }
+
+    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 만료 시작
+        Cookie cookieForExpire = new Cookie("Authorization", null);
+        cookieForExpire.setPath("/");
+        cookieForExpire.setMaxAge(0);
+        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
+        //쿠키 만료 끝
+
+        //리프레시 토큰 삭제 시작
+        Cookie currentCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .findFirst().orElseThrow();
+        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        refreshTokenService.removeTokenInfo(token);
+        //리프레시 토큰 삭제 끝
+
+        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
+        return logoutResponse;
+    }
+
 
     public MyPageResponse showMyPage(Long userId) {
         Member currentUser = memberRepository.findById(userId)

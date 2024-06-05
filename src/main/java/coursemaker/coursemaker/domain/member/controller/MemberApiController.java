@@ -12,6 +12,7 @@ import coursemaker.coursemaker.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,14 @@ public class MemberApiController {
         //TODO: 유저 정보 Cookie에 저장
         return ResponseEntity.ok().body(loginResponse);
     }
+
+    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
+        LogoutResponse logoutResponse = memberService.logout(request, response);
+        return ResponseEntity.ok().body(logoutResponse);
+    }
+
 
     @Operation(summary = "마이페이지 정보 조회", description = "마이페이지에 필요한 정보를 조회한다.")
     @GetMapping(value = "/my-page")
