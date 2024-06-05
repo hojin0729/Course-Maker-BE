@@ -1,12 +1,18 @@
 package coursemaker.coursemaker.domain.member.controller;
 
+import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.service.EmailService;
 import coursemaker.coursemaker.domain.member.service.MemberService;
+import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
+import coursemaker.coursemaker.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +63,14 @@ public class MemberApiController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
+    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
+        LogoutResponse logoutResponse = memberService.logout(request, response);
+        return ResponseEntity.ok().body(logoutResponse);
+    }
+
+
     @Operation(summary = "마이페이지 정보 조회", description = "마이페이지에 필요한 정보를 조회한다.")
     @GetMapping(value = "/my-page")
     public ResponseEntity<MyPageResponse> showMyPage(@Valid @RequestParam("userId") Long userId) {
@@ -71,10 +85,31 @@ public class MemberApiController {
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
+    @Operation(summary = "이메일 유효 확인", description = "회원가입 및 회원정보 수정 시,  중복 또는 글자 수 등, 이메일 중복 여부를 검증한다.")
+    @PostMapping(value = "/validate-email")
+    public ResponseEntity<ValidateEmailResponse> validateEmail(@Valid @RequestBody ValidateEmailRequest validateEmailRequest) {
+        ValidateEmailResponse validateEmailResponse = memberService.isEmailValid(validateEmailRequest);
+        return ResponseEntity.ok(validateEmailResponse);
+    }
+
     @Operation(summary = "이메일 검증", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
     @PostMapping("/send-validate")
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
+    }
+
+    @ExceptionHandler(UserDuplicatedException.class)
+    public ResponseEntity<String> handleUserDuplicatedException(UserDuplicatedException e) {
+        return ResponseEntity
+                .status(ErrorCode.DUPLICATED_MEMBER.getStatus())
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity
+                .status(ErrorCode.NOT_FOUND_MEMBER.getStatus())
+                .body(e.getMessage());
     }
 }
