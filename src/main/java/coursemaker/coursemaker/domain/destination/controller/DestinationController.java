@@ -140,10 +140,10 @@ public class DestinationController {
     // Id에 해당하는 여행지의 정보를 수정합니다.
     @PatchMapping("/{id}")
 
-    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @RequestBody RequestDto request, @AuthenticationPrincipal Member member) {
-        if (!request.getNickname().equals(member.getNickname())) {
-            throw new IllegalDestinationArgumentException("닉네임이 틀려요.", "request nickname: " + request.getNickname() + "\tauthentication member nickname: " + member.getNickname());
-        }
+    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @RequestBody RequestDto request) {
+//        if (!request.getNickname().equals(member.getNickname())) {
+//            throw new IllegalDestinationArgumentException("닉네임이 틀려요.", "request nickname: " + request.getNickname() + "\tauthentication member nickname: " + member.getNickname());
+//        }
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId())
                 .stream()
