@@ -16,7 +16,9 @@ import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.validation.annotation.Validated;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,12 +85,16 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @GetMapping
-    public ResponseEntity<List<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") Integer record,
-                                                                          @RequestParam(defaultValue = "1", name = "page") Integer page) {
-        List<TravelCourseResponse> response = new ArrayList<>();
+    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                           @RequestParam(defaultValue = "1", name = "page") Integer page) {
 
         Pageable pageable = PageRequest.of(page-1, record);
-        List<TravelCourse> travelCourses = courseService.getAllOrderByViewsDesc(pageable);
+
+        List<TravelCourseResponse> contents = new ArrayList<>();
+        CourseMakerPagination<TravelCourse> travelCoursePage = courseService.getAllOrderByViewsDesc(pageable);
+        int totalPage = travelCoursePage.getTotalPage();//
+        List<TravelCourse> travelCourses = travelCoursePage.getContents();
+
 
         /*DTO - entity 변환*/
         for (TravelCourse travelCourse : travelCourses) {
@@ -99,8 +105,12 @@ public class CourseApiController {
                     .map(courseDestinationService::toResponse)
                     .toList();
 
-            response.add(new TravelCourseResponse(travelCourse, courseDestinationResponses));
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses));
         }
+
+        Page<TravelCourseResponse> responsePagepage = new PageImpl<>(contents, pageable, totalPage);
+
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePagepage);
 
         return ResponseEntity.ok(response);
     }
