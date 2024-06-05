@@ -8,6 +8,8 @@ import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundE
 import coursemaker.coursemaker.domain.destination.exception.IllegalDestinationArgumentException;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
+import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
@@ -28,16 +30,65 @@ import java.util.StringJoiner;
 public class DestinationServiceImpl implements DestinationService {
     private final DestinationRepository destinationRepository;
     private final TagService tagService;
+    private final MemberService memberService;
 
     @Autowired
-    public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService) {
+    public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService, MemberService memberService) {
         this.destinationRepository = destinationRepository;
         this.tagService = tagService;
+        this.memberService = memberService;
     }
 
     @Override
     public Destination save(RequestDto requestDto) {
+        validateRequestDto(requestDto);
+        // 멤버를 가져옴
+        Member member = memberService.findByNickname(requestDto.getNickname());
 
+        // DTO를 엔티티로 변환
+        Destination destination = requestDto.toEntity(member);
+
+        // 여행지 엔티티를 저장
+        Destination savedDestination = destinationRepository.save(destination);
+
+        // 태그를 추가
+        tagService.addTagsByDestination(savedDestination.getId(), getTagIds(requestDto));
+
+        // 여행지 엔티티를 저장
+        return destinationRepository.save(destination);
+    }
+
+    @Override
+    public Destination update(Long id, RequestDto requestDto) {
+        validateRequestDto(requestDto);
+
+        // 기존 여행지 엔티티를 찾고 없으면 예외 처리
+        Destination destination = destinationRepository.findById(id)
+                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+
+        // 멤버 정보는 유지하고, 업데이트할 정보를 다시 설정
+        destination.setName(requestDto.getName());
+        destination.setPictureLink(requestDto.getPictureLink());
+        destination.setContent(requestDto.getContent());
+        destination.setLocation(requestDto.getLocation());
+        destination.setLongitude(requestDto.getLongitude());
+        destination.setLatitude(requestDto.getLatitude());
+
+        // 태그 삭제하고 다시 추가
+        tagService.deleteAllTagByDestination(destination.getId());
+        tagService.addTagsByDestination(destination.getId(), getTagIds(requestDto));
+
+        return destinationRepository.save(destination);
+    }
+
+    // 통합 예외 처리
+    private void validateRequestDto(RequestDto requestDto) {
+        if (requestDto.getNickname() == null || requestDto.getNickname().isEmpty()) {
+            throw new IllegalDestinationArgumentException("닉네임이 없습니다.", "Destination Nickname: " + requestDto.getNickname());
+        }
+        if (requestDto.getName() == null || requestDto.getName().isEmpty()) {
+            throw new IllegalDestinationArgumentException("여행지 이름이 없습니다.", "Destination name: " + requestDto.getName());
+        }
         if (requestDto.getLocation() == null || requestDto.getLocation().isEmpty()) {
             throw new IllegalDestinationArgumentException("위치 정보가 없습니다.", "Destination Location: " + requestDto.getLocation());
         }
@@ -53,7 +104,6 @@ public class DestinationServiceImpl implements DestinationService {
         if (requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
             throw new IllegalDestinationArgumentException("내용이 없습니다.", "Destination Content: " + requestDto.getContent());
         }
-        // 태그 검사
         if (requestDto.getTags() == null || requestDto.getTags().isEmpty()) {
             throw new TagNotFoundException("태그가 없습니다.", "Destination name: " + requestDto.getName());
         }
@@ -63,29 +113,16 @@ public class DestinationServiceImpl implements DestinationService {
                 throw new TagDuplicatedException("태그가 중복되었습니다.", "Tag id: " + tag.getId());
             }
         }
-        // DTO를 엔티티로 변환
-        Destination destination = requestDto.toEntity();
-
-        // 여행지 엔티티를 저장
-        Destination savedDestination = destinationRepository.save(destination);
-
-        // 태그를 추가
-        tagService.addTagsByDestination(savedDestination.getId(), tagIds.stream().toList());
-
-        // 여행지 엔티티를 저장
-        return destinationRepository.save(destination);
     }
-
-//    @Override
-//    public Destination update(DestinationDto destinationDto) {
-//        // 여행지 엔티티를 업데이트
-//        if (!destinationRepository.existsById(destinationDto.getId())) {
-//            throw new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationDto.getId());
-//        }
-//        Destination destination = DestinationDto.toEntity(destinationDto);
-//        return destinationRepository.save(destination);
-//    }
-
+    // 1. RequestDto 객체에서 태그 ID를 추출합니다.
+    // 2. 중복된 태그 ID를 제거합니다.
+    // 3. 태그 ID를 List<Long> 형태로 반환합니다.
+    private List<Long> getTagIds(RequestDto requestDto) {
+        return requestDto.getTags().stream()
+                .map(TagResponseDto::getId)
+                .distinct()
+                .toList();
+    }
     @Override
     public Destination findById(Long id) {
         // ID로 여행지를 찾고, 없으면 예외처리

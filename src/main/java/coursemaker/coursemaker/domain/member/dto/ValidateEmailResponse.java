@@ -11,5 +11,6 @@ public class ValidateEmailResponse {
     String title;
     String authCode;
     Boolean isDuplicate;
+    Boolean isInappropriate; //조건에 부적절할 경우 true
 }
 

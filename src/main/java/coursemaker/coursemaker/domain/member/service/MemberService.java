@@ -2,6 +2,9 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.IllegalUserArgumentException;
+import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
 import jakarta.servlet.http.Cookie;
@@ -26,20 +29,29 @@ public class MemberService {
 //    private final RefreshTokenRepository refreshTokenRepository;
 
     public Member findById(Long userId){
-        return memberRepository.findById(userId).orElseThrow();
+        return memberRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + userId));
     }
 
+
     public Member findByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname).orElseThrow();
+        return memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
     }
 
     public Member signUp(SignUpRequest signUpRequest) {
-
+        if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
+            throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
+        }
+        if(signUpRequest.getEmail() == null) {
+            throw new IllegalUserArgumentException("올바른 값을 ", "");
+        }
         String email = signUpRequest.getEmail();
         Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
         String name = signUpRequest.getName();
         String nickname = signUpRequest.getNickname();
         String rawPassword = signUpRequest.getPassword();
+        String phoneNumber = signUpRequest.getPhoneNumber();
         String encodedPassword = passwordEncoder.encode(rawPassword);
         String profileImg = signUpRequest.getProfileImgUrl();
         String profileDescription = signUpRequest.getProfileDescription();
@@ -51,6 +63,7 @@ public class MemberService {
                 .name(name)
                 .nickname(nickname)
                 .password(encodedPassword)
+                .phoneNumber(phoneNumber)
                 .profileImgUrl(profileImg)
                 .profileDescription(profileDescription)
                 .roles(roles)
@@ -65,7 +78,7 @@ public class MemberService {
         //TODO: Optional 예외처리
         Member user = memberRepository
                 .findById(updateRequest.getUserId())
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + updateRequest.getUserId()));
 
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
@@ -99,7 +112,7 @@ public class MemberService {
 
         //TODO: 예외처리
         Member user = memberRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + userId));
 
         user.setDeletedAt(LocalDateTime.now());
 
@@ -110,9 +123,8 @@ public class MemberService {
     public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
         LoginResponse loginResponse = new LoginResponse();
 
-        //TODO: 예외처리
         Member loginUser = memberRepository.findByEmail(id)
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + id));
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
@@ -173,7 +185,7 @@ public class MemberService {
     public ValidateNicknameResponse isValid(ValidateNicknameRequest validateNicknameRequest) {
         String nickname = validateNicknameRequest.getNickname();
 
-        // 중복 여부 확인(false면 합격)
+        // 중복 여부 확인
         Boolean isDuplicate = memberRepository.findByNickname(nickname).isPresent();
 
         // 조건 불일치 여부 확인
@@ -196,9 +208,14 @@ public class MemberService {
         // 이메일 중복 여부 확인
         Boolean isDuplicate = memberRepository.findByEmail(email).isPresent();
 
-        // 최종, 이메일 유효 여부 반환
+        // 조건 불일치 여부 확인
+        String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        Boolean isInappropriate = !email.matches(emailRegex);
+
+        // 이메일 유효 여부 반환
         ValidateEmailResponse validateEmailResponse = ValidateEmailResponse.builder()
                 .isDuplicate(isDuplicate)
+                .isInappropriate(isInappropriate)
                 .build();
 
         return validateEmailResponse;
