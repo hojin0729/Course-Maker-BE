@@ -2,6 +2,8 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
 import jakarta.servlet.http.Cookie;
@@ -26,7 +28,14 @@ public class MemberService {
 //    private final RefreshTokenRepository refreshTokenRepository;
 
     public Member findById(Long userId){
-        return memberRepository.findById(userId).orElseThrow();
+        return memberRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + userId));
+    }
+
+
+    public Member findByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
     }
 
     public Member findByNickname(String nickname) {
@@ -34,6 +43,9 @@ public class MemberService {
     }
 
     public Member signUp(SignUpRequest signUpRequest) {
+        if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
+            throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
+        }
 
         String email = signUpRequest.getEmail();
         Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
@@ -65,7 +77,7 @@ public class MemberService {
         //TODO: Optional 예외처리
         Member user = memberRepository
                 .findById(updateRequest.getUserId())
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + updateRequest.getUserId()));
 
         String name = updateRequest.getName();
         String nickname = updateRequest.getNickname();
@@ -99,7 +111,7 @@ public class MemberService {
 
         //TODO: 예외처리
         Member user = memberRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + userId));
 
         user.setDeletedAt(LocalDateTime.now());
 
@@ -110,9 +122,8 @@ public class MemberService {
     public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
         LoginResponse loginResponse = new LoginResponse();
 
-        //TODO: 예외처리
         Member loginUser = memberRepository.findByEmail(id)
-                .orElseThrow();
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + id));
         String encodedPassword = loginUser.getPassword();
         log.info("[getSignInResult] Id : {}", id);
 
