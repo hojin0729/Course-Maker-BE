@@ -1,8 +1,10 @@
 package coursemaker.coursemaker.exception;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Getter
 public class RootException extends RuntimeException{
     private ErrorCode errorCode;
     private String logMessage;

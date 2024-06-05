@@ -17,6 +17,7 @@ import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,13 +144,18 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public List<TravelCourse> findAll() {
-        return travelCourseRepository.findAll();
+    public CourseMakerPagination<TravelCourse> findAll(Pageable pageable) {
+        Page<TravelCourse> page = travelCourseRepository.findAll(pageable);// db에서 페이지 단위로 가져옴
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page);// 페이지네이션 객체 변환
+
+        return courseMakerPagination;
     }
 
     @Override
-    public List<TravelCourse> getAllOrderByViewsDesc(Pageable pageable) {
-        return travelCourseRepository.findAllByOrderByViewsDesc(pageable);
+    public CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable) {
+        Page<TravelCourse> page = travelCourseRepository.findAllByOrderByViewsDesc(pageable);// db에서 페이지 단위로 가져옴
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page);// 페이지네이션 객체 변환
+        return courseMakerPagination;
     }
 
     @Override
@@ -221,6 +227,8 @@ public class CourseServiceImpl implements CourseService{
         travelCourse.setId(id);// id가 있으면 update함
         travelCourse = travelCourseRepository.save(travelCourse);
 
+
+        /****TODO: ROW MAPPER로 엔티티 - DTO 매핑****/
         /*destination 설정*/
         courseDestinationRepository.deleteAllByTravelCourseId(id);// 여행지 초기화
         for (AddCourseDestinationRequest courseDestination : request.getCourseDestinations()) {
