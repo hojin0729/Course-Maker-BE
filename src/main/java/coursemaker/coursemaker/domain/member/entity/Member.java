@@ -60,12 +60,13 @@ public class Member extends BaseEntity {
     }
 
     @Builder(builderMethodName = "addMemberBuilder")
-    public Member(String email, LoginType loginType, String name, String nickname, String password, String profileImgUrl, String profileDescription, String roles) {
+    public Member(String email, LoginType loginType, String name, String nickname, String password, String phoneNumber, String profileImgUrl, String profileDescription, String roles) {
         this.email = email;
         this.loginType = loginType;
         this.name = name;
         this.nickname = nickname;
         this.password = password;
+        this.phoneNumber = phoneNumber;
         this.profileImgUrl = profileImgUrl;
         this.profileDescription = profileDescription;
         this.roles = roles != null ? roles : "ROLE_USER";

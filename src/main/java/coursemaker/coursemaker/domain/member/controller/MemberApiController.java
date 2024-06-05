@@ -76,7 +76,7 @@ public class MemberApiController {
         return ResponseEntity.ok(validateNicknameResponse);
     }
 
-    @Operation(summary = "이메일 중복 확인", description = "회원가입 및 회원정보 수정 시, 이메일 중복 여부를 검증한다.")
+    @Operation(summary = "이메일 유효 확인", description = "회원가입 및 회원정보 수정 시,  중복 또는 글자 수 등, 이메일 중복 여부를 검증한다.")
     @PostMapping(value = "/validate-email")
     public ResponseEntity<ValidateEmailResponse> validateEmail(@Valid @RequestBody ValidateEmailRequest validateEmailRequest) {
         ValidateEmailResponse validateEmailResponse = memberService.isEmailValid(validateEmailRequest);
