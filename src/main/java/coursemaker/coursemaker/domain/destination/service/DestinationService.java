@@ -14,7 +14,7 @@ public interface DestinationService {
     Destination save(RequestDto requestDto);
 
     // 여행지를 업데이트하는 메서드
-//    Destination update(DestinationDto destinationDto);
+    Destination update(Long id, RequestDto requestDto);
 
     // id 기반으로 특정 여행지를 조회하는 메서드
     Destination findById(Long id);

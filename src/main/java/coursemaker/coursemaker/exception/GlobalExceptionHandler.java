@@ -15,6 +15,13 @@ public class GlobalExceptionHandler {
                 .body("인자값이 잘못됬습니다.");
     }
 
+    @ExceptionHandler(RootException.class)
+    public ResponseEntity<String> handleRootException(RootException e) {
+        return ResponseEntity
+                .status(400)
+                .body(e.getMessage());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
 
