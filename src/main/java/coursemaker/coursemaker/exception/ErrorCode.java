@@ -21,10 +21,15 @@ public enum ErrorCode {
     /*Course 도메인 예외*/
     INVALID_COURSE(HttpStatus.NOT_FOUND, "해당하는 코스가 없습니다.", "COURSE-001"),
     DUPLICATED_COURSE(HttpStatus.CONFLICT, "해당 코스가 이미 존재합니다.", "COURSE-002"),
-    ILLEGAL_COURSE_ARGUMENT(HttpStatus.BAD_REQUEST, "코스에 알맞은 인자값이 아닙니다.", "COURSE-003");
+    ILLEGAL_COURSE_ARGUMENT(HttpStatus.BAD_REQUEST, "코스에 알맞은 인자값이 아닙니다.", "COURSE-003"),
 
-//    /*Member 도메인 예외*/
-//    VALIDATION_MEMBER(HttpStatus.)
+    /*Member 도메인 예외*/
+    /* 회원가입, 로그인 시 */
+    DUPLICATED_MEMBER(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다.", "MEMBER-001"),
+    WRONG_PASSWORD(HttpStatus.OK, "비밀번호가 잘못되었습니다.", "MEMBER-002"),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원 정보가 없습니다.", "MEMBER-003"),
+    ILLEGAL_MEMBER_ARGUMENT(HttpStatus.BAD_REQUEST, "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004");
+
 
 
     private String description;
