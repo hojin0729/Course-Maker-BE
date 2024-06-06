@@ -6,11 +6,8 @@ import lombok.Getter;
 
 @Getter
 public class PictureNotFoundException extends RootException {
-    String message;
 
-    public PictureNotFoundException(String message, String logMessage) {
-        super(ErrorCode.PICTURE_NOT_FOUND, logMessage);
-
-        this.message = message;
+    public PictureNotFoundException(ErrorCode message, String logMessage) {
+        super(message, logMessage);
     }
 }
