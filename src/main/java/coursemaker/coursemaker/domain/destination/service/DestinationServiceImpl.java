@@ -14,6 +14,8 @@ import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.exception.ErrorCode;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -40,7 +42,7 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
-    public Destination save(RequestDto requestDto) {
+    public Destination save(@Valid RequestDto requestDto) {
         validateRequestDto(requestDto);
         // 멤버를 가져옴
         Member member = memberService.findByNickname(requestDto.getNickname());
@@ -59,7 +61,7 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
-    public Destination update(Long id, RequestDto requestDto) {
+    public Destination update(Long id, @Valid RequestDto requestDto) {
         validateRequestDto(requestDto);
 
         // 기존 여행지 엔티티를 찾고 없으면 예외 처리
@@ -84,25 +86,25 @@ public class DestinationServiceImpl implements DestinationService {
     // 통합 예외 처리
     private void validateRequestDto(RequestDto requestDto) {
         if (requestDto.getNickname() == null || requestDto.getNickname().isEmpty()) {
-            throw new IllegalDestinationArgumentException("닉네임이 없습니다.", "Destination Nickname: " + requestDto.getNickname());
+            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Nickname: " + requestDto.getNickname());
         }
         if (requestDto.getName() == null || requestDto.getName().isEmpty()) {
-            throw new IllegalDestinationArgumentException("여행지 이름이 없습니다.", "Destination name: " + requestDto.getName());
+            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination name: " + requestDto.getName());
         }
         if (requestDto.getLocation() == null || requestDto.getLocation().isEmpty()) {
-            throw new IllegalDestinationArgumentException("위치 정보가 없습니다.", "Destination Location: " + requestDto.getLocation());
+            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Location: " + requestDto.getLocation());
         }
         if (requestDto.getLatitude() == null) {
-            throw new IllegalDestinationArgumentException("위도 정보가 없습니다.", "Destination Latitude: " + requestDto.getLatitude());
+            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Latitude: " + requestDto.getLatitude());
         }
         if (requestDto.getLongitude() == null) {
-            throw new IllegalDestinationArgumentException("경도 정보가 없습니다.", "Destination Longitude: " + requestDto.getLongitude());
+            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Longitude: " + requestDto.getLongitude());
         }
         if (requestDto.getPictureLink() == null || requestDto.getPictureLink().isEmpty()) {
-            throw new PictureNotFoundException("사진 링크가 없습니다.", "Destination PictureLink: " + requestDto.getPictureLink());
+            throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Destination PictureLink: " + requestDto.getPictureLink());
         }
         if (requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
-            throw new IllegalDestinationArgumentException("내용이 없습니다.", "Destination Content: " + requestDto.getContent());
+            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Content: " + requestDto.getContent());
         }
         if (requestDto.getTags() == null || requestDto.getTags().isEmpty()) {
             throw new TagNotFoundException("태그가 없습니다.", "Destination name: " + requestDto.getName());
@@ -163,7 +165,7 @@ public class DestinationServiceImpl implements DestinationService {
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
         String pictureLink = destination.getPictureLink();
         if (pictureLink.isEmpty()) {
-            throw new PictureNotFoundException("사진이 존재하지 않습니다.", "Destination id: " + destinationId);
+            throw new PictureNotFoundException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination id: " + destinationId);
         }
         return pictureLink;
     }
@@ -183,7 +185,7 @@ public class DestinationServiceImpl implements DestinationService {
         Destination destination = destinationRepository.findById(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
         if (destination.getPictureLink().isEmpty()) {
-            throw new PictureNotFoundException("사진이 존재하지 않습니다.", "Destination id: " + destinationId);
+            throw new PictureNotFoundException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination id: " + destinationId);
         }
         // 대표사진 링크만 삭제
         destination.setPictureLink(null);
