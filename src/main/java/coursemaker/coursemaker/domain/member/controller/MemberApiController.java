@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.member.controller;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.service.EmailService;
@@ -12,10 +13,12 @@ import coursemaker.coursemaker.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +65,14 @@ public class MemberApiController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
+//    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
+//    @PostMapping("/logout")
+//    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
+//        LogoutResponse logoutResponse = memberService.logout(request, response);
+//        return ResponseEntity.ok().body(logoutResponse);
+//    }
+
+
     @Operation(summary = "마이페이지 정보 조회", description = "마이페이지에 필요한 정보를 조회한다.")
     @GetMapping(value = "/my-page")
     public ResponseEntity<MyPageResponse> showMyPage(@Valid @RequestParam("userId") Long userId) {
@@ -101,6 +112,13 @@ public class MemberApiController {
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
         return ResponseEntity
                 .status(ErrorCode.NOT_FOUND_MEMBER.getStatus())
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
+        return ResponseEntity
+                .status(ErrorCode.UNAUTHORIZED_MEMBER.getStatus())
                 .body(e.getMessage());
     }
 }
