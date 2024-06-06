@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/tags")
 @RequiredArgsConstructor
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Tag", description = "태그 API")
 public class TagController {
 
     private final TagService tagService;

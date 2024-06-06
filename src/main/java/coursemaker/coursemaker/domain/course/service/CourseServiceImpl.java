@@ -18,6 +18,7 @@ import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -288,7 +289,7 @@ public class CourseServiceImpl implements CourseService{
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
         String pictureLink = travelCourse.getPictureLink();
         if (pictureLink.isEmpty()) {
-            throw new PictureNotFoundException("사진이 존재하지 않습니다.", "Course id: " + courseId);
+            throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Course id: " + courseId);
         }
         return pictureLink;
     }
@@ -308,7 +309,7 @@ public class CourseServiceImpl implements CourseService{
         TravelCourse travelCourse = travelCourseRepository.findById(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
         if (travelCourse.getPictureLink().isEmpty()) {
-            throw new PictureNotFoundException("사진이 존재하지 않습니다.", "Course id: " + courseId);
+            throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Course id: " + courseId);
         }
         // 대표사진 링크만 삭제
         travelCourse.setPictureLink(null);

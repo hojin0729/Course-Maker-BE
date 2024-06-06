@@ -2,23 +2,18 @@ package coursemaker.coursemaker.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-
         return ResponseEntity
                 .status(400)
-                .body("인자값이 잘못됬습니다.");
+                .body("인자값이 잘못됬습니다.\n인자값: " + "오류: " + e.getMessage());
     }
 
     @ExceptionHandler(RootException.class)
@@ -45,13 +40,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ErrorResponse response = new ErrorResponse();
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            response.setMessage(errorMessage);
+            response.setStatus(400);
+            response.setErrorType("request validation error");
         });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
