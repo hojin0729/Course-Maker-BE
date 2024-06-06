@@ -26,6 +26,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 *.yml
+src/main/generated/
 
 
 ### NetBeans ###
@@ -37,3 +38,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Deploy ###
+Dockerfile
+*.Dockerfile
+*.dockerfile
