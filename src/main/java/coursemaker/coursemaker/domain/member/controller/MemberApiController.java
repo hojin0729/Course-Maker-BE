@@ -65,12 +65,12 @@ public class MemberApiController {
         return ResponseEntity.ok().body(loginResponse);
     }
 
-//    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
-//    @PostMapping("/logout")
-//    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
-//        LogoutResponse logoutResponse = memberService.logout(request, response);
-//        return ResponseEntity.ok().body(logoutResponse);
-//    }
+    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
+        LogoutResponse logoutResponse = memberService.logout(request, response);
+        return ResponseEntity.ok().body(logoutResponse);
+    }
 
 
     @Operation(summary = "마이페이지 정보 조회", description = "마이페이지에 필요한 정보를 조회한다.")
