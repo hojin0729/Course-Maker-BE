@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-/*TODO: 반환객체 response entity로 수정!*/
 public interface CourseService {
 
     TravelCourse save(AddTravelCourseRequest request);
@@ -23,5 +22,15 @@ public interface CourseService {
     TravelCourse update(Long id, AddTravelCourseRequest request);
     void delete(Long id);
     TravelCourse incrementViews(Long id);
+    void addPictureLink(Long courseId, String pictureLink);
+
+    // 코스 id로 여행지의 대표사진 URL을 조회하는 메서드
+    String getPictureLink(Long courseId);
+
+    // 기존 코스의 대표사진 URL을 새 URL로 변경하는 메서드
+    void updatePictureLink(Long courseId, String newPictureLink);
+
+    // 특정 코스의 대표사진을 삭제하는 메서드
+    void deletePictureLink(Long courseId);
 
 }
