@@ -12,6 +12,7 @@ import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
@@ -48,7 +49,7 @@ public class CourseServiceImpl implements CourseService{
     public CourseServiceImpl(CourseDestinationRepository courseDestinationRepository,
                              TravelCourseRepository travelCourseRepository,
                              @Lazy TagService tagService,
-                             DestinationService destinationService, 
+                             DestinationService destinationService,
                              MemberService memberService) {
         this.courseDestinationRepository = courseDestinationRepository;
         this.travelCourseRepository = travelCourseRepository;
@@ -270,5 +271,47 @@ public class CourseServiceImpl implements CourseService{
                 .orElseThrow(() -> new TravelCourseNotFoundException("코스가 존재하지 않습니다.", "Course ID: " + id));
         travelCourse.incrementViews();
         return travelCourseRepository.save(travelCourse);
+    }
+
+    @Override
+    public void addPictureLink(Long courseId, String pictureLink) {
+        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+        travelCourse.setPictureLink(pictureLink);
+        travelCourseRepository.save(travelCourse);
+    }
+
+    // 코스 id로 여행지의 대표사진 URL을 조회하는 메서드
+    @Override
+    public String getPictureLink(Long courseId) {
+        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+        String pictureLink = travelCourse.getPictureLink();
+        if (pictureLink.isEmpty()) {
+            throw new PictureNotFoundException("사진이 존재하지 않습니다.", "Course id: " + courseId);
+        }
+        return pictureLink;
+    }
+
+    // 기존 코스의 대표사진 URL을 변경하는 메서드.
+    @Override
+    public void updatePictureLink(Long courseId, String newPictureLink) {
+        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+        travelCourse.setPictureLink(newPictureLink);
+        travelCourseRepository.save(travelCourse);
+    }
+
+    // 특정 코스의 대표사진 링크를 삭제하는 메서드.
+    @Override
+    public void deletePictureLink(Long courseId) {
+        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+        if (travelCourse.getPictureLink().isEmpty()) {
+            throw new PictureNotFoundException("사진이 존재하지 않습니다.", "Course id: " + courseId);
+        }
+        // 대표사진 링크만 삭제
+        travelCourse.setPictureLink(null);
+        travelCourseRepository.save(travelCourse);
     }
 }
