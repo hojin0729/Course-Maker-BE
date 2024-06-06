@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,15 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
+    private final long TOKEN_VALID_MILISECOND = 1000L * 30;
     private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
+
+    private final RefreshTokenService refreshTokenService;
+
+    @Autowired
+    public JwtTokenProvider(RefreshTokenService refreshTokenService) {
+        this.refreshTokenService = refreshTokenService;
+    }
 
     @Value("${spring.jwt.salt}")
     private String salt;
@@ -73,6 +81,10 @@ public class JwtTokenProvider {
             log.info("[validateToken] 토큰 유효 체크 예외 발생");
             return false;
         }
+    }
+
+    public boolean isBlackList(String accessToken) {
+        return refreshTokenService.isBlackList(accessToken);
     }
 
 }

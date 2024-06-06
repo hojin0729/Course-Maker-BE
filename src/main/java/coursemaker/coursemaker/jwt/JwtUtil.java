@@ -52,4 +52,8 @@ public class JwtUtil {
         }
         return null;
     }
+
+    public Boolean isBlack(String accessToken) {
+        return jwtTokenProvider.isBlackList(accessToken);
+    }
 }

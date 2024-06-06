@@ -8,6 +8,7 @@ import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
+import coursemaker.coursemaker.jwt.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
     public Member findById(Long userId){
         return memberRepository.findById(userId)
@@ -46,9 +48,10 @@ public class MemberService {
         if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
         }
-        if(signUpRequest.getEmail() == null) {
-            throw new IllegalUserArgumentException("올바른 값을 ", "");
+        if(signUpRequest.getEmail() == null || signUpRequest.getEmail().isBlank()) {
+            throw new IllegalUserArgumentException("이메일 입력값이 비어있습니다 ", "email is empty");
         }
+
         String email = signUpRequest.getEmail();
         Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
         String name = signUpRequest.getName();
@@ -155,36 +158,37 @@ public class MemberService {
         cookie1.setMaxAge(60 * 60);
         response.addCookie(cookie1);
 
-//        refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
+        /*db에 리프레시토큰이랑 엑세스토큰 저장*/
+        refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
 
         log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
         return loginResponse;
 
     }
 
-//    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-//        // 쿠키 만료 시작
-//        Cookie cookieForExpire = new Cookie("Authorization", null);
-//        cookieForExpire.setPath("/");
-//        cookieForExpire.setMaxAge(0);
-//        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
-//        //쿠키 만료 끝
-//
-//        //리프레시 토큰 삭제 시작
-//        Cookie currentCookie = Arrays.stream(request.getCookies())
-//                .filter(cookie -> "Authorization".equals(cookie.getName()))
-//                .findFirst().orElseThrow();
-//        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
-//        if (token.startsWith("Bearer ")) {
-//            token = token.substring(7);
-//        }
-//
+    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 만료 시작
+        Cookie cookieForExpire = new Cookie("Authorization", null);
+        cookieForExpire.setPath("/");
+        cookieForExpire.setMaxAge(0);
+        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
+        //쿠키 만료 끝
+
+        //리프레시 토큰 삭제 시작
+        Cookie currentCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .findFirst().orElseThrow();
+        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        refreshTokenService.setBlackList(token);// 토큰 블랙리스트 등록
 //        refreshTokenService.removeTokenInfo(token);
-//        //리프레시 토큰 삭제 끝
-//
-//        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
-//        return logoutResponse;
-//    }
+        //리프레시 토큰 삭제 끝
+
+        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
+        return logoutResponse;
+    }
 
 
     public MyPageResponse showMyPage(Long userId) {
