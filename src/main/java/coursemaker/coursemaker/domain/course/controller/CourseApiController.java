@@ -17,6 +17,7 @@ import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.validation.annotation.Validated;
@@ -126,7 +127,7 @@ public class CourseApiController {
     @GetMapping("/{id}")
     public ResponseEntity<TravelCourseResponse> findTravelCourseById(@PathVariable("id") Long id) {
         TravelCourse travelCourse = courseService.incrementViews(id);
-        
+
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                 .stream()
