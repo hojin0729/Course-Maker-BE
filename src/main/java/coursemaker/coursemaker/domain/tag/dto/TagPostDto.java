@@ -1,13 +1,17 @@
 package coursemaker.coursemaker.domain.tag.dto;
 
 import coursemaker.coursemaker.domain.tag.entity.Tag;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class TagPostDto {
 
+    @Schema(description = "태그 이름", example = "연인")
     private String name;
+
+    @Schema(description = "태그에 대한 설명", example = "그래서, 커플이시겠다?")
     private String description;
 
     public Tag toEntity() {

@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-@io.swagger.v3.oas.annotations.tags.Tag(name = "destination", description = "여행지 API")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Destination", description = "여행지 API")
 @RestController
 @RequestMapping("v1/destination")
 public class DestinationController {

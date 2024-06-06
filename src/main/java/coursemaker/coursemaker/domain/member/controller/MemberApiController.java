@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/member")
 @RequiredArgsConstructor
 @Slf4j
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Member", description = "회원 API")
 public class MemberApiController {
     private final MemberService memberService;
     private final EmailService emailService;

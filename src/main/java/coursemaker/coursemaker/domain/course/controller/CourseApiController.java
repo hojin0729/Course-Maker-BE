@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/courses")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Course", description = "여행 코스 API")
 public class CourseApiController {
 
     private final CourseService courseService;
