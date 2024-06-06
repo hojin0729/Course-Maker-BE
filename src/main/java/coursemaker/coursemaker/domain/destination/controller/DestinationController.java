@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -112,7 +113,7 @@ public class DestinationController {
     /*********스웨거 어노테이션**********/
     // 여행지를 새로 생성함.
     @PostMapping
-    public ResponseEntity<DestinationDto> createDestination(@RequestBody RequestDto request) {
+    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request) {
 //        if (!request.getNickname().equals(member.getNickname())) {
 //            throw new IllegalDestinationArgumentException("닉네임이 틀려요.", "request nickname: " + request.getNickname() + "\tauthentication member nickname: " + member.getNickname());
 //        }
@@ -140,7 +141,7 @@ public class DestinationController {
     // Id에 해당하는 여행지의 정보를 수정합니다.
     @PatchMapping("/{id}")
 
-    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @RequestBody RequestDto request) {
+    public ResponseEntity<DestinationDto> updateDestination(@Valid @PathVariable("id") Long id, @RequestBody RequestDto request) {
 //        if (!request.getNickname().equals(member.getNickname())) {
 //            throw new IllegalDestinationArgumentException("닉네임이 틀려요.", "request nickname: " + request.getNickname() + "\tauthentication member nickname: " + member.getNickname());
 //        }

@@ -6,11 +6,8 @@ import lombok.Getter;
 
 @Getter
 public class IllegalDestinationArgumentException extends RootException {
-    String message;
 
-    public IllegalDestinationArgumentException(String message, String logMessage) {
-        super(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, logMessage);
-
-        this.message = message;
+    public IllegalDestinationArgumentException(ErrorCode message, String logMessage) {
+        super(message, logMessage);
     }
 }
