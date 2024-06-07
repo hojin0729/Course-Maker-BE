@@ -67,6 +67,10 @@ public class CourseServiceImpl implements CourseService{
             throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
         }
 
+        if (request.getTitle().length() > 50) {
+            throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
+        }
+
         if (request.getContent() == null || request.getContent().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
         }
@@ -175,6 +179,9 @@ public class CourseServiceImpl implements CourseService{
             throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
         }
 
+        if (request.getTitle().length() > 50) {
+            throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
+        }
 
         if (request.getContent() == null || request.getContent().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
