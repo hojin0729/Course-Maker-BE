@@ -61,14 +61,14 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public TravelCourse save(AddTravelCourseRequest request) {
-        Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
+        // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
         if (request.getTitle() == null || request.getTitle().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
         }
 
-        if (existingCourse.isPresent()) {
-            throw new TravelCourseDuplicatedException("이미 존재하는 코스입니다. ", "코스 이름: " + request.getTitle());
-        }
+//        if (existingCourse.isPresent()) {
+//            throw new TravelCourseDuplicatedException("이미 존재하는 코스입니다. ", "코스 이름: " + request.getTitle());
+//        }
 
         if (request.getContent() == null || request.getContent().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
@@ -167,9 +167,9 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public TravelCourse update(Long id, AddTravelCourseRequest request) {
+    public TravelCourse update(Long id, UpdateTravelCourseRequest request) {
 
-        Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
+        // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
 
         travelCourseRepository.findById(id).orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다..", "course ID: " + id));
 
@@ -233,7 +233,7 @@ public class CourseServiceImpl implements CourseService{
         /****TODO: ROW MAPPER로 엔티티 - DTO 매핑****/
         /*destination 설정*/
         courseDestinationRepository.deleteAllByTravelCourseId(id);// 여행지 초기화
-        for (AddCourseDestinationRequest courseDestination : request.getCourseDestinations()) {
+        for (UpdateCourseDestinationRequest courseDestination : request.getCourseDestinations()) {
 
             CourseDestination courseDestinationEntity = CourseDestination.builder()
                     .date(courseDestination.getDate())
@@ -263,6 +263,9 @@ public class CourseServiceImpl implements CourseService{
         if (!travelCourseRepository.existsById(id)) {
             throw new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id);
         }
+
+        courseDestinationRepository.deleteAllByTravelCourseId(id);
+
         travelCourseRepository.deleteById(id);
     }
 
