@@ -27,7 +27,7 @@ public class JwtUtil {
         RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
                 .orElseThrow();
 
-        if (jwtTokenProvider.validateToken(refreshToken.getRefreshToken())) {
+        if (jwtTokenProvider.validateToken(refreshToken.getRefreshToken(), request)) {
             log.info("[refreshToken] 기존 RefreshToken으로 AccessToken 재발급 && 새 RefreshToken 발급 시작");
             String newAccessToken = jwtTokenProvider.createAccessToken(String.valueOf(Long.valueOf(refreshToken.getId())));
             String newRefreshToken = jwtTokenProvider.createRefreshToken();

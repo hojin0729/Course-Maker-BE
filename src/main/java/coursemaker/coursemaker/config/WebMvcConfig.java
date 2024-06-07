@@ -23,12 +23,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
     
     /*JWT 인터셉터 등록*/
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(JwtInterceptor)
-//                .excludePathPatterns("/v1/member")// 회원가입
-//                .excludePathPatterns("/v1/member/login");// 로그인
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(JwtInterceptor)
+                .excludePathPatterns("/v1/member")// 회원가입
+                .excludePathPatterns("/v1/member/login");// 로그인
+    }
 
 }
 

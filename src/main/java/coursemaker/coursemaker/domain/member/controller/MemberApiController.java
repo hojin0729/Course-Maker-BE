@@ -102,6 +102,7 @@ public class MemberApiController {
         return ResponseEntity.ok(validateEmailResponse);
     }
 
+    //TODO: 위치 Refactor
     @ExceptionHandler(UserDuplicatedException.class)
     public ResponseEntity<String> handleUserDuplicatedException(UserDuplicatedException e) {
         return ResponseEntity
