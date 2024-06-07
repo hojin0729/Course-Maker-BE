@@ -48,6 +48,10 @@ public class UpdateTravelCourseRequest {
     @Size(min = 1, message = "최소한 한 개의 코스 여행지가 있어야 합니다.")
     private List<UpdateCourseDestinationRequest> courseDestinations;
 
+    @Schema(description = "유저 닉네임", example = "nickname2")
+    @NotNull(message = "닉네임이 비어있지 않아야 합니다.")
+    private String nickname;// 유저 닉네임
+
     @Schema(description = "코스 태그 목록")
     @NotNull(message = "최소한 한 개의 태그가 있어야 합니다.")
     @Size(min = 1, message = "최소한 한 개의 태그가 있어야 합니다.")

@@ -19,7 +19,7 @@ public interface CourseService {
     CourseMakerPagination<TravelCourse> findAll(Pageable pageable);
     CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable);
     TravelCourse findById(Long id);
-    TravelCourse update(Long id, AddTravelCourseRequest request);
+    TravelCourse update(Long id, UpdateTravelCourseRequest request);
     void delete(Long id);
     TravelCourse incrementViews(Long id);
     void addPictureLink(Long courseId, String pictureLink);
