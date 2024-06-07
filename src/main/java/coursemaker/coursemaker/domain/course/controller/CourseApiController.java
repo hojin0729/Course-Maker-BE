@@ -12,10 +12,12 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 
 
+import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -184,24 +186,63 @@ public class CourseApiController {
 
 
     @ExceptionHandler(TravelCourseDuplicatedException.class)
-    public ResponseEntity<String> handleTagDuplicatedException(TravelCourseNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagDuplicatedException(TravelCourseNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.DUPLICATED_COURSE.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(TravelCourseNotFoundException.class)
-    public ResponseEntity<String> handleTagNotFoundException(TravelCourseNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagNotFoundException(TravelCourseNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.INVALID_COURSE.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(IllegalTravelCourseArgumentException.class)
-    public ResponseEntity<String> handleIllegalTravelCourseArgumentException(IllegalTravelCourseArgumentException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalTravelCourseArgumentException(IllegalTravelCourseArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.ILLEGAL_COURSE_ARGUMENT.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(PictureNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePictureNotFoundException(PictureNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
     }
 
 }
