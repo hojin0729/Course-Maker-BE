@@ -8,17 +8,21 @@ import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/v1/tags")
 @RequiredArgsConstructor
@@ -51,7 +55,7 @@ public class TagController {
             responseCode = "409", description = "생성하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content
     )
     @PostMapping
-    public ResponseEntity<Void> addTag(@RequestBody TagPostDto request) {
+    public ResponseEntity<Void> addTag(@Valid @RequestBody TagPostDto request) {
         TagResponseDto response = tagService.createTag(request.toEntity())
                 .toResponseDto();
 
@@ -74,7 +78,7 @@ public class TagController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<TagResponseDto> updateTag(@PathVariable(name = "id") Long id
-                                                    ,@RequestBody TagPostDto request) {
+                                                    ,@Valid @RequestBody TagPostDto request) {
         Tag tag = request.toEntity();
         tag.setId(id);
 
@@ -100,24 +104,48 @@ public class TagController {
     }
 
     @ExceptionHandler(TagDuplicatedException.class)
-    public ResponseEntity<String> handleTagDuplicatedException(TagDuplicatedException e) {
+    public ResponseEntity<ErrorResponse> handleTagDuplicatedException(TagDuplicatedException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.DUPLICATED_TAG.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<String> handleTagNotFoundException(TagNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagNotFoundException(TagNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.INVALID_TAG.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(IllegalTagArgumentException.class)
-    public ResponseEntity<String> handleIllegalTagArgumentException(IllegalTagArgumentException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalTagArgumentException(IllegalTagArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.ILLEGAL_TAG_ARGUMENT.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
 }

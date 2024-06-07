@@ -60,10 +60,6 @@ public class TagServiceImpl implements TagService{
             throw new TagDuplicatedException("이미 존재하는 태그입니다.", "tag name: " + tag.getName() );
         }
 
-        if(tag.getDescription() == null || tag.getDescription().isEmpty()) {
-            throw new IllegalTagArgumentException("태그에 대한 설명이 없습니다.", "tag name: " + tag.getName() );
-        }
-
         return tagRepository.save(tag);
     }
 
@@ -100,10 +96,6 @@ public class TagServiceImpl implements TagService{
             throw new TagDuplicatedException("이미 존재하는 태그 이름입니다.", "tag name: " + tag.getName() );
         }
 
-        /*태그 설명 존재여부 확인*/
-        if(tag.getDescription() == null || tag.getDescription().isEmpty()) {
-            throw new IllegalTagArgumentException("태그에 대한 설명이 없습니다.", "tag name: " + tag.getName() );
-        }
 
         return tagRepository.save(tag);
     }

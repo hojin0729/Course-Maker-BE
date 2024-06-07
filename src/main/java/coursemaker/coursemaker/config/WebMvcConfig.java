@@ -13,12 +13,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
+    private final JwtInterceptor JwtInterceptor;
+
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
                 .exposedHeaders("Set-Cookie")
                 .allowedMethods("*");
     }
+    
+    /*JWT 인터셉터 등록*/
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(JwtInterceptor)
+//                .excludePathPatterns("/v1/member")// 회원가입
+//                .excludePathPatterns("/v1/member/login");// 로그인
+//    }
 
 }
 
