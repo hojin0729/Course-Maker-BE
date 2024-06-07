@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,7 @@ public class JwtTokenProvider {
         log.info("[init] JwtTokenProvider 내 SecretKey 초기화 완료");
     }
 
+    //
     public String createAccessToken(String name) {
         Claims claims = Jwts.claims().setSubject(name);
         Date now = new Date();
@@ -71,11 +73,13 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
-    public boolean validateToken(String jwtToken) {
+    public boolean validateToken(String jwtToken, HttpServletRequest request) {
         log.info("[validateToken] 토큰 유효 체크 시작 ");
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
                     .parseClaimsJws(jwtToken);
+            request.setAttribute("user", claims.getBody().get("nickname"));
+            System.out.println(claims.toString());
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             log.info("[validateToken] 토큰 유효 체크 예외 발생");
@@ -83,8 +87,18 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean isBlackList(String accessToken) {
-        return refreshTokenService.isBlackList(accessToken);
+    public long getRemainingTTL(String jwtToken) {
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(jwtToken);
+        Date expiration = claims.getBody().getExpiration();
+        Date now = new Date();
+        long remainingMillis = expiration.getTime() - now.getTime();
+        return Math.max(remainingMillis, 0) / 1000;
     }
+
+
+//    public boolean isBlackList(String accessToken) {
+//        return refreshTokenService.isBlackList(accessToken);
+//    }
 
 }
