@@ -63,7 +63,7 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<Void> createTravelCourse(@RequestBody AddTravelCourseRequest request) {
+    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request) {
         TravelCourse savedTravelCourse = courseService.save(request);
 
         return (savedTravelCourse != null) ?
@@ -148,7 +148,7 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
-    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @RequestBody AddTravelCourseRequest request) {
+    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request) {
         System.out.println("---------------------------------------------------id = " + id);
         TravelCourse updatedTravelCourse = courseService.update(id, request);
 
