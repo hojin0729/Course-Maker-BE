@@ -17,8 +17,10 @@ public class JwtInterceptor implements HandlerInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtUtil jwtUtil;
 
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler)
-            throws Exception {
+    @Override
+    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+        log.info("@@@@@@@@@@@@인터셉터 쌈@뽕 하게 동작중@@@@@@@@@@@@@@@");
+
         if(HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
