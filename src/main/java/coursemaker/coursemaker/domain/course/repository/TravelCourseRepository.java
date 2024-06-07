@@ -11,8 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface TravelCourseRepository extends JpaRepository<TravelCourse, Long> {
-    Page<TravelCourse> findAll(Pageable pageable);
-    Page<TravelCourse> findAllByOrderByViewsDesc(Pageable pageable);
-
-    // Optional<TravelCourse> findByTitle(String title);
+    Page<TravelCourse> findAllByDeletedAtIsNull(Pageable pageable);
+    Page<TravelCourse> findAllByDeletedAtIsNullOrderByViewsDesc(Pageable pageable);
+    Optional<TravelCourse> findByIdAndDeletedAtIsNull(Long id);
 }

@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.course.service;
 import coursemaker.coursemaker.domain.course.dto.*;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -39,7 +41,6 @@ public class CourseServiceImpl implements CourseService{
     private final CourseDestinationRepository courseDestinationRepository;
 
     private final TravelCourseRepository travelCourseRepository;
-
 
     private final TagService tagService;
 
@@ -65,10 +66,6 @@ public class CourseServiceImpl implements CourseService{
         if (request.getTitle() == null || request.getTitle().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
         }
-
-//        if (existingCourse.isPresent()) {
-//            throw new TravelCourseDuplicatedException("이미 존재하는 코스입니다. ", "코스 이름: " + request.getTitle());
-//        }
 
         if (request.getContent() == null || request.getContent().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
@@ -147,7 +144,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseMakerPagination<TravelCourse> findAll(Pageable pageable) {
-        Page<TravelCourse> page = travelCourseRepository.findAll(pageable);// db에서 페이지 단위로 가져옴
+        Page<TravelCourse> page = travelCourseRepository.findAllByDeletedAtIsNull(pageable);// db에서 페이지 단위로 가져옴
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page);// 페이지네이션 객체 변환
 
         return courseMakerPagination;
@@ -155,14 +152,14 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable) {
-        Page<TravelCourse> page = travelCourseRepository.findAllByOrderByViewsDesc(pageable);// db에서 페이지 단위로 가져옴
+        Page<TravelCourse> page = travelCourseRepository.findAllByDeletedAtIsNullOrderByViewsDesc(pageable);// db에서 페이지 단위로 가져옴
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page);// 페이지네이션 객체 변환
         return courseMakerPagination;
     }
 
     @Override
     public TravelCourse findById(Long id) {
-        return travelCourseRepository.findById(id)
+        return travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("존재하지 않는 코스입니다.", "Course ID: " + id));
     }
 
@@ -171,7 +168,8 @@ public class CourseServiceImpl implements CourseService{
 
         // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
 
-        travelCourseRepository.findById(id).orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다..", "course ID: " + id));
+        travelCourseRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id));
 
         if (request.getTitle() == null || request.getTitle().isEmpty()) {
             throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
@@ -260,18 +258,28 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public void delete(Long id) {
-        if (!travelCourseRepository.existsById(id)) {
-            throw new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id);
+        TravelCourse travelCourse = travelCourseRepository.findById(id)
+                .orElseThrow(() -> new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id));
+
+        if (travelCourse.getDeletedAt() != null) {
+            throw new TravelCourseAlreadyDeletedException("해당 코스는 이미 삭제되었습니다.", "Course ID: " + id);
         }
 
-        courseDestinationRepository.deleteAllByTravelCourseId(id);
-
-        travelCourseRepository.deleteById(id);
+        travelCourse.setDeletedAt(LocalDateTime.now());
+        travelCourseRepository.save(travelCourse);
+//        if (!travelCourseRepository.existsById(id)) {
+//            throw new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id);
+//        }
+//        // Todo:  실제로 날리지 말고 soft 딜리트로 하자. 컬럼 추가: deleteAt 추가. deleteAt에 특정 날짜 추가 (디폴트 벨류 null)
+//        // 오늘 삭제하면 오늘 들어가게 된다. 데이터는 날리면 안 된다.
+//        // null이면 데이터 조회가 되고, 날짜값이 있으면 조회가 안 되게 해야한다.
+//        courseDestinationRepository.deleteAllByTravelCourseId(id);
+//        travelCourseRepository.deleteById(id);
     }
 
     @Override
     public TravelCourse incrementViews(Long id) {
-        TravelCourse travelCourse = travelCourseRepository.findById(id)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("코스가 존재하지 않습니다.", "Course ID: " + id));
         travelCourse.incrementViews();
         return travelCourseRepository.save(travelCourse);
@@ -279,7 +287,7 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public void addPictureLink(Long courseId, String pictureLink) {
-        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
         travelCourse.setPictureLink(pictureLink);
         travelCourseRepository.save(travelCourse);
@@ -288,7 +296,7 @@ public class CourseServiceImpl implements CourseService{
     // 코스 id로 여행지의 대표사진 URL을 조회하는 메서드
     @Override
     public String getPictureLink(Long courseId) {
-        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
         String pictureLink = travelCourse.getPictureLink();
         if (pictureLink.isEmpty()) {
@@ -300,7 +308,7 @@ public class CourseServiceImpl implements CourseService{
     // 기존 코스의 대표사진 URL을 변경하는 메서드.
     @Override
     public void updatePictureLink(Long courseId, String newPictureLink) {
-        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
         travelCourse.setPictureLink(newPictureLink);
         travelCourseRepository.save(travelCourse);
@@ -309,7 +317,7 @@ public class CourseServiceImpl implements CourseService{
     // 특정 코스의 대표사진 링크를 삭제하는 메서드.
     @Override
     public void deletePictureLink(Long courseId) {
-        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
         if (travelCourse.getPictureLink().isEmpty()) {
             throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Course id: " + courseId);

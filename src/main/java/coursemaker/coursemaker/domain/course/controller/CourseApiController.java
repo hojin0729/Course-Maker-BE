@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.course.controller;
 
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.service.CourseService;
@@ -11,7 +12,7 @@ import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 
-
+import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
@@ -217,6 +218,21 @@ public class CourseApiController {
 
     @ExceptionHandler(IllegalTravelCourseArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalTravelCourseArgumentException(IllegalTravelCourseArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(TravelCourseAlreadyDeletedException.class)
+    public ResponseEntity<ErrorResponse> handleTravelCourseAlreadyDeletedException(TravelCourseAlreadyDeletedException e) {
         ErrorResponse response = new ErrorResponse();
 
         response.setErrorType(e.getErrorCode().getErrorType());
