@@ -10,33 +10,58 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType("Illegal argument");
+        response.setMessage("인자값이 잘못됬습니다: "+e.getMessage());
+        response.setStatus(400);
+
         return ResponseEntity
-                .status(400)
-                .body("인자값이 잘못됬습니다.\n인자값: " + "오류: " + e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(RootException.class)
-    public ResponseEntity<String> handleRootException(RootException e) {
+    public ResponseEntity<ErrorResponse> handleRootException(RootException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType("unknown error");
+        response.setMessage("예상치 못한 오류가 발생했습니다: "+e.getMessage());
+        response.setStatus(400);
 
         return ResponseEntity
-                .status(400)
-                .body("예상치 못한 오류가 발생했습니다.\n오류: " + e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType("unknown error");
+        response.setMessage("예상치 못한 쌈@뽕한 오류가 발생했습니다: " + e.getMessage());
+        response.setStatus(400);
 
         return ResponseEntity
-                .status(400)
-                .body("예상치 못한 쌈@뽕한 예외가 발생했습니다. \n오류: " + e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,7 +72,7 @@ public class GlobalExceptionHandler {
             String errorMessage = error.getDefaultMessage();
             response.setMessage(errorMessage);
             response.setStatus(400);
-            response.setErrorType("request validation error");
+            response.setErrorType("Illegal argument");
         });
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

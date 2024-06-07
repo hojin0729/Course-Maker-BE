@@ -8,6 +8,7 @@ import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -103,24 +104,48 @@ public class TagController {
     }
 
     @ExceptionHandler(TagDuplicatedException.class)
-    public ResponseEntity<String> handleTagDuplicatedException(TagDuplicatedException e) {
+    public ResponseEntity<ErrorResponse> handleTagDuplicatedException(TagDuplicatedException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.DUPLICATED_TAG.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<String> handleTagNotFoundException(TagNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagNotFoundException(TagNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.INVALID_TAG.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(IllegalTagArgumentException.class)
-    public ResponseEntity<String> handleIllegalTagArgumentException(IllegalTagArgumentException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalTagArgumentException(IllegalTagArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.ILLEGAL_TAG_ARGUMENT.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
 }
