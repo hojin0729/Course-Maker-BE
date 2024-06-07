@@ -45,7 +45,7 @@
 ## 데이터베이스 구조
 
 
-<img width="1027" alt="스크린샷 2024-06-04 17 19 30" src="https://github.com/course-maker/Course-Maker-BE/assets/105052888/aa33ee02-ee30-4d2b-a81d-72002416e966">
+<img width="1011" alt="스크린샷 2024-06-07 15 31 37" src="https://github.com/course-maker/Course-Maker-BE/assets/105052888/b6fcc336-aaf7-4d0b-b4b1-16d95e795fe9">
 
 ## 팀원
 
@@ -69,6 +69,7 @@
 | <img src="https://avatars.githubusercontent.com/u/73402982?v=4" width=130px alt="김재협"/> | <img src="https://avatars.githubusercontent.com/u/155591134?v=4" width=130px alt="송호진"/> | <img src="https://avatars.githubusercontent.com/u/105052888?v=4" width=130px alt="안준수"/> |   <img src="https://avatars.githubusercontent.com/u/46448947?v=4" width=130px alt="주디">   |
 |                           [김재협](https://github.com/YachaTree)                           |                           [송호진](https://github.com/hojin0729)                           |                           [안준수](https://github.com/Derit7042)                            |                            [임혁진](https://github.com/isaiahIM)                             |
 |                                      Member 도메인 담당                                      |                                   Destination 도메인 담당                                    |                                      Course 도메인 담당                                       |                                    팀장  <br/>Tag 도메인 담당                                    |
+
 
 
 
