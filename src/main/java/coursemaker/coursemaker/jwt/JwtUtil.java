@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -35,20 +36,11 @@ public class JwtUtil {
         }
     } // TODO: Redis RefreshToken에 맞게 수정 2
 
-    public String getTokenFromRequest(HttpServletRequest request, String tokenName) throws UnsupportedEncodingException {
-        if (request.getCookies() != null) {
-            Optional<Cookie> tokenCookie = Arrays.stream(request.getCookies())
-                    .filter(
-                            cookie -> cookie.getName().equals(tokenName)
-                    ).findFirst();
-
-            if (tokenCookie.isPresent()) {
-                String token = URLDecoder.decode(tokenCookie.get().getValue(), "UTF-8");
-                if (token != null && token.startsWith("Bearer ")) {
-                    return token.substring(7);
-                }
-                log.info(token);
-            }
+    public String getTokenFromRequest(HttpServletRequest request) throws UnsupportedEncodingException {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            log.info("BearerToken: {}", bearerToken);
+            return bearerToken.substring("Bearer ".length());
         }
         return null;
     }

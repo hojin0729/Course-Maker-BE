@@ -183,7 +183,6 @@ public class MemberService {
             token = token.substring(7);
         }
         refreshTokenService.setBlackList(token);// 토큰 블랙리스트 등록
-//        refreshTokenService.removeTokenInfo(token);
         //리프레시 토큰 삭제 끝
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
@@ -247,5 +246,4 @@ public class MemberService {
 
         return validateEmailResponse;
     }
-
 }

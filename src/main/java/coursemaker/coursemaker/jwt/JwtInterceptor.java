@@ -7,8 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.lang.reflect.Parameter;
 
 @RequiredArgsConstructor
 @Component
@@ -25,27 +28,32 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String accessToken = jwtUtil.getTokenFromRequest(request, "Authorization");
+        if (handler instanceof HandlerMethod handlerMethod) {
+            boolean requiresAuthorization = false;
 
-        log.info("[preHandle] accessToken 값 추출 완료, token: {}", accessToken);
-        log.info("[preHandle] accessToken 값 유효성 체크 시작");
+            for (Parameter parameter : handlerMethod.getMethod().getParameters()) {
+                if (parameter.isAnnotationPresent(JwtAuthorization.class)) {
+                    JwtAuthorization jwtAuthorization = parameter.getAnnotation(JwtAuthorization.class);
+                    requiresAuthorization = jwtAuthorization.required();
+                    break;
+                }
+            }
 
-        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
-            log.info("[preHandle] accessToken 값 유효성 체크 완료");
-            return HandlerInterceptor.super.preHandle(request, response, handler);
-        } else {
-            log.warn("[preHandle] AccessToken이 만료되었습니다.");
-            return jwtUtil.refreshAuthentication(request, response); //TODO: 여기서 Exception 뱉는 분기점 만들어줘야함
+            if (requiresAuthorization) {
+                String accessToken = jwtUtil.getTokenFromRequest(request);
+
+                log.info("[preHandle] accessToken 값 추출 완료, token: {}", accessToken);
+                log.info("[preHandle] accessToken 값 유효성 체크 시작");
+
+                if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+                    log.info("[preHandle] accessToken 값 유효성 체크 완료");
+                    return HandlerInterceptor.super.preHandle(request, response, handler);
+                } else {
+                    log.warn("[preHandle] AccessToken이 만료되었습니다.");
+                    return jwtUtil.refreshAuthentication(request, response);
+                }
+            }
         }
-    } // TODO: 토큰 없으면 False를 반환하므로 postHandle로 안넘어감
-
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) throws Exception {
-        log.info("@@@@@@ POSTHANDLE @@@@@@");
-        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-    }
-
-    //view 처리 이후 이벤트 작동
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        log.info("================================ END ================================");
+        return true;
     }
 }
