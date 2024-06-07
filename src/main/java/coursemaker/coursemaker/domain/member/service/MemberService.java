@@ -2,10 +2,7 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
-import coursemaker.coursemaker.domain.member.exception.IllegalUserArgumentException;
-import coursemaker.coursemaker.domain.member.exception.InvalidPasswordException;
-import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
-import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
+import coursemaker.coursemaker.domain.member.exception.*;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
 import coursemaker.coursemaker.jwt.RefreshTokenService;
@@ -166,24 +163,32 @@ public class MemberService {
 
     }
 
-    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키 만료 시작
-        Cookie cookieForExpire = new Cookie("Authorization", null);
-        cookieForExpire.setPath("/");
-        cookieForExpire.setMaxAge(0);
-        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
+    public LogoutResponse logout(HttpServletRequest request) {
+//        // 쿠키 만료 시작
+//        Cookie cookieForExpire = new Cookie("Authorization", null);
+//        cookieForExpire.setPath("/");
+//        cookieForExpire.setMaxAge(0);
+//        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
         //쿠키 만료 끝
 
-        //리프레시 토큰 삭제 시작
-        Cookie currentCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> "Authorization".equals(cookie.getName()))
-                .findFirst().orElseThrow();
-        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+//        //리프레시 토큰 삭제 시작
+//        Cookie currentCookie = Arrays.stream(request.getCookies())
+//                .filter(cookie -> "Authorization".equals(cookie.getName()))
+//                .findFirst().orElseThrow();
+//        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+
+        String token = request.getHeader("Authorization");
+
+        //TODO:예외처리
+        if (token == null) {
+            throw new UnauthorizedException("인증받지 않은 회원입니다. ", "");
+        }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        refreshTokenService.setBlackList(token);// 토큰 블랙리스트 등록
+//        refreshTokenService.setBlackList(token);//TODO 토큰 블랙리스트 등록
         //리프레시 토큰 삭제 끝
+        refreshTokenService.removeTokenInfo(token);
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
         return logoutResponse;

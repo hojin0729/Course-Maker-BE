@@ -83,8 +83,18 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean isBlackList(String accessToken) {
-        return refreshTokenService.isBlackList(accessToken);
+    public long getRemainingTTL(String jwtToken) {
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(jwtToken);
+        Date expiration = claims.getBody().getExpiration();
+        Date now = new Date();
+        long remainingMillis = expiration.getTime() - now.getTime();
+        return Math.max(remainingMillis, 0) / 1000;
     }
+
+
+//    public boolean isBlackList(String accessToken) {
+//        return refreshTokenService.isBlackList(accessToken);
+//    }
 
 }

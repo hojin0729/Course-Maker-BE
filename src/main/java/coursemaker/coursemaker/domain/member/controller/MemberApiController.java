@@ -69,7 +69,7 @@ public class MemberApiController {
     @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
-        LogoutResponse logoutResponse = memberService.logout(request, response);
+        LogoutResponse logoutResponse = memberService.logout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
 
