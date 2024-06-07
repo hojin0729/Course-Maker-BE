@@ -12,13 +12,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/v1/tags")
 @RequiredArgsConstructor
@@ -51,7 +54,7 @@ public class TagController {
             responseCode = "409", description = "생성하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content
     )
     @PostMapping
-    public ResponseEntity<Void> addTag(@RequestBody TagPostDto request) {
+    public ResponseEntity<Void> addTag(@Valid @RequestBody TagPostDto request) {
         TagResponseDto response = tagService.createTag(request.toEntity())
                 .toResponseDto();
 
@@ -74,7 +77,7 @@ public class TagController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<TagResponseDto> updateTag(@PathVariable(name = "id") Long id
-                                                    ,@RequestBody TagPostDto request) {
+                                                    ,@Valid @RequestBody TagPostDto request) {
         Tag tag = request.toEntity();
         tag.setId(id);
 

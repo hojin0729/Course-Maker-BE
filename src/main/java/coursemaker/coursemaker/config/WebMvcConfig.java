@@ -21,12 +21,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .exposedHeaders("Set-Cookie")
                 .allowedMethods("*");
     }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(JwtInterceptor)
-                .excludePathPatterns("/v1/member/**");// 멤버도메인은 예외로
-    }
+    
+    /*JWT 인터셉터 등록*/
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(JwtInterceptor)
+//                .excludePathPatterns("/v1/member")// 회원가입
+//                .excludePathPatterns("/v1/member/login");// 로그인
+//    }
 
 }
 
