@@ -42,7 +42,7 @@ public class StubData implements CommandLineRunner {
         SignUpRequest dto;
         for (long i = 1; i <= 5; i++) {
             dto = new SignUpRequest();
-            dto.setName("User" + i);
+            dto.setName("User");
             dto.setEmail("User" + i + "@example.com");
             dto.setNickname("nickname" + i);
             dto.setPassword("password" + i);
