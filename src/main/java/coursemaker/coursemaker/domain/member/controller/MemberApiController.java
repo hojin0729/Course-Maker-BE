@@ -101,26 +101,4 @@ public class MemberApiController {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
     }
-
-    //TODO: 위치 Refactor
-    @ExceptionHandler(UserDuplicatedException.class)
-    public ResponseEntity<String> handleUserDuplicatedException(UserDuplicatedException e) {
-        return ResponseEntity
-                .status(ErrorCode.DUPLICATED_MEMBER.getStatus())
-                .body(e.getMessage());
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity
-                .status(ErrorCode.NOT_FOUND_MEMBER.getStatus())
-                .body(e.getMessage());
-    }
-
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
-        return ResponseEntity
-                .status(ErrorCode.UNAUTHORIZED_MEMBER.getStatus())
-                .body(e.getMessage());
-    }
 }
