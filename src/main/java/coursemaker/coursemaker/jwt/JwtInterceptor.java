@@ -25,14 +25,11 @@ public class JwtInterceptor implements HandlerInterceptor {
         log.info("@@@@@@@@@@@@인터셉터 쌈@뽕 하게 동작중@@@@@@@@@@@@@@@");
 
         if(HttpMethod.OPTIONS.matches(request.getMethod())) {
-            System.out.println("matches");
             return true;
         }
 
         if (handler instanceof HandlerMethod handlerMethod) {
-            System.out.println("handler");
-            boolean requiresAuthorization = true;
-
+            boolean requiresAuthorization = false;
 
             if (requiresAuthorization) {
                 String accessToken = jwtUtil.getTokenFromRequest(request);
