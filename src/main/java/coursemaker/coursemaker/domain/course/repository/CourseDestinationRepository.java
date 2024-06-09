@@ -12,4 +12,6 @@ public interface CourseDestinationRepository extends JpaRepository<CourseDestina
     List<CourseDestination> findAllByTravelCourse(TravelCourse travelCourse);
 
     void deleteAllByTravelCourseId(long travelCourseId);
+
+    void deleteAllByTravelCourseId(Long travelCourseId);
 }

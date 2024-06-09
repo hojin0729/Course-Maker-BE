@@ -20,10 +20,10 @@ public class TravelCourse extends BaseEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 50)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "MEDIUMTEXT")
     private String content;
 
     @Column(name = "views", nullable = false)

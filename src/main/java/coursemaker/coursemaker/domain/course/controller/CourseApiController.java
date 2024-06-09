@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.course.controller;
 
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.service.CourseService;
@@ -11,11 +12,13 @@ import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 
-
+import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
+import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -63,7 +66,7 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<Void> createTravelCourse(@RequestBody AddTravelCourseRequest request) {
+    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request) {
         TravelCourse savedTravelCourse = courseService.save(request);
 
         return (savedTravelCourse != null) ?
@@ -148,7 +151,7 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
-    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @RequestBody AddTravelCourseRequest request) {
+    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request) {
         System.out.println("---------------------------------------------------id = " + id);
         TravelCourse updatedTravelCourse = courseService.update(id, request);
 
@@ -184,24 +187,78 @@ public class CourseApiController {
 
 
     @ExceptionHandler(TravelCourseDuplicatedException.class)
-    public ResponseEntity<String> handleTagDuplicatedException(TravelCourseNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagDuplicatedException(TravelCourseNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.DUPLICATED_COURSE.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(TravelCourseNotFoundException.class)
-    public ResponseEntity<String> handleTagNotFoundException(TravelCourseNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagNotFoundException(TravelCourseNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.INVALID_COURSE.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(IllegalTravelCourseArgumentException.class)
-    public ResponseEntity<String> handleIllegalTravelCourseArgumentException(IllegalTravelCourseArgumentException e) {
+    public ResponseEntity<ErrorResponse> handleIllegalTravelCourseArgumentException(IllegalTravelCourseArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.ILLEGAL_COURSE_ARGUMENT.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(TravelCourseAlreadyDeletedException.class)
+    public ResponseEntity<ErrorResponse> handleTravelCourseAlreadyDeletedException(TravelCourseAlreadyDeletedException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
+    }
+
+    @ExceptionHandler(PictureNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePictureNotFoundException(PictureNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
     }
 
 }

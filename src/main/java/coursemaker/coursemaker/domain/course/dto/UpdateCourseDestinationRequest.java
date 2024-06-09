@@ -21,13 +21,13 @@ public class UpdateCourseDestinationRequest {
 
     @Schema(description = "여행지")
     @NotNull(message = "코스롤 동륵할 여행지가 있어야 합니다.")
-    private Destination destination;
+    private DestinationDto destination;
 
-    public CourseDestination toEntity() {
-        return CourseDestination.builder()
-                .visitOrder(visitOrder)
-                .date(date)
-                .destination(destination)
-                .build();
-    }
+//    public CourseDestination toEntity() {
+//        return CourseDestination.builder()
+//                .visitOrder(visitOrder)
+//                .date(date)
+//                .destination(destination)
+//                .build();
+//    }
 }
