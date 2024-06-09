@@ -14,21 +14,21 @@ public class RefreshTokenService {
         refreshTokenRepository.save(refreshTokenInfo);
     }
     
-    /*블랙리스트 지정방식*/
-    public void setBlackList(String accessToken) {
-        if(refreshTokenRepository.findByAccessToken(accessToken).isPresent()) {
-            RefreshToken token = refreshTokenRepository.findByAccessToken(accessToken).get();
-            token.setBlackList();
-            refreshTokenRepository.save(token);
-        }
-    }
-    public Boolean isBlackList(String accessToken) {
-        if(refreshTokenRepository.findByAccessToken(accessToken).isPresent()) {
-            RefreshToken token = refreshTokenRepository.findByAccessToken(accessToken).get();
-            return token.getIsBlackListed();
-        }
-        return true;
-    }
+//    /*블랙리스트 지정방식*/
+//    public void setBlackList(String accessToken) {
+//        if(refreshTokenRepository.findByAccessToken(accessToken).isPresent()) {
+//            RefreshToken token = refreshTokenRepository.findByAccessToken(accessToken).get();
+//            token.setBlackList();
+//            refreshTokenRepository.save(token);
+//        }
+//    }
+//    public Boolean isBlackList(String accessToken) {
+//        if(refreshTokenRepository.findByAccessToken(accessToken).isPresent()) {
+//            RefreshToken token = refreshTokenRepository.findByAccessToken(accessToken).get();
+//            return token.getIsBlackListed();
+//        }
+//        return true;
+//    }
 
     public void removeTokenInfo(String accessToken) {
         refreshTokenRepository.findByAccessToken(accessToken)

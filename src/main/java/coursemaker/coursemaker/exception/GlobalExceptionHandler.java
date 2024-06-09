@@ -1,5 +1,8 @@
 package coursemaker.coursemaker.exception;
 
+import coursemaker.coursemaker.domain.member.exception.InvalidPasswordException;
+import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -75,5 +78,26 @@ public class GlobalExceptionHandler {
             response.setErrorType("Illegal argument");
         });
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserDuplicatedException.class)
+    public ResponseEntity<String> handleUserDuplicatedException(UserDuplicatedException e) {
+        return ResponseEntity
+                .status(ErrorCode.DUPLICATED_MEMBER.getStatus())
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity
+                .status(ErrorCode.NOT_FOUND_MEMBER.getStatus())
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
+        return ResponseEntity
+                .status(ErrorCode.UNAUTHORIZED_MEMBER.getStatus())
+                .body(e.getMessage());
     }
 }

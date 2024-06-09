@@ -2,10 +2,7 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
-import coursemaker.coursemaker.domain.member.exception.IllegalUserArgumentException;
-import coursemaker.coursemaker.domain.member.exception.InvalidPasswordException;
-import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
-import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
+import coursemaker.coursemaker.domain.member.exception.*;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
 import coursemaker.coursemaker.jwt.RefreshTokenService;
@@ -45,11 +42,10 @@ public class MemberService {
     }
 
     public Member signUp(SignUpRequest signUpRequest) {
+        signUpRequest.validate(); // 검증 로직 추가
+
         if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
             throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
-        }
-        if(signUpRequest.getEmail() == null || signUpRequest.getEmail().isBlank()) {
-            throw new IllegalUserArgumentException("이메일 입력값이 비어있습니다 ", "email is empty");
         }
 
         String email = signUpRequest.getEmail();
@@ -80,8 +76,8 @@ public class MemberService {
     }
 
     public Member updateUser(UpdateRequest updateRequest) {
-        //TODO: 회원 정보 수정 시 Access Token 재발급 해야함
-        //TODO: Optional 예외처리
+        updateRequest.validate(); // 검증 로직 추가
+        //TODO: 수정 시 Access Token 재발급
         Member user = memberRepository
                 .findById(updateRequest.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + updateRequest.getUserId()));
@@ -113,17 +109,24 @@ public class MemberService {
     }
 
     public Member deleteUser(DeleteRequest deleteRequest) {
+        if (deleteRequest == null || deleteRequest.getUserId() == null) {
+            throw new IllegalUserArgumentException("유효하지 않은 요청입니다. 유저 ID가 필요합니다.", "deleteRequest or userId is null");
+        }
 
         Long userId = deleteRequest.getUserId();
 
-        //TODO: 예외처리
         Member user = memberRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + userId));
 
         user.setDeletedAt(LocalDateTime.now());
 
-        Member deletedUser = memberRepository.save(user);
-        return deletedUser;
+        try {
+            Member deletedUser = memberRepository.save(user);
+            return deletedUser;
+        } catch (Exception e) {
+            log.error("Error occurred while deleting user with ID: {}", userId, e);
+            throw new RuntimeException("회원 삭제 중 오류가 발생했습니다.");
+        }
     }
 
     public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
@@ -166,26 +169,35 @@ public class MemberService {
 
     }
 
-    public LogoutResponse logout(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키 만료 시작
-        Cookie cookieForExpire = new Cookie("Authorization", null);
-        cookieForExpire.setPath("/");
-        cookieForExpire.setMaxAge(0);
-        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
+    public LogoutResponse logout(HttpServletRequest request) {
+//        // 쿠키 만료 시작
+//        Cookie cookieForExpire = new Cookie("Authorization", null);
+//        cookieForExpire.setPath("/");
+//        cookieForExpire.setMaxAge(0);
+//        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
         //쿠키 만료 끝
 
-        //리프레시 토큰 삭제 시작
-        Cookie currentCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> "Authorization".equals(cookie.getName()))
-                .findFirst().orElseThrow();
-        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+//        //리프레시 토큰 삭제 시작
+//        Cookie currentCookie = Arrays.stream(request.getCookies())
+//                .filter(cookie -> "Authorization".equals(cookie.getName()))
+//                .findFirst().orElseThrow();
+//        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
+
+        String token = request.getHeader("Authorization");
+
+        //TODO:예외처리
+        if (token == null) {
+            throw new UnauthorizedException("인증받지 않은 회원입니다. ", "");
+        }
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        refreshTokenService.setBlackList(token);// 토큰 블랙리스트 등록
+//        refreshTokenService.setBlackList(token);//TODO 토큰 블랙리스트 등록
         //리프레시 토큰 삭제 끝
+        refreshTokenService.removeTokenInfo(token);
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
+        log.info("[logIn] 정상적으로 로그아웃되었습니다.");
         return logoutResponse;
     }
 
