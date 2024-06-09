@@ -69,7 +69,7 @@ public class MemberApiController {
     @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
-        LogoutResponse logoutResponse = memberService.logout(request, response);
+        LogoutResponse logoutResponse = memberService.logout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
 
@@ -100,26 +100,5 @@ public class MemberApiController {
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
-    }
-
-    @ExceptionHandler(UserDuplicatedException.class)
-    public ResponseEntity<String> handleUserDuplicatedException(UserDuplicatedException e) {
-        return ResponseEntity
-                .status(ErrorCode.DUPLICATED_MEMBER.getStatus())
-                .body(e.getMessage());
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity
-                .status(ErrorCode.NOT_FOUND_MEMBER.getStatus())
-                .body(e.getMessage());
-    }
-
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
-        return ResponseEntity
-                .status(ErrorCode.UNAUTHORIZED_MEMBER.getStatus())
-                .body(e.getMessage());
     }
 }

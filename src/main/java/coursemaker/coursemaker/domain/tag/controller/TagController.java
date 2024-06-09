@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,8 @@ public class TagController {
     /*전체 태그 조회*/
     @Operation(summary = "전체 태그 조회")
     @GetMapping
-    public ResponseEntity<List<TagResponseDto>> getTags() {
+    public ResponseEntity<List<TagResponseDto>> getTags(HttpServletRequest request) {
+        System.out.println(request.getAttribute("user"));
         List<TagResponseDto> response = tagService.findAllTags()
                 .stream()
                 .map(Tag::toResponseDto)
