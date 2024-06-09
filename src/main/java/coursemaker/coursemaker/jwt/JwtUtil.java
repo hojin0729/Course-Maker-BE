@@ -43,7 +43,7 @@ public class JwtUtil {
             log.warn("[refreshToken] RefreshToken이 만료 되었습니다.");
             return false;
         }
-    } // TODO: Redis RefreshToken에 맞게 수정 2
+    }
 
     public String getTokenFromRequest(HttpServletRequest request) throws UnsupportedEncodingException {
         String bearerToken = request.getHeader("Authorization");
