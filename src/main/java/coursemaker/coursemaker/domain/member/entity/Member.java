@@ -38,7 +38,7 @@ public class Member extends BaseEntity {
     @Column(nullable = true, length = 15)
     private String phoneNumber; // 회원 전화번호
 
-    @Column(name = "password", columnDefinition = "VARCHAR(20)")
+    @Column(name = "password", columnDefinition = "VARCHAR(255)")
     private String password; // 회원 비밀번호
 
     @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'ROLE_USER'")
