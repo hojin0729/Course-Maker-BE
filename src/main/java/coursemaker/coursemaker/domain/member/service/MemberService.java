@@ -191,6 +191,7 @@ public class MemberService {
         refreshTokenService.removeTokenInfo(token);
 
         LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
+        log.info("[logIn] 정상적으로 로그아웃되었습니다.");
         return logoutResponse;
     }
 
