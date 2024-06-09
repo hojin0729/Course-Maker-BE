@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.domain.tag.controller;
 
+import coursemaker.coursemaker.aop.LoginedUser;
+import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
