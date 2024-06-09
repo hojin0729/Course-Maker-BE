@@ -3,6 +3,8 @@ package coursemaker.coursemaker.jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
@@ -34,4 +36,9 @@ public class RefreshTokenService {
         refreshTokenRepository.findByAccessToken(accessToken)
                 .ifPresent(refreshTokenRepository::delete);
     }
+
+    public Optional<RefreshToken> getByAccessToken(String accessToken){
+        return refreshTokenRepository.findByAccessToken(accessToken);
+    }
+
 }
