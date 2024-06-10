@@ -22,7 +22,7 @@ public class SignUpRequest {
     @Schema(description = "닉네임", example = "nickname123")
     @NotNull(message = "닉네임을 입력하세요.")
     @NotBlank(message = "닉네임은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    @Pattern(regexp = "[a-zA-Z가-힣]{2,10}", message = "닉네임은 2~10자의 영문자, 한글로 구성되어야 합니다.")
+    @Pattern(regexp = "[a-z0-9가-힣]{2,10}", message = "닉네임은 2~10자의 영문 소문자, 숫자, 한글로 구성되어야 합니다.")
     private String nickname;
 
     @Schema(description = "비밀번호", example = "your_password")
@@ -59,8 +59,8 @@ public class SignUpRequest {
         if (nickname == null || nickname.isBlank()) {
             throw new IllegalUserArgumentException("닉네임 입력값이 비어있습니다.", "nickname is empty");
         }
-        if (!nickname.matches("[a-zA-Z가-힣]{2,10}")) {
-            throw new IllegalUserArgumentException("닉네임은 2~10자의 영문자, 한글로 구성되어야 합니다.", "invalid nickname format");
+        if (!nickname.matches("[a-z0-9가-힣]{2,10}")) {
+            throw new IllegalUserArgumentException("닉네임은 2~10자의 영문 소문자, 숫자, 한글로 구성되어야 합니다.", "invalid nickname format");
         }
         if (password == null || password.isBlank()) {
             throw new IllegalUserArgumentException("비밀번호 입력값이 비어있습니다.", "password is empty");

@@ -1,9 +1,9 @@
 package coursemaker.coursemaker.jwt;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     Optional<RefreshToken> findByAccessToken(String accessToken);
 }

@@ -26,28 +26,28 @@ public class Member extends BaseEntity {
     @Column(nullable = true)
     private String username; // 회원 id
 
-    @Column(name = "name", columnDefinition = "VARCHAR(50)")
+    @Column(name = "name", columnDefinition = "VARCHAR(20)")
     private String name; // 회원 이름
 
     @Column(name = "email", columnDefinition = "VARCHAR(255) UNIQUE")
     private String email; // 회원 이메일
 
-    @Column(unique = true, columnDefinition = "VARCHAR(100) UNIQUE")
+    @Column(unique = true, columnDefinition = "VARCHAR(20) UNIQUE")
     private String nickname; // 회원 닉네임
 
     @Column(nullable = true, length = 15)
     private String phoneNumber; // 회원 전화번호
 
-    @Column(name = "password", columnDefinition = "VARCHAR(100)")
+    @Column(name = "password", columnDefinition = "VARCHAR(255)")
     private String password; // 회원 비밀번호
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'ROLE_USER'")
+    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'ROLE_USER'")
     private String roles; // 회원 등급
 
     @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
     private String profileImgUrl;
 
-    @Column(name = "profile_description", columnDefinition = "VARCHAR(150)")
+    @Column(name = "profile_description", columnDefinition = "VARCHAR(255)")
     private String profileDescription;
 
     @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")

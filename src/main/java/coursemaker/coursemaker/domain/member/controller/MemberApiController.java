@@ -44,7 +44,7 @@ public class MemberApiController {
     @PutMapping
     public ResponseEntity<Member> updateCurrentUser(@Valid @RequestBody UpdateRequest updateRequest) {
         Member updatedUser = memberService.updateUser(updateRequest);
-        return ResponseEntity.ok().body(updatedUser);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원 삭제", description = "로그인한 회원을 삭제한다. (소프트 딜리트)")

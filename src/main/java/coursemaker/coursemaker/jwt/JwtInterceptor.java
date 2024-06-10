@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.jwt;
 
+import coursemaker.coursemaker.jwt.exception.InvalidTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
@@ -41,10 +42,11 @@ public class JwtInterceptor implements HandlerInterceptor {
 
                 if (accessToken != null && jwtTokenProvider.validateToken(accessToken, request)) {
                     log.info("[preHandle] accessToken 값 유효성 체크 완료");
+                    response.addHeader("Authorization", accessToken);
                     return HandlerInterceptor.super.preHandle(request, response, handler);
                 } else {
                     log.warn("[preHandle] AccessToken이 만료되었습니다.");
-                    return jwtUtil.refreshAuthentication(request, response);
+                    throw new InvalidTokenException("AccessToken이 만료되었습니다.", "expired accessToken");
                 }
             }
         }
