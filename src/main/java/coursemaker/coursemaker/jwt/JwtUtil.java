@@ -69,6 +69,7 @@ public class JwtUtil {
             log.info("BearerToken: {}", bearerToken);
             return bearerToken.substring("Bearer ".length());
         }else {
+            log.error("Invalid token format: {}", bearerToken);
             throw new InvalidTokenException("토큰 형식이 잘못되었습니다.", "invalid token");
         }
 
