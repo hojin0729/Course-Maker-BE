@@ -1,40 +1,31 @@
 package coursemaker.coursemaker.domain.course.controller;
 
+import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
+import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
+import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
-import coursemaker.coursemaker.domain.course.service.CourseService;
-import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
-import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
-import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
-
-import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
+import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
-import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
-import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
-import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
-import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.validation.annotation.Validated;
-
+import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -66,7 +56,8 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request) {
+    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request, @LoginUser String nickname) {
+        request.setNickname(nickname);
         TravelCourse savedTravelCourse = courseService.save(request);
 
         return (savedTravelCourse != null) ?
@@ -151,7 +142,8 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
-    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request) {
+    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request, @LoginUser String nickname) {
+        request.setNickname(nickname);
         System.out.println("---------------------------------------------------id = " + id);
         TravelCourse updatedTravelCourse = courseService.update(id, request);
 

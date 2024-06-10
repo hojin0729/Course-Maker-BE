@@ -1,13 +1,9 @@
 package coursemaker.coursemaker.domain.course.dto;
 
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
+import lombok.Data;
 
 import java.util.List;
 
@@ -48,8 +44,8 @@ public class UpdateTravelCourseRequest {
     @Size(min = 1, message = "최소한 한 개의 코스 여행지가 있어야 합니다.")
     private List<UpdateCourseDestinationRequest> courseDestinations;
 
-    @Schema(description = "유저 닉네임", example = "nickname2")
-    @NotNull(message = "닉네임이 비어있지 않아야 합니다.")
+    @Schema(description = "유저 닉네임", example = "nickname2", hidden = true)
+    //@NotNull(message = "닉네임이 비어있지 않아야 합니다.")
     private String nickname;// 유저 닉네임
 
     @Schema(description = "코스 태그 목록")

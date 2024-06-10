@@ -4,7 +4,8 @@ package coursemaker.coursemaker.domain.course.dto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Data;
+
 import java.util.List;
 
 
@@ -45,8 +46,8 @@ public class AddTravelCourseRequest {
     @Size(min = 1, message = "최소한 한 개의 코스 여행지가 있어야 합니다.")
     private List<AddCourseDestinationRequest> courseDestinations;
 
-    @Schema(description = "유저 닉네임", example = "nickname1")
-    @NotNull(message = "닉네임이 비어있지 않아야 합니다.")
+    @Schema(description = "유저 닉네임", example = "nickname1", hidden = true)
+    //@NotNull(message = "닉네임이 비어있지 않아야 합니다.")
     private String nickname;// 유저 닉네임
 
     // 태그를 빼먹어여?! 대가리 박고있죠ㅇㅇ
