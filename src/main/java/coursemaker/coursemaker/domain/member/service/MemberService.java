@@ -48,6 +48,10 @@ public class MemberService {
             throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
         }
 
+        if (memberRepository.findByNickname(signUpRequest.getNickname()).isPresent()) {
+            throw new UserDuplicatedException("이미 존재하는 닉네임 입니다. ", "닉네임: " + signUpRequest.getNickname());
+        }
+
         String email = signUpRequest.getEmail();
         Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
         String name = signUpRequest.getName();
@@ -91,7 +95,10 @@ public class MemberService {
         if(name != null) {
             user.setName(name);
         }
-        if(nickname != null) {
+        if (nickname != null && !nickname.equals(user.getNickname())) {
+            if (memberRepository.findByNickname(nickname).isPresent()) {
+                throw new UserDuplicatedException("이미 존재하는 닉네임입니다.", "Nickname: " + nickname);
+            }
             user.setNickname(nickname);
         }
         if(password != null) {
@@ -258,4 +265,9 @@ public class MemberService {
 
         return validateEmailResponse;
     }
+
+    public boolean checkExistByEmail(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
 }

@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.jwt;
 
+import coursemaker.coursemaker.domain.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -45,7 +46,7 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().setSubject(name);
         Date now = new Date();
         claims.put("nickname", name);
-        log.info("[createAccessToken] access 토큰 생성 완료");
+        log.info("[createAccessToken] accessToken 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
@@ -58,7 +59,7 @@ public class JwtTokenProvider {
     public String createRefreshToken(){
         Claims claims = Jwts.claims();
         Date now = new Date();
-        log.info("[createRefreshToken] refresh 토큰 생성 완료");
+        log.info("[createRefreshToken] refreshToken 생성 완료");
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
@@ -66,6 +67,30 @@ public class JwtTokenProvider {
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    //TODO: 코드 중복 리팩토링
+    public String createAccessTokenKakao(Long userId, String kakaoAccessToken, Member.LoginType loginType) {
+        Claims claims = Jwts.claims();
+        Date now = new Date();
+        claims.put("userId", userId);
+        claims.put("kakao", kakaoAccessToken);
+        claims.put("loginType", loginType);
+        log.info("[createKakaoAccessToken] accessToken for kakao 생성 완료");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALID_MILISECOND))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String getKakaoToken(String jwtToken){
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
+                .parseClaimsJws(jwtToken);
+        return claims.getBody().get("kakao").toString();
+    }
+
+
 
     public String getUserPk(String token) {
         log.info("[getUserPk] 토큰 기반 회원 구별 정보 추출");
