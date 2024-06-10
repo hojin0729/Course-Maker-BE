@@ -4,6 +4,7 @@ import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
+import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
@@ -42,7 +43,7 @@ public class StubData implements CommandLineRunner {
         SignUpRequest dto;
         for (long i = 1; i <= 5; i++) {
             dto = new SignUpRequest();
-            dto.setName("User" + i);
+            dto.setName("User");
             dto.setEmail("User" + i + "@example.com");
             dto.setNickname("nickname" + i);
             dto.setPassword("password" + i);
@@ -71,9 +72,14 @@ public class StubData implements CommandLineRunner {
             RequestDto dto = new RequestDto();
             dto.setName("Destination" + i);
             dto.setContent("Destination Content" + i);
-            dto.setLatitude(BigDecimal.valueOf(11.1234 + i));
-            dto.setLongitude(BigDecimal.valueOf(22.2345 + i));
-            dto.setLocation("Destination Location" + i);
+
+            // Location 객체 생성 및 설정
+            LocationDto location = new LocationDto();
+            location.setLatitude(BigDecimal.valueOf(11.1234 + i));
+            location.setLongitude(BigDecimal.valueOf(22.2345 + i));
+            location.setAddress("Destination Location" + i);
+            dto.setLocation(location);
+
             dto.setPictureLink("http://example.com/destination" + i + ".jpg");
             dto.setNickname(member.getNickname());
             dto.setTags(tags.stream().map(Tag::toResponseDto).collect(Collectors.toList()));
@@ -88,9 +94,7 @@ public class StubData implements CommandLineRunner {
         dto.setName(destination.getName());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
-        dto.setLocation(destination.getLocation());
-        dto.setLongitude(destination.getLongitude());
-        dto.setLatitude(destination.getLatitude());
+        dto.setLocationDto(new LocationDto(destination.getLocation(), destination.getLongitude(), destination.getLatitude()));
         dto.setTags(tags.stream().map(Tag::toResponseDto).collect(Collectors.toList()));
         return dto;
     }
@@ -133,4 +137,5 @@ public class StubData implements CommandLineRunner {
         CourseStubData();
     }
 }
+
 
