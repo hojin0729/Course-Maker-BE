@@ -9,6 +9,7 @@ import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.jwt.JwtTokenProvider;
 import coursemaker.coursemaker.jwt.JwtUtil;
 import coursemaker.coursemaker.jwt.RefreshTokenService;
+import coursemaker.coursemaker.jwt.exception.InvalidTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -73,11 +74,28 @@ public class KakaoService {
     }
 
     public LogoutResponse kakaoLogout(HttpServletRequest request) {
-        String accessToken = jwtUtil.getTokenFromRequest(request);
+        log.info("[kakao] 로그아웃 시작");
+        String accessToken;
+        try {
+            accessToken = jwtUtil.getTokenFromRequest(request);
+        } catch (InvalidTokenException e) {
+            log.error("[kakao] Access token이 유효하지 않거나 비어있습니다.", e);
+            throw new InvalidTokenException("Access token이 유효하지 않거나 비어있습니다.", "Missing or invalid access token");
+        }
+
+
         String kakaoToken = jwtTokenProvider.getKakaoToken(accessToken);
+        if (kakaoToken == null) {
+            log.error("[kakao] Kakao token 값이 null");
+            throw new InvalidTokenException("Kakao token이 없습니다", "kakaoToken missing");
+        }
+
         kakaoOauth.expireKakaoToken(kakaoToken);
+        log.info("[kakao] 카카오 토큰만료 완료");
         kakaoTokenService.removeKakaoTokenInfo(accessToken);
+        log.info("[kakao] 카카오 토큰제거 완료");
         userService.logout(request);
+        log.info("[kakao] 로그아웃 완료");
 
         return LogoutResponse.builder().success(true).build();
     }

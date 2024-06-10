@@ -27,6 +27,9 @@ public class KakaoOauth {
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoApiKey;
 
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String kakaoClientSecret; // 추가: client_secret 값
+
     private final String kakaoLoginRedirectUri = "http://localhost:8080/login/oauth2/code/kakao";
     private final String kakaoLogoutRedirectUri = "http://localhost:8080/auth/logout";
     private final String kakaoTokenUri = "https://kauth.kakao.com/oauth/token";
@@ -48,6 +51,7 @@ public class KakaoOauth {
 
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=").append(kakaoApiKey);
+            sb.append("&client_secret=").append(kakaoClientSecret); // 추가: client_secret 값
             sb.append("&redirect_uri=").append(kakaoLoginRedirectUri);
             sb.append("&code=").append(code);
 
@@ -73,7 +77,15 @@ public class KakaoOauth {
             log.info("responseBody = {}", result);
 
             JsonElement element = JsonParser.parseString(result);
-            kakaoAccessToken = element.getAsJsonObject().get("access_token").getAsString();
+
+            JsonObject jsonObject = element.getAsJsonObject();
+
+            if (jsonObject != null && jsonObject.has("access_token")) {
+                kakaoAccessToken = jsonObject.get("access_token").getAsString();
+            } else {
+                log.error("Invalid response: accessToken을 찾을 수 없습니다.");
+                throw new RuntimeException("Invalid response: accessToken을 찾을 수 없습니다.");
+            }
 
             br.close();
             bw.close();

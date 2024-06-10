@@ -20,7 +20,7 @@
     <div class="container mt-3">
         <div class="navbar-brand">
             <a class="navbar-item" href="/">
-                <span class="has-text-link">CourserMaker</span>
+                <span class="has-text-link">CourseMaker</span>
             </a>
 
             <a
@@ -45,7 +45,6 @@
     </div>
 </nav>
 
-
 <!-- 로그인 폼(Form) -->
 <div class="login-form-container">
     <form class="box login-form-box" id="loginForm" th:action="@{/auth/login}" th:object="${login}" method="post">
@@ -69,17 +68,48 @@
         <button class="button is-info is-fullwidth" id="submitButton" type="submit">로그인하기</button>
     </form>
     <div class="text-center">
-        <a href=""
-           th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
-           카카오로그인
+        <a th:href="@{https://kauth.kakao.com/oauth/authorize(client_id=${kakaoApiKey}, redirect_uri=${redirectUri}, response_type='code')}">
+            카카오로그인
         </a>
     </div>
     <div class="text-center">
-        <a href=""
-           th:href="@{'https://kauth.kakao.com/oauth/logout?client_id=' + ${kakaoApiKey} + '&logout_redirect_uri=' + ${redirectLogoutUri}}">
-            카카오로그아웃
-        </a>
+        <button id="logoutButton" th:attr="data-token=${jwtToken}">카카오 로그아웃</button>
     </div>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        // JWT 토큰을 버튼의 data-token 속성에서 가져오기
+        var token = /*[[${jwtToken}]]*/ '';
+
+        if (!token) {
+            alert('로그인된 토큰이 없습니다.');
+            return;
+        }
+
+        // 로그아웃 요청 보내기
+        fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('로그아웃 성공');
+                // 로그아웃 후 페이지 리디렉션
+                window.location.href = '/login';
+            } else {
+                alert('로그아웃 실패');
+            }
+        })
+        .catch(error => {
+            console.error('로그아웃 중 에러 발생:', error);
+        });
+    });
+    /*]]>*/
+</script>
 </body>
 </html>

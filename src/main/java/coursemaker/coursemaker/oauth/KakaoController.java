@@ -59,7 +59,7 @@ public class KakaoController {
 
     @Operation(summary = "로그아웃", description = "카카오 로그아웃")
     @RequestMapping(value = "/auth/logout", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<LogoutResponse> KakaoLogout(HttpServletRequest request) {
+    public ResponseEntity<LogoutResponse> kakaoLogout(HttpServletRequest request) {
         LogoutResponse logoutResponse = kakaoService.kakaoLogout(request);
         return ResponseEntity.ok().body(logoutResponse);
     }
