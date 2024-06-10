@@ -20,8 +20,11 @@ import coursemaker.coursemaker.domain.tag.repository.CourseTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.DestinationTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.TagRepository;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -191,7 +194,7 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public List<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
+    public CourseMakerPagination<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
         /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
         if(tagIds == null || tagIds.isEmpty()){
@@ -234,7 +237,27 @@ public class TagServiceImpl implements TagService{
                 .map(n -> n.get(courseTag).getCourse())
                 .collect(Collectors.toList());
 
-        return courses;
+        // TODO: 쿼리 최적화
+
+        long total = queryFactory
+                .select(courseTag, courseTag.course.count())
+                .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
+                .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
+                .where(courseTag.tag.id.in(tagIds))// 다중태그
+                .groupBy(courseTag.course)// 코스로 묶어서
+                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
+                .orderBy(orderBySpecifier)// 정렬 조건 설정
+                .fetch()
+                .stream()
+                .map(n -> n.get(courseTag).getCourse())
+                .toList()
+                .size();
+
+        Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
+
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage);
+
+        return courseMakerPagination;
     }
 
 
@@ -334,7 +357,7 @@ public class TagServiceImpl implements TagService{
 
 
     @Override
-    public List<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy) {
+    public CourseMakerPagination<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy) {
 
         /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
         if(tagIds == null || tagIds.isEmpty()){
@@ -366,7 +389,7 @@ public class TagServiceImpl implements TagService{
         List<Destination> destinations = queryFactory
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
-                .leftJoin(destinationTag.destination, destination)// 코스-코스태그 조인
+                .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
                 .where(destinationTag.tag.id.in(tagIds))// 다중태그 조건 검색
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
                 .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
@@ -378,7 +401,26 @@ public class TagServiceImpl implements TagService{
                 .map(n -> n.get(destinationTag).getDestination())// 여행지태그 -> 여행지 변환
                 .collect(Collectors.toList());
 
-        return destinations;
+        // TODO: 쿼리 최적화
+        long total = queryFactory
+                .select(destinationTag, destinationTag.destination.count())
+                .from(destinationTag)// 여행지 태그에서 선택(코스에는 FK가 없음)
+                .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
+                .where(destinationTag.tag.id.in(tagIds))// 다중태그
+                .groupBy(destinationTag.destination)// 여행지로 묶어서
+                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
+                .orderBy(orderBySpecifier)// 정렬 조건 설정
+                .fetch()
+                .stream()
+                .map(n -> n.get(destinationTag).getDestination())
+                .toList()
+                .size();
+
+        Page<Destination> coursePage = new PageImpl<>(destinations, pageable, total);
+
+        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage);
+
+        return courseMakerPagination;
     }
 
 
