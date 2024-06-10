@@ -28,7 +28,7 @@ public class DestinationDto {
     private List<TagResponseDto> tags; // 태그 리스트
 
     @Schema(description = "위치 정보")
-    private LocationDto locationDto; // 위치
+    private LocationDto location; // 위치
 
     @Schema(description = "대표 사진", defaultValue = "http://example.com/coursemaker.jpg")
     private String pictureLink; // 대표 사진
@@ -47,12 +47,12 @@ public class DestinationDto {
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
         dto.setTags(tagDtos);
-        LocationDto locationDto = new LocationDto(
+        LocationDto location = new LocationDto(
                 destination.getLocation(),
                 destination.getLongitude(),
                 destination.getLatitude()
         );
-        dto.setLocationDto(locationDto);
+        dto.setLocation(location);
         return dto;
     }
 }
