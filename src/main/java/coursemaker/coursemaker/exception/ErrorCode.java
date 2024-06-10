@@ -16,7 +16,7 @@ public enum ErrorCode {
     ILLEGAL_DESTINATION_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "여행지에 알맞은 인자값이 아닙니다.", "DEST-003"),
 
     PICTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 사진이 없습니다.", "PICTURE-001"),
-    PICTURE_OVER_SIZE(HttpStatus.PAYLOAD_TOO_LARGE, "Out of range size", "허용하는 사진 용량을 초과했습니다.", "PICTURE-002"),
+    PICTURE_OVER_SIZE(HttpStatus.PAYLOAD_TOO_LARGE, "Out of range size", "허용하는 사진 용량(15MB)을 초과했습니다.", "PICTURE-002"),
 
     /*Course 도메인 예외*/
     INVALID_COURSE(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 코스가 없습니다.", "COURSE-001"),
