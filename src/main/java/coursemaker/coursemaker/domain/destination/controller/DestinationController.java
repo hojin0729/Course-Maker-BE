@@ -15,6 +15,8 @@ import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.exception.ErrorResponse;
+import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +34,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+
+import static coursemaker.coursemaker.domain.member.entity.QMember.member;
 
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Destination", description = "여행지 API")
 @RestController
@@ -49,31 +55,39 @@ public class DestinationController {
     @Operation(summary = "전체 여행지 목록 조회", description = "한 페이지에 표시할 데이터 수(record)와 조회할 페이지 번호(page)를 입력하여 전체 여행지 목록을 조회합니다. 페이지 번호는 1부터 시작합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    description = "전체 여행지 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = DestinationDto.class))),
+                    description = "전체 여행지 목록 조회 성공"
+                   ),
     })
     @Parameter(name = "record", description = "한 페이지 당 표시할 데이터 수")
     @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1 페이지 부터 시작합니다.)")
     /*********스웨거 어노테이션**********/
     // 전체 여행지 목록을 가져옵니다.
     @GetMapping
-    public List<DestinationDto> getAllDestinations(@RequestParam(name = "record") int record,
-                                                   @RequestParam(name = "page") int page) {
+    public ResponseEntity<CourseMakerPagination<DestinationDto>> getAllDestinations(@RequestParam(defaultValue = "20", name = "record") int record,
+                                                                                    @RequestParam(defaultValue = "1", name = "page") int page) {
         Pageable pageable = PageRequest.of(page - 1, record);
-        Page<Destination> destinations = destinationService.findAll(pageable);
-        return destinations.stream()
-                .map(destination -> {
-                    // Destination의 ID로 관련된 모든 태그를 가져옴.
-                    List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId())
-                            .stream()
-                            // 각 태그 엔티티를 TagResponseDto로 변환하고 리스트로 수집.
-                            .map(Tag::toResponseDto)
-                            .toList();
-                    // Destination 엔티티와 태그 리스트를 이용하여 DestinationDto로 변환
-                    return DestinationDto.toDto(destination, tags);
-                })
-                .toList();
+
+        List<DestinationDto> destinationDtos = new ArrayList<>();
+        CourseMakerPagination<Destination> destinations = destinationService.findAll(pageable);
+        int totalPage = destinations.getTotalPage();
+        List<Destination> destinationList = destinations.getContents();
+
+        // 각 Destination 엔티티를 DestinationDto로 변환
+        for (Destination destination : destinationList) {
+            List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId())
+                    .stream()
+                    .map(Tag::toResponseDto)
+                    .toList();
+            destinationDtos.add(DestinationDto.toDto(destination, tags));
+        }
+
+        Page<DestinationDto> responsePage = new PageImpl<>(destinationDtos, pageable, totalPage);
+
+        CourseMakerPagination<DestinationDto> response = new CourseMakerPagination<>(pageable, responsePage);
+
+        return ResponseEntity.ok(response);
     }
+
 
 
 
@@ -113,10 +127,8 @@ public class DestinationController {
     /*********스웨거 어노테이션**********/
     // 여행지를 새로 생성함.
     @PostMapping
-    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request) {
-//        if (!request.getNickname().equals(member.getNickname())) {
-//            throw new IllegalDestinationArgumentException("닉네임이 틀려요.", "request nickname: " + request.getNickname() + "\tauthentication member nickname: " + member.getNickname());
-//        }
+    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @AuthenticationPrincipal Member member) {
+        request.setNickname(member.getNickname());
         Destination savedDestination = destinationService.save(request);
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId())
                 .stream()
@@ -141,10 +153,8 @@ public class DestinationController {
     // Id에 해당하는 여행지의 정보를 수정합니다.
     @PatchMapping("/{id}")
 
-    public ResponseEntity<DestinationDto> updateDestination(@Valid @PathVariable("id") Long id, @RequestBody RequestDto request) {
-//        if (!request.getNickname().equals(member.getNickname())) {
-//            throw new IllegalDestinationArgumentException("닉네임이 틀려요.", "request nickname: " + request.getNickname() + "\tauthentication member nickname: " + member.getNickname());
-//        }
+    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @AuthenticationPrincipal Member member) {
+        request.setNickname(member.getNickname());
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId())
                 .stream()
@@ -208,16 +218,32 @@ public class DestinationController {
     }
 
     @ExceptionHandler(TagDuplicatedException.class)
-    public ResponseEntity<String> handleTagDuplicatedException(TagDuplicatedException e) {
+    public ResponseEntity<ErrorResponse> handleTagDuplicatedException(TagDuplicatedException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.DUPLICATED_TAG.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 
     @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<String> handleTagNotFoundException(TagNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleTagNotFoundException(TagNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
         return ResponseEntity
-                .status(ErrorCode.INVALID_TAG.getStatus())
-                .body(e.getMessage());
+                .status(response.getStatus())
+                .body(response);
     }
 }
