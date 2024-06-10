@@ -17,6 +17,7 @@ import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
+import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -127,8 +128,8 @@ public class DestinationController {
     /*********스웨거 어노테이션**********/
     // 여행지를 새로 생성함.
     @PostMapping
-    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @AuthenticationPrincipal Member member) {
-        request.setNickname(member.getNickname());
+    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @LoginUser String nickname) {
+        request.setNickname(nickname);
         Destination savedDestination = destinationService.save(request);
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId())
                 .stream()
@@ -153,8 +154,8 @@ public class DestinationController {
     // Id에 해당하는 여행지의 정보를 수정합니다.
     @PatchMapping("/{id}")
 
-    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @AuthenticationPrincipal Member member) {
-        request.setNickname(member.getNickname());
+    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @LoginUser String nickname) {
+        request.setNickname(nickname);
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId())
                 .stream()

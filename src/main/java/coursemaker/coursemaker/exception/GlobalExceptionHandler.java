@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -99,5 +100,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(ErrorCode.UNAUTHORIZED_MEMBER.getStatus())
                 .body(e.getMessage());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(ErrorCode.PICTURE_OVER_SIZE.getErrorType());
+        response.setMessage(ErrorCode.PICTURE_OVER_SIZE.getDescription());
+        response.setStatus(ErrorCode.PICTURE_OVER_SIZE.getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }
