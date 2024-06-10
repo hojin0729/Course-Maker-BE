@@ -54,8 +54,6 @@ public class CourseApiController {
 
     private final CourseDestinationService courseDestinationService;
 
-    private final TagService tagService;
-
     // POST
     /*********스웨거 어노테이션**********/
     @Operation(summary = "코스 등록", description = "유저가 코스를 등록합니다.")
