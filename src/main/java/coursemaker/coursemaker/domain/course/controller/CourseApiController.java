@@ -12,6 +12,8 @@ import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundExcep
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
+import coursemaker.coursemaker.domain.tag.service.OrderBy;
+import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import coursemaker.coursemaker.util.LoginUser;
@@ -43,6 +45,8 @@ import java.util.List;
 public class CourseApiController {
 
     private final CourseService courseService;
+
+    private final TagService tagService;
 
     private final CourseDestinationService courseDestinationService;
 
@@ -77,17 +81,22 @@ public class CourseApiController {
     })
     @Parameters({
             @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", schema = @Schema(type = "integer", defaultValue = "0")),
-            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)", schema = @Schema(type = "integer"))
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)", schema = @Schema(type = "integer")),
+            @Parameter(name = "tagIds", description = "태그를 선택하지 않으면 전체 태그로 조회됩니다."),
+            @Parameter(name = "orderBy", description = "정렬하는 기능을 나타냅니다. NEWEST는 최신순을 의미합니다.")
     })
     /*********스웨거 어노테이션**********/
     @GetMapping
-    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") Integer record,
-                                                                                           @RequestParam(defaultValue = "1", name = "page") Integer page) {
+    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findAllTravelCourse(@RequestParam(name = "tagIds", required = false) List<Long> tagIds,
+                                                                                           @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                           @RequestParam(defaultValue = "1", name = "page") Integer page,
+                                                                                           @RequestParam(defaultValue = "NEWEST", name = "orderBy") OrderBy orderBy) {
 
         Pageable pageable = PageRequest.of(page-1, record);
 
         List<TravelCourseResponse> contents = new ArrayList<>();
-        CourseMakerPagination<TravelCourse> travelCoursePage = courseService.getAllOrderByViewsDesc(pageable);
+        // CourseMakerPagination<TravelCourse> travelCoursePage = courseService.getAllOrderByViewsDesc(pageable);
+        CourseMakerPagination<TravelCourse> travelCoursePage = tagService.findAllCourseByTagIds(tagIds, pageable, orderBy);
         int totalPage = travelCoursePage.getTotalPage();//
         List<TravelCourse> travelCourses = travelCoursePage.getContents();
 
