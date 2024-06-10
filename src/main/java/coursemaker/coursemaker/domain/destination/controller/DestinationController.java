@@ -13,6 +13,7 @@ import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
@@ -59,17 +60,21 @@ public class DestinationController {
                     description = "전체 여행지 목록 조회 성공"
                    ),
     })
+    @Parameter(name = "tagIds", description = "필터링할 태그 ID 목록(선택 안할 시 전체 태그 조회)", example = "[1, 2, 3]")
     @Parameter(name = "record", description = "한 페이지 당 표시할 데이터 수")
     @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1 페이지 부터 시작합니다.)")
+    @Parameter(name = "orderBy", description = "정렬 기준 (VIEWS: 조회수, NEWEST: 최신순, POPULAR: 인기순, RATING: 평점순 중 하나)", example = "NEWEST")
     /*********스웨거 어노테이션**********/
     // 전체 여행지 목록을 가져옵니다.
     @GetMapping
-    public ResponseEntity<CourseMakerPagination<DestinationDto>> getAllDestinations(@RequestParam(defaultValue = "20", name = "record") int record,
-                                                                                    @RequestParam(defaultValue = "1", name = "page") int page) {
+    public ResponseEntity<CourseMakerPagination<DestinationDto>> getAllDestinations(@RequestParam(name = "tagIds", required = false) List<Long> tagIds,
+                                                                                    @RequestParam(defaultValue = "20", name = "record") int record,
+                                                                                    @RequestParam(defaultValue = "1", name = "page") int page,
+                                                                                    @RequestParam(name = "orderBy", defaultValue = "NEWEST") OrderBy orderBy) {
         Pageable pageable = PageRequest.of(page - 1, record);
 
         List<DestinationDto> destinationDtos = new ArrayList<>();
-        CourseMakerPagination<Destination> destinations = destinationService.findAll(pageable);
+        CourseMakerPagination<Destination> destinations = tagService.findAllDestinationByTagIds(tagIds, pageable, orderBy);
         int totalPage = destinations.getTotalPage();
         List<Destination> destinationList = destinations.getContents();
 
@@ -88,7 +93,6 @@ public class DestinationController {
 
         return ResponseEntity.ok(response);
     }
-
 
 
 
