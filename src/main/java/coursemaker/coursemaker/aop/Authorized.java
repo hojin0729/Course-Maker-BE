@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.aop;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,5 +14,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})// METHOD와 클래스, enum에 사용 가능
 @Retention(RetentionPolicy.RUNTIME)// 어플리케이션 실행 시점에 정보를 가져옴
 public @interface Authorized {
-    String roles() default "ROLE_USER";
+    @AliasFor("role")
+    String role() default "ROLE_USER";
 }

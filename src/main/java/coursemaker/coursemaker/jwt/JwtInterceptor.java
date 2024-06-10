@@ -24,12 +24,14 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         log.info("@@@@@@@@@@@@인터셉터 쌈@뽕 하게 동작중@@@@@@@@@@@@@@@");
 
+        boolean requiresAuthorization = jwtUtil.getTokenFromRequest(request) != null;
+
         if(HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
 
         if (handler instanceof HandlerMethod handlerMethod) {
-            boolean requiresAuthorization = false;
+
 
             if (requiresAuthorization) {
                 String accessToken = jwtUtil.getTokenFromRequest(request);
