@@ -17,6 +17,9 @@ public class DestinationDto {
 
     @Schema(description = "유저 닉네임", example = "coursemaker")
     private String nickname; // 유저 이름
+//      Todo: 고도화때 예정
+//    @Schema(description = "회원 등급", example = "준회원")
+//    private String roles;
 
     @Schema(description = "여행지 이름", defaultValue = "역시 부산은 해운대!")
     private String name; // 여행지 이름
@@ -24,14 +27,8 @@ public class DestinationDto {
     @Schema(description = "태그 리스트")
     private List<TagResponseDto> tags; // 태그 리스트
 
-    @Schema(description = "위치 이름", defaultValue = "해운대")
-    private String location; // 위치 이름
-
-    @Schema(description = "위도", defaultValue = "35.169")
-    private BigDecimal latitude; // 위도
-
-    @Schema(description = "경도", defaultValue = "128.934")
-    private BigDecimal longitude; // 경도
+    @Schema(description = "위치 정보")
+    private LocationDto locationDto; // 위치
 
     @Schema(description = "대표 사진", defaultValue = "http://example.com/coursemaker.jpg")
     private String pictureLink; // 대표 사진
@@ -45,13 +42,17 @@ public class DestinationDto {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
+//        dto.setRoles(destination.getMember().getRoles());
         dto.setName(destination.getName());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
-        dto.setLocation(destination.getLocation());
-        dto.setLongitude(destination.getLongitude());
-        dto.setLatitude(destination.getLatitude());
         dto.setTags(tagDtos);
+        LocationDto locationDto = new LocationDto(
+                destination.getLocation(),
+                destination.getLongitude(),
+                destination.getLatitude()
+        );
+        dto.setLocationDto(locationDto);
         return dto;
     }
 }
