@@ -69,9 +69,9 @@ public class DestinationServiceImpl implements DestinationService {
         destination.setName(requestDto.getName());
         destination.setPictureLink(requestDto.getPictureLink());
         destination.setContent(requestDto.getContent());
-        destination.setLocation(requestDto.getLocation());
-        destination.setLongitude(requestDto.getLongitude());
-        destination.setLatitude(requestDto.getLatitude());
+        destination.setLocation(requestDto.getLocation().getAddress());
+        destination.setLongitude(requestDto.getLocation().getLongitude());
+        destination.setLatitude(requestDto.getLocation().getLatitude());
 
         // 태그 삭제하고 다시 추가
         tagService.deleteAllTagByDestination(destination.getId());
@@ -166,7 +166,7 @@ public class DestinationServiceImpl implements DestinationService {
         Destination destination = destinationRepository.findById(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
 
-        destination.setLocation(locationDto.getLocation());
+        destination.setLocation(locationDto.getAddress());
         destination.setLatitude(locationDto.getLatitude());
         destination.setLongitude(locationDto.getLongitude());
         return destinationRepository.save(destination);

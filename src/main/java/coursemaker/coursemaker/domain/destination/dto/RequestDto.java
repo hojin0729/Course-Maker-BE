@@ -27,17 +27,9 @@ public class RequestDto {
     @Size(min = 1, message = "적어도 하나의 태그가 있어야 합니다.")
     private List<TagResponseDto> tags; // 태그 리스트
 
-    @Schema(description = "위치 이름", defaultValue = "해운대")
-    @NotEmpty(message = "위치 이름은 비어 있을 수 없습니다.")
-    private String location; // 위치 이름
-
-    @Schema(description = "위도", defaultValue = "35.169")
-    @NotNull(message = "위도는 비어 있을 수 없습니다.")
-    private BigDecimal latitude; // 위도
-
-    @Schema(description = "경도", defaultValue = "128.934")
-    @NotNull(message = "경도는 비어 있을 수 없습니다.")
-    private BigDecimal longitude; // 경도
+    @Schema(description = "위치 정보")
+    @NotNull(message = "위치 정보는 비어 있을 수 없습니다.")
+    private LocationDto location; // 위치 정보
 
     @Schema(description = "대표 사진", defaultValue = "http://example.com/coursemaker.jpg")
     @NotEmpty(message = "대표 사진 링크는 비어 있을 수 없습니다.")
@@ -54,9 +46,9 @@ public class RequestDto {
         destination.setName(this.name);
         destination.setPictureLink(this.pictureLink);
         destination.setContent(this.content);
-        destination.setLocation(this.location);
-        destination.setLongitude(this.longitude);
-        destination.setLatitude(this.latitude);
+        destination.setLocation(this.location.getAddress());
+        destination.setLongitude(this.location.getLongitude());
+        destination.setLatitude(this.location.getLatitude());
         return destination;
     }
 }
