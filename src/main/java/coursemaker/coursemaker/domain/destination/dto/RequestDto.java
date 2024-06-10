@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.destination.dto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,8 +15,7 @@ import java.util.List;
 
 @Data
 public class RequestDto {
-    @Schema(description = "유저 닉네임", example = "coursemaker")
-    @NotEmpty(message = "닉네임은 비어 있을 수 없습니다.")
+    @Schema(description = "유저 닉네임", example = "coursemaker", hidden = true)
     private String nickname; // 유저 이름
 
     @Schema(description = "여행지 이름", defaultValue = "역시 부산은 해운대!")
