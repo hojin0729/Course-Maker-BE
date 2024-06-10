@@ -47,7 +47,7 @@ public class TravelCourseResponse {
     @Schema(description = "코스 만든 멤버")
     private final CourseMemberResponse member;
 
-    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses) {
+    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses, List<TagResponseDto> courseTags) {
         this.id = travelCourse.getId();
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
@@ -58,14 +58,16 @@ public class TravelCourseResponse {
         this.pictureLink = travelCourse.getPictureLink();
         this.member = new CourseMemberResponse(travelCourse.getMember());
         this.courseDestinations = courseDestinationResponses;
-        this.courseTags = travelCourse.getCourseTags().stream()
-                .map(courseTag -> {
-                    TagResponseDto tagResponseDto = new TagResponseDto();
-                    tagResponseDto.setId(courseTag.getTag().getId());
-                    tagResponseDto.setName(courseTag.getTag().getName());
-                    tagResponseDto.setDescription(courseTag.getTag().getDescription());
-                    return tagResponseDto;
-                })
-                .collect(Collectors.toList());
+        this.courseTags = courseTags;
+        // TODO: 코스태그 - 코스간에 연관관계를 잘 공부해보세여
+//        this.courseTags = travelCourse.getCourseTags().stream()
+//                .map(courseTag -> {
+//                    TagResponseDto tagResponseDto = new TagResponseDto();
+//                    tagResponseDto.setId(courseTag.getTag().getId());
+//                    tagResponseDto.setName(courseTag.getTag().getName());
+//                    tagResponseDto.setDescription(courseTag.getTag().getDescription());
+//                    return tagResponseDto;
+//                })
+//                .collect(Collectors.toList());
     }
 }

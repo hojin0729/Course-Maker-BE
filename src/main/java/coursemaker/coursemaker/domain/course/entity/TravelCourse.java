@@ -48,8 +48,11 @@ public class TravelCourse extends BaseEntity {
 //    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<CourseDestination> courseDestinations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseTag> courseTags = new ArrayList<>();
+    // TODO: 코스태그 - 코스간에 연관관계를 잘 공부해보세여.
+    // TODO: 여기서 순환참조가 터졌습니다.
+    // TODO: 오류 메시지: Could not write JSON: Infinite recursion (StackOverflowError)
+//    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
     public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member) {

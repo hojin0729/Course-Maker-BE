@@ -12,7 +12,11 @@ import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundExcep
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
+
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.entity.Tag;
+
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
@@ -49,6 +53,8 @@ public class CourseApiController {
     private final TagService tagService;
 
     private final CourseDestinationService courseDestinationService;
+
+    private final TagService tagService;
 
     // POST
     /*********스웨거 어노테이션**********/
@@ -110,7 +116,11 @@ public class CourseApiController {
                     .map(courseDestinationService::toResponse)
                     .toList();
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses));
+            /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
+                            .stream().map(Tag::toResponseDto).toList();
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
         }
 
         Page<TravelCourseResponse> responsePagepage = new PageImpl<>(contents, pageable, totalPage);
@@ -138,7 +148,11 @@ public class CourseApiController {
                 .map(courseDestinationService::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses));
+        /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+        List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
+                .stream().map(Tag::toResponseDto).toList();
+
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
     }
 
     // PUT
@@ -162,7 +176,10 @@ public class CourseApiController {
                 .map(courseDestinationService::toResponse)
                 .toList();
 
-        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses);
+        /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
+                .stream().map(Tag::toResponseDto).toList();
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags);
 
         return (updatedTravelCourse != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :

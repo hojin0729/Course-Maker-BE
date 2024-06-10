@@ -209,16 +209,16 @@ public class TagServiceImpl implements TagService{
         // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
         switch(orderBy) {
             case VIEWS:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
                 break;
             case NEWEST:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.createdAt);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.createdAt);
                 break;
             case POPULAR:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
                 break;
             case RATING:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
                 break;
         }
 
@@ -253,7 +253,16 @@ public class TagServiceImpl implements TagService{
                 .toList()
                 .size();
 
+        System.out.println("-----------------total = " + total);
+        for(TravelCourse course : courses){
+            System.out.println("course.getId() = " + course.getId());
+        }
+
         Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
+
+        System.out.println("coursePage.getTotalPages() = " + coursePage.getTotalPages());
+        System.out.println("coursePage.getNumber() = " + coursePage.getNumber());
+        System.out.println("coursePage.getSize() = " + coursePage.getSize());
 
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage);
 
@@ -416,9 +425,9 @@ public class TagServiceImpl implements TagService{
                 .toList()
                 .size();
 
-        Page<Destination> coursePage = new PageImpl<>(destinations, pageable, total);
+        Page<Destination> destinationPage = new PageImpl<>(destinations, pageable, total);
 
-        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage);
+        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, destinationPage);
 
         return courseMakerPagination;
     }
