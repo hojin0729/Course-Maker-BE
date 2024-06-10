@@ -1,6 +1,5 @@
 package coursemaker.coursemaker.domain.destination.service;
 
-import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
@@ -15,6 +14,7 @@ import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
+import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringJoiner;
 
 
 @Service
@@ -43,7 +42,6 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public Destination save(@Valid RequestDto requestDto) {
-        validateRequestDto(requestDto);
         // 멤버를 가져옴
         Member member = memberService.findByNickname(requestDto.getNickname());
 
@@ -62,7 +60,6 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public Destination update(Long id, @Valid RequestDto requestDto) {
-        validateRequestDto(requestDto);
 
         // 기존 여행지 엔티티를 찾고 없으면 예외 처리
         Destination destination = destinationRepository.findById(id)
@@ -84,38 +81,7 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     // 통합 예외 처리
-    private void validateRequestDto(RequestDto requestDto) {
-        if (requestDto.getNickname() == null || requestDto.getNickname().isEmpty()) {
-            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Nickname: " + requestDto.getNickname());
-        }
-        if (requestDto.getName() == null || requestDto.getName().isEmpty()) {
-            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination name: " + requestDto.getName());
-        }
-        if (requestDto.getLocation() == null || requestDto.getLocation().isEmpty()) {
-            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Location: " + requestDto.getLocation());
-        }
-        if (requestDto.getLatitude() == null) {
-            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Latitude: " + requestDto.getLatitude());
-        }
-        if (requestDto.getLongitude() == null) {
-            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Longitude: " + requestDto.getLongitude());
-        }
-        if (requestDto.getPictureLink() == null || requestDto.getPictureLink().isEmpty()) {
-            throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Destination PictureLink: " + requestDto.getPictureLink());
-        }
-        if (requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
-            throw new IllegalDestinationArgumentException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination Content: " + requestDto.getContent());
-        }
-        if (requestDto.getTags() == null || requestDto.getTags().isEmpty()) {
-            throw new TagNotFoundException("태그가 없습니다.", "Destination name: " + requestDto.getName());
-        }
-        Set<Long> tagIds = new HashSet<>();
-        for (TagResponseDto tag : requestDto.getTags()) {
-            if (!tagIds.add(tag.getId())) {
-                throw new TagDuplicatedException("태그가 중복되었습니다.", "Tag id: " + tag.getId());
-            }
-        }
-    }
+
     // 1. RequestDto 객체에서 태그 ID를 추출합니다.
     // 2. 중복된 태그 ID를 제거합니다.
     // 3. 태그 ID를 List<Long> 형태로 반환합니다.
@@ -139,8 +105,10 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
-    public Page<Destination> findAll(Pageable pageable) {
-        return destinationRepository.findAll(pageable);
+    public CourseMakerPagination<Destination> findAll(Pageable pageable) {
+        Page<Destination> destinations = destinationRepository.findAll(pageable);
+        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, destinations);
+        return courseMakerPagination;
     }
 
     @Override
