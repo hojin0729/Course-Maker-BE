@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.tag.controller;
 
+import coursemaker.coursemaker.util.LoginUser;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
@@ -7,13 +8,10 @@ import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
-import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +33,8 @@ public class TagController {
     /*전체 태그 조회*/
     @Operation(summary = "전체 태그 조회")
     @GetMapping
-    public ResponseEntity<List<TagResponseDto>> getTags(HttpServletRequest request) {
-        System.out.println(request.getAttribute("user"));
+    public ResponseEntity<List<TagResponseDto>> getTags() {
+
         List<TagResponseDto> response = tagService.findAllTags()
                 .stream()
                 .map(Tag::toResponseDto)
