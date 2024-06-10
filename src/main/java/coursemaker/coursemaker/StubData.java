@@ -94,7 +94,7 @@ public class StubData implements CommandLineRunner {
         dto.setName(destination.getName());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
-        dto.setLocationDto(new LocationDto(destination.getLocation(), destination.getLongitude(), destination.getLatitude()));
+        dto.setLocation(new LocationDto(destination.getLocation(), destination.getLongitude(), destination.getLatitude()));
         dto.setTags(tags.stream().map(Tag::toResponseDto).collect(Collectors.toList()));
         return dto;
     }
