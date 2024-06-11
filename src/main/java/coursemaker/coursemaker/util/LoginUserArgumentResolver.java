@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.util;
 
+import coursemaker.coursemaker.domain.member.exception.UnauthorizedException;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
@@ -26,6 +27,10 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
             @Nullable WebDataBinderFactory binderFactory
     ) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        Object user = request.getAttribute("user");
+        if(user == null) {
+            throw new UnauthorizedException("로그인 후 이용이 가능합니다.", "login access ");
+        }
         return request.getAttribute("user");
     }
 

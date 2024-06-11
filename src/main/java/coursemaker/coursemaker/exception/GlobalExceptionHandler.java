@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.exception;
 
 import coursemaker.coursemaker.domain.member.exception.InvalidPasswordException;
+import coursemaker.coursemaker.domain.member.exception.UnauthorizedException;
 import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,19 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType("login required");
+        response.setMessage("로그인 후 이용이 가능합니다.");
+        response.setStatus(401);
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
