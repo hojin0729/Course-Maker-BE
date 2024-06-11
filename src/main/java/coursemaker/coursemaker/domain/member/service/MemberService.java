@@ -142,14 +142,14 @@ public class MemberService {
         Member loginUser = memberRepository.findByEmail(id)
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + id));
         String encodedPassword = loginUser.getPassword();
-        log.info("[getSignInResult] Id : {}", id);
+        log.info("[SignInResult] Id : {}", id);
 
         if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            log.error("[getSignInResult] 패스워드 불일치");
+            log.error("[SignInResult] 패스워드 불일치");
             throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.", "Password: " + rawPassword);
         }
-        log.info("[getLogInResult] 패스워드 일치");
-        log.info("[getLogInResult] LogInResponse 객체 생성");
+        log.info("[LogInResult] 패스워드 일치");
+        log.info("[LogInResult] LogInResponse 객체 생성");
         String accessToken = jwtTokenProvider.createAccessToken(
                 loginUser.getNickname()
         );
@@ -162,7 +162,7 @@ public class MemberService {
                 .build();
 
 
-        log.info("[getLogInResult] LogInResponse 객체에 값 주입");
+        log.info("[LogInResult] LogInResponse 객체에 값 주입");
         var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
         cookie1.setPath("/");
         cookie1.setMaxAge(60 * 60);
