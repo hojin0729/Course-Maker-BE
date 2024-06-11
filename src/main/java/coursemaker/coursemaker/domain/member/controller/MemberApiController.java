@@ -42,9 +42,8 @@ public class MemberApiController {
     @ApiResponse(
             responseCode = "409", description = "이미 존재하는 회원입니다.", content = @Content
     )
-    @PostMapping
+    @PostMapping(value = "/signup")
     public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
-        // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
         String nickname = memberService.signUp(signUpRequest).getNickname();
         SignUpResponse signUpResponse = new SignUpResponse();
         signUpResponse.setNickname(nickname);
@@ -161,7 +160,7 @@ public class MemberApiController {
     @ApiResponse(
             responseCode = "400", description = "잘못된 요청입니다.", content = @Content
     )
-    @PostMapping("/send-validate")
+    @PostMapping("/signup/send-validate")
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
