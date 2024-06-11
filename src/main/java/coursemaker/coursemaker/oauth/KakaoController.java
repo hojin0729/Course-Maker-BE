@@ -30,7 +30,7 @@ public class KakaoController {
     private final MemberService memberService;
 
     @GetMapping("/login")
-    public String showLogInForm(Model model) {
+    public String tempLoginForm(Model model) {
         model.addAttribute("kakaoApiKey", kakaoOauth.getKakaoApiKey());
         model.addAttribute("redirectUri", kakaoOauth.getKakaoLoginRedirectUri());
         model.addAttribute("redirectLogoutUri", kakaoOauth.getKakaoLogoutRedirectUri());

@@ -1,16 +1,22 @@
 package coursemaker.coursemaker.domain.member.service;
 
+import coursemaker.coursemaker.domain.member.dto.EmailCodeVerifyRequest;
+import coursemaker.coursemaker.domain.member.dto.EmailCodeVerifyResponse;
 import coursemaker.coursemaker.domain.member.dto.ValidateEmailResponse;
 import coursemaker.coursemaker.config.EmailConfig;
+import coursemaker.coursemaker.domain.member.email.EmailCode;
+import coursemaker.coursemaker.domain.member.email.EmailCodeRepository;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Slf4j
@@ -20,6 +26,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
     private final MemberRepository memberRepository;
     private final EmailConfig emailConfig;
+    private final EmailCodeRepository emailCodeRepository;
     private String fromEmail;
 
     @PostConstruct // 의존성 주입이 완료된 후 초기화를 수행하는 메서드
@@ -52,6 +59,11 @@ public class EmailService {
     }
 
     public ValidateEmailResponse sendValidateSignupMail(String toEmail) throws MessagingException {
+
+        if (validateEmail(toEmail).getIsSuccess() == false) {  // 0. 이메일 중복 체크
+            throw new ValidationException("이미 가입된 이메일입니다.");
+        };
+
         String authCode = generateAuthCode();
         String title = "CourseMaker 회원가입 인증코드입니다.";
         String content =
@@ -72,4 +84,31 @@ public class EmailService {
 
         return validateEmailResponse;
     }
+
+    public EmailCodeVerifyResponse verifyEmailCode(EmailCodeVerifyRequest emailCodeVerifyRequest) {
+        String givenAuthCode = emailCodeVerifyRequest.getAuthCode();
+        String toMail = emailCodeVerifyRequest.getToEmail();
+
+        Optional<EmailCode> foundAuthCodeOptional = emailCodeRepository.findById(toMail);
+
+        if (foundAuthCodeOptional.isPresent()) {
+            String foundAuthCode = foundAuthCodeOptional.get().getEmailCode();
+            if (!foundAuthCode.equals(givenAuthCode)) {
+                return EmailCodeVerifyResponse.builder()
+                        .isValid(false)
+                        .message("인증 코드 요청이 주어진 이메일이지만, 인증 코드가 일치하지 않습니다.")
+                        .build();
+            }
+            return EmailCodeVerifyResponse.builder()
+                    .isValid(true)
+                    .message("이메일과 인증 코드가 일치하여, 유효한 인증 코드로 검증되었습니다.")
+                    .build();
+        } else {
+            return EmailCodeVerifyResponse.builder()
+                    .isValid(false)
+                    .message("인증 코드 요청이 오지 않은 이메일입니다.")
+                    .build();
+        }
+    }
+
 }

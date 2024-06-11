@@ -33,9 +33,8 @@ public class MemberApiController {
 
 
     @Operation(summary = "회원 생성", description = "기본 회원가입 후 유저를 생성한다.")
-    @PostMapping
+    @PostMapping(value = "/signup")
     public ResponseEntity<Member> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
-        // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
         Member newUser = memberService.signUp(signUpRequest);
         return ResponseEntity.ok().body(newUser);
     }
@@ -96,9 +95,17 @@ public class MemberApiController {
     }
 
     @Operation(summary = "이메일 검증", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-    @PostMapping("/send-validate")
+    @PostMapping("/signup/send-validate")
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
     }
+
+    @Operation(summary = "이메일 인증코드 검증", description = "인증코드의 유효성을 검증한다.")
+    @PostMapping("/signup/verify-validate")
+    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
+        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
+        return ResponseEntity.ok(emailCodeVerifyResponse);
+    }
+
 }
