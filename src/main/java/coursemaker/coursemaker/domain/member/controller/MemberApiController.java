@@ -42,9 +42,8 @@ public class MemberApiController {
     @ApiResponse(
             responseCode = "409", description = "이미 존재하는 회원입니다.", content = @Content
     )
-    @PostMapping
+    @PostMapping(value = "/signup")
     public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
-        // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
         String nickname = memberService.signUp(signUpRequest).getNickname();
         SignUpResponse signUpResponse = new SignUpResponse();
         signUpResponse.setNickname(nickname);
@@ -161,10 +160,23 @@ public class MemberApiController {
     @ApiResponse(
             responseCode = "400", description = "잘못된 요청입니다.", content = @Content
     )
-    @PostMapping("/send-validate")
+    @PostMapping("/signup/send-validate")
     public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
         ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
         return ResponseEntity.ok(validateEmailResponse);
+    }
+
+    @Operation(summary = "인증코드 검증", description = "이메일 인증코드의 유효성을 검증한다.")
+    @ApiResponse(
+            responseCode = "200", description = "이메일 인증 코드가 일치합니다."
+    )
+    @ApiResponse(
+            responseCode = "400", description = "잘못된 요청입니다.", content = @Content
+    )
+    @PostMapping("/signup/verify-validate")
+    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
+        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
+        return ResponseEntity.ok(emailCodeVerifyResponse);
     }
 
     @ExceptionHandler(UserDuplicatedException.class)

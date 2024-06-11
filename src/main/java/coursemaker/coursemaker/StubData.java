@@ -99,7 +99,7 @@ public class StubData implements CommandLineRunner {
         return dto;
     }
 
-    public void CourseStubData() throws Exception {
+    public void CourseStubData1() throws Exception {
         for (long i = 1; i <= 3; i++) {
             Member member = memberService.findById(i);
             List<Tag> tags = tagService.findAllTags();
@@ -129,13 +129,42 @@ public class StubData implements CommandLineRunner {
         }
     }
 
+    public void CourseStubData2() throws Exception {
+        for (long i = 1; i <= 2; i++) {
+            Member member = memberService.findById(i+3);
+            List<Tag> tags = tagService.findAllTags();
+            List<Destination> destinations = destinationService.findAll();
+
+            long finalI = i;
+            List<AddCourseDestinationRequest> courseDestinations = destinations.stream().map(destination -> {
+                AddCourseDestinationRequest courseDestinationRequest = new AddCourseDestinationRequest();
+                courseDestinationRequest.setVisitOrder((short) finalI);
+                courseDestinationRequest.setDate((short) finalI);
+                courseDestinationRequest.setDestination(toDestinationDto(destination, tags));
+                return courseDestinationRequest;
+            }).collect(Collectors.toList());
+
+            AddTravelCourseRequest travelCourseRequest = new AddTravelCourseRequest();
+            travelCourseRequest.setTitle("Course Title" + (i+3));
+            travelCourseRequest.setContent("Course Content" + (i+3));
+            travelCourseRequest.setDuration((int)i);
+            travelCourseRequest.setTravelerCount((int)i);
+            travelCourseRequest.setTravelType((int)i);
+            travelCourseRequest.setPictureLink("http://example.com/course" + (i+3) + ".jpg");
+            travelCourseRequest.setNickname(member.getNickname());
+            travelCourseRequest.setCourseDestinations(courseDestinations);
+            travelCourseRequest.setTags(tags.stream().map(Tag::toResponseDto).collect(Collectors.toList()));
+
+            courseService.save(travelCourseRequest);
+        }
+    }
+
     @Override
     public void run(String... args) throws Exception {
         MemberStubData();
         TagStubData();
         DestinationStubData();
-        CourseStubData();
+        CourseStubData1();
+        CourseStubData2();
     }
 }
-
-
