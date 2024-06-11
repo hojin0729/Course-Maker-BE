@@ -30,7 +30,7 @@ public class KakaoService {
     private final KakaoTokenService kakaoTokenService;
     private final JwtUtil jwtUtil;
     private final KakaoOauth kakaoOauth;
-    private final MemberService userService;
+    private final MemberService memberService;
 
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         log.info("카카오 회원가입 시작");
@@ -94,7 +94,7 @@ public class KakaoService {
         log.info("[kakao] 카카오 토큰만료 완료");
         kakaoTokenService.removeKakaoTokenInfo(accessToken);
         log.info("[kakao] 카카오 토큰제거 완료");
-        userService.logout(request);
+        memberService.logout(request);
         log.info("[kakao] 로그아웃 완료");
 
         return LogoutResponse.builder().success(true).build();
