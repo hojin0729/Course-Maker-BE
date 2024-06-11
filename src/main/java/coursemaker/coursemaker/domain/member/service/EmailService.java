@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.EmailCodeVerifyRequest;
 import coursemaker.coursemaker.domain.member.dto.EmailCodeVerifyResponse;
+import coursemaker.coursemaker.domain.member.dto.EmailVerifyResponse;
 import coursemaker.coursemaker.domain.member.dto.ValidateEmailResponse;
 import coursemaker.coursemaker.config.EmailConfig;
 import coursemaker.coursemaker.domain.member.email.EmailCode;
@@ -60,7 +61,7 @@ public class EmailService {
 
     public ValidateEmailResponse sendValidateSignupMail(String toEmail) throws MessagingException {
 
-        if (validateEmail(toEmail).getIsSuccess() == false) {  // 0. 이메일 중복 체크
+        if (validateEmail(toEmail).getIsSuccess() == false) {  // 이메일 중복 체크
             throw new ValidationException("이미 가입된 이메일입니다.");
         };
 
@@ -86,14 +87,14 @@ public class EmailService {
     }
 
     public EmailCodeVerifyResponse verifyEmailCode(EmailCodeVerifyRequest emailCodeVerifyRequest) {
-        String givenAuthCode = emailCodeVerifyRequest.getAuthCode();
+        String givenEmailCode = emailCodeVerifyRequest.getEmailCode();
         String toMail = emailCodeVerifyRequest.getToEmail();
 
         Optional<EmailCode> foundAuthCodeOptional = emailCodeRepository.findById(toMail);
 
         if (foundAuthCodeOptional.isPresent()) {
             String foundAuthCode = foundAuthCodeOptional.get().getEmailCode();
-            if (!foundAuthCode.equals(givenAuthCode)) {
+            if (!foundAuthCode.equals(givenEmailCode)) {
                 return EmailCodeVerifyResponse.builder()
                         .isValid(false)
                         .message("인증 코드 요청이 주어진 이메일이지만, 인증 코드가 일치하지 않습니다.")
@@ -111,4 +112,17 @@ public class EmailService {
         }
     }
 
+    public EmailVerifyResponse validateEmail(String email) {
+        if (memberRepository.existsByEmail(email)) {
+            return EmailVerifyResponse.builder()
+                    .isSuccess(false)
+                    .status("email-duplicated")
+                    .build();
+        }
+
+        return EmailVerifyResponse.builder()
+                .isSuccess(true)
+                .status("success")
+                .build();
+    }
 }

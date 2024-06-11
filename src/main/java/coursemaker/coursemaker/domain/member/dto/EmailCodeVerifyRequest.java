@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EmailCodeVerifyRequest {
     private String toEmail;
-    private String authCode;
+    private String emailCode;
 }
