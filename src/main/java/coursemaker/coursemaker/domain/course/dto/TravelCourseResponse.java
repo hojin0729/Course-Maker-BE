@@ -42,12 +42,12 @@ public class TravelCourseResponse {
     private final List<CourseDestinationResponse> courseDestinations;
 
     @Schema(description = "코스 태그 목록")
-    private final List<TagResponseDto> courseTags;
+    private final List<TagResponseDto> tags;
 
     @Schema(description = "코스 만든 멤버")
     private final CourseMemberResponse member;
 
-    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses, List<TagResponseDto> courseTags) {
+    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses, List<TagResponseDto> tags) {
         this.id = travelCourse.getId();
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
@@ -58,7 +58,7 @@ public class TravelCourseResponse {
         this.pictureLink = travelCourse.getPictureLink();
         this.member = new CourseMemberResponse(travelCourse.getMember());
         this.courseDestinations = courseDestinationResponses;
-        this.courseTags = courseTags;
+        this.tags = tags;
         // TODO: 코스태그 - 코스간에 연관관계를 잘 공부해보세여
 //        this.courseTags = travelCourse.getCourseTags().stream()
 //                .map(courseTag -> {
