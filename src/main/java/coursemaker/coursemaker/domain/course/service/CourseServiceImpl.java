@@ -1,38 +1,34 @@
 package coursemaker.coursemaker.domain.course.service;
 
-import coursemaker.coursemaker.domain.course.dto.*;
+import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
+import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
+import coursemaker.coursemaker.domain.course.dto.UpdateCourseDestinationRequest;
+import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
-import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
+import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -168,9 +164,14 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public TravelCourse update(Long id, UpdateTravelCourseRequest request) {
+    public TravelCourse update(Long id, UpdateTravelCourseRequest request/*, @LoginUser String nickname*/) {
 
         // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
+
+        // Todo: 로그인 하지 않은 상태에서 업데이트와 딜리트는 고도화 때 예외처리 구현하기
+//        if (request.getNickname() != nickname) {
+//            throw new
+//        }
 
         travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id));
@@ -264,7 +265,13 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id/*, @LoginUser String nickname*/) {
+
+        // Todo: 로그인 하지 않은 상태에서 업데이트와 딜리트는 고도화 때 예외처리 구현하기
+//        if (request.getNickname() != nickname) {
+//            throw new
+//        }
+
         TravelCourse travelCourse = travelCourseRepository.findById(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id));
 
