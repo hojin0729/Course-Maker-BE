@@ -22,24 +22,8 @@ public class EmailCode {
 
     // 생성자 및 빌더 패턴을 통한 객체 생성
     @Builder
-    public EmailCode(String id, String emailCode) {
-        this.id = id;
+    public EmailCode(String toEmail, String emailCode) {
+        this.id = toEmail;
         this.emailCode = emailCode;
-    }
-
-    // authCode 생성 로직을 이곳으로 옮기는 것도 가능.
-    public static EmailCode create(String email) {
-        String generatedAuthCode = generateAuthCode(); // 인증 코드 생성 로직
-        return EmailCode.builder()
-                .id(email)
-                .emailCode(generatedAuthCode)
-                .build();
-    }
-
-    private static String generateAuthCode() {
-        // 인증 코드 생성 로직을 여기에 구현
-        // 예: 6자리 난수 생성
-        int authCode = (int)(Math.random() * 1000000);
-        return String.format("%06d", authCode);
     }
 }

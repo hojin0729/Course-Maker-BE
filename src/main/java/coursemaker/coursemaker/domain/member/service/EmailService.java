@@ -72,6 +72,12 @@ public class EmailService {
                         + "인증 코드는 <code>" + authCode + "</code>입니다.<br>"
                         + "인증 코드를 바르게 입력해주세요."
                 ;
+        //EmailCodeRepository에 인증코드 저장
+        EmailCode authCodeObject = EmailCode.builder()
+                .toEmail(toEmail)
+                .emailCode(authCode)
+                .build();
+        emailCodeRepository.save(authCodeObject);
 
         sendMail(toEmail, title, content); // 생성된 메일 발송
 
