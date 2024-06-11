@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DestinationRepository extends JpaRepository<Destination, Long> {
     Page<Destination> findAll(Pageable pageable);
+    boolean existsByName(String name);
+    boolean existsByNameAndIdNot(String name, Long id);
 }

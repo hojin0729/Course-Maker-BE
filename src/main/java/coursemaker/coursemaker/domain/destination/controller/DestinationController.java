@@ -195,31 +195,55 @@ public class DestinationController {
     }
 
     @ExceptionHandler(DestinationDuplicatedException.class)
-    public ResponseEntity<String> handleDestinationDuplicatedException(DestinationDuplicatedException e) {
-        return ResponseEntity
-                .status(ErrorCode.DUPLICATED_DESTINATION.getStatus())
-                .body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleDestinationDuplicatedException(DestinationDuplicatedException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @ExceptionHandler(DestinationNotFoundException.class)
-    public ResponseEntity<String> handleDestinationNotFoundException(DestinationNotFoundException e) {
-        return ResponseEntity
-                .status(ErrorCode.INVALID_DESTINATION.getStatus())
-                .body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleDestinationNotFoundException(DestinationNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @ExceptionHandler(IllegalDestinationArgumentException.class)
-    public ResponseEntity<String> handleIllegalDestinationArgumentException(IllegalDestinationArgumentException e) {
-        return ResponseEntity
-                .status(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT.getStatus())
-                .body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleIllegalDestinationArgumentException(IllegalDestinationArgumentException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @ExceptionHandler(PictureNotFoundException.class)
-    public ResponseEntity<String> handlePictureNotFoundException(PictureNotFoundException e) {
-        return ResponseEntity
-                .status(ErrorCode.PICTURE_NOT_FOUND.getStatus())
-                .body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handlePictureNotFoundException(PictureNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @ExceptionHandler(TagDuplicatedException.class)
