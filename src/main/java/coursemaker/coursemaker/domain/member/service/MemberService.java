@@ -79,40 +79,33 @@ public class MemberService {
         return newUser;
     }
 
-    public Member updateUser(UpdateRequest updateRequest) {
+    public Member updateUser(UpdateRequest updateRequest, String nickname) {
         updateRequest.validate(); // 검증 로직 추가
         //TODO: 수정 시 Access Token 재발급
-        Member user = memberRepository
-                .findById(updateRequest.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + updateRequest.getUserId()));
+        Member user = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
 
-        String name = updateRequest.getName();
-        String nickname = updateRequest.getNickname();
-        String password = updateRequest.getPassword();
-        String profileImg = updateRequest.getProfileImgUrl();
-        String profileDescription = updateRequest.getProfileDescription();
-
-        if(name != null) {
-            user.setName(name);
-        }
-        if (nickname != null && !nickname.equals(user.getNickname())) {
-            if (memberRepository.findByNickname(nickname).isPresent()) {
-                throw new UserDuplicatedException("이미 존재하는 닉네임입니다.", "Nickname: " + nickname);
+        if (updateRequest.getNickname() != null && !updateRequest.getNickname().equals(nickname)) {
+            if (memberRepository.findByNickname(updateRequest.getNickname()).isPresent()) {
+                throw new UserDuplicatedException("이미 존재하는 닉네임입니다.", "Nickname: " + updateRequest.getNickname());
             }
-            user.setNickname(nickname);
-        }
-        if(password != null) {
-            user.setPassword(password);
-        }
-        if(profileImg != null) {
-            user.setProfileImgUrl(profileImg);
-        }
-        if(profileDescription != null) {
-            user.setProfileDescription(profileDescription);
+            user.setNickname(updateRequest.getNickname());
         }
 
-        Member updatedUser = memberRepository.save(user);
-        return updatedUser;
+        if (updateRequest.getName() != null) {
+            user.setName(updateRequest.getName());
+        }
+        if (updateRequest.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+        }
+        if (updateRequest.getProfileImgUrl() != null) {
+            user.setProfileImgUrl(updateRequest.getProfileImgUrl());
+        }
+        if (updateRequest.getProfileDescription() != null) {
+            user.setProfileDescription(updateRequest.getProfileDescription());
+        }
+
+        return memberRepository.save(user);
     }
 
     public Member deleteUser(DeleteRequest deleteRequest) {
@@ -209,10 +202,10 @@ public class MemberService {
     }
 
 
-    public MyPageResponse showMyPage(Long userId) {
-        Member currentUser = memberRepository.findById(userId)
-                .orElseThrow();
-        String nickname = currentUser.getNickname();
+    public MyPageResponse showMyPage(String nickname) {
+        Member currentUser = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
+
         String name = currentUser.getName();
         String profileDescription = currentUser.getProfileDescription();
         String profileImgUrl = currentUser.getProfileImgUrl();
