@@ -3,10 +3,7 @@ package coursemaker.coursemaker.domain.destination.controller;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.exception.DestinationDuplicatedException;
-import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
-import coursemaker.coursemaker.domain.destination.exception.IllegalDestinationArgumentException;
-import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
+import coursemaker.coursemaker.domain.destination.exception.*;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
@@ -31,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -150,6 +148,7 @@ public class DestinationController {
             @ApiResponse(responseCode = "200", description = "Id에 해당하는 여행지 수정 성공",
                     content = @Content(schema = @Schema(implementation = DestinationDto.class))),
             @ApiResponse(responseCode = "400", description = "수정하려는 여행지의 인자값이 올바르지 않을 때 반환합니다.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "접근 권한이 없을 때 반환합니다.", content = @Content),
             @ApiResponse(responseCode = "404", description = "수정하려는 여행지의 id를 찾지 못할 때 반환합니다.", content = @Content),
             @ApiResponse(responseCode = "409", description = "수정하려는 여행지의 이름이 이미 있을 때 반환합니다.", content = @Content)
     })
@@ -160,6 +159,11 @@ public class DestinationController {
 
     public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @LoginUser String nickname) {
         request.setNickname(nickname);
+        // 해당 여행지가 로그인한 사용자에게 속하는지 확인
+        Destination existingDestination = destinationService.findById(id);
+        if (!existingDestination.getMember().getNickname().equals(nickname)) {
+            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
+        }
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId())
                 .stream()
@@ -175,17 +179,22 @@ public class DestinationController {
     @Operation(summary = "id에 해당하는 여행지 삭제", description = "여행지 ID를 입력하여 해당 여행지를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Id에 해당하는 여행지 삭제 성공", content = @Content),
+            @ApiResponse(responseCode = "403", description = "접근 권한이 없을 때 반환합니다.", content = @Content),
             @ApiResponse(responseCode = "404", description = "삭제하려는 여행지의 id를 찾지 못할 때 반환합니다.", content = @Content)
     })
     @Parameter(name = "id", description = "여행지 Id")
     // Id에 해당하는 여행지의 정보를 삭제합니다.
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id) {
+    public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id, @LoginUser String nickname) {
 
         // 해당 ID의 여행지가 존재하는지 확인합니다.
         Destination destination = destinationService.findById(id);
         if (destination == null) {
             return ResponseEntity.notFound().build();
+        }
+        // 해당 여행지가 로그인한 사용자에게 속하는지 확인
+        if (!destination.getMember().getNickname().equals(nickname)) {
+            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         // 여행지에 연결된 태그들을 먼저 삭제합니다.
         tagService.deleteAllTagByDestination(id);
@@ -274,5 +283,17 @@ public class DestinationController {
         return ResponseEntity
                 .status(response.getStatus())
                 .body(response);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }
