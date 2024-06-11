@@ -9,9 +9,9 @@ import lombok.Data;
 
 @Data
 public class UpdateRequest {
-    @Schema(description = "유저 ID", example = "1")
-    @NotNull(message = "유저 ID가 비어있습니다.")
-    private Long userId; //TODO: 쿠키에서 가져오기
+//    @Schema(description = "유저 ID", example = "1")
+//    @NotNull(message = "유저 ID가 비어있습니다.")
+//    private Long userId; //TODO: 쿠키에서 가져오기
 
     @Schema(description = "이름", example = "홍길동")
     @Pattern(regexp = "[a-zA-Z가-힣]{2,10}", message = "이름은 2~10자의 영문자, 한글로 구성되어야 합니다.")
@@ -33,9 +33,9 @@ public class UpdateRequest {
     private String profileDescription;
 
     public void validate() {
-        if (userId == null) {
-            throw new IllegalUserArgumentException("유저 ID가 비어있습니다.", "userId is empty");
-        }
+//        if (userId == null) {
+//            throw new IllegalUserArgumentException("유저 ID가 비어있습니다.", "userId is empty");
+//        }
         if (name != null && !name.isBlank() && !name.matches("[a-zA-Z가-힣]{2,10}")) {
             throw new IllegalUserArgumentException("이름은 2~10자의 영문자, 한글로 구성되어야 합니다.", "invalid name format");
         }
