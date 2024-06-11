@@ -34,9 +34,9 @@ public class EmailConfig {
     private int writeTimeout = 5000;
 
     @Bean
-    public JavaMailSender mailSender() { // Java MailSender 인터페이스를 구현한 객체를 빈으로 등록한다
+    public JavaMailSender mailSender() { // Java MailSender 인터페이스를 구현한 객체를 빈으로 등록
 
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl(); // Java MailSender 구현체를 생성 및 정의한다
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl(); // Java MailSender 구현체를 생성 및 정의
         mailSender.setHost(host);
         mailSender.setPort(port);
         mailSender.setUsername(username);

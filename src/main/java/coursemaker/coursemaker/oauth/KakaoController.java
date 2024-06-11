@@ -30,11 +30,19 @@ public class KakaoController {
     private final MemberService memberService;
 
     @GetMapping("/login")
-    public String showLogInForm(Model model) {
+    public String tempLoginForm(Model model) {
         model.addAttribute("kakaoApiKey", kakaoOauth.getKakaoApiKey());
         model.addAttribute("redirectUri", kakaoOauth.getKakaoLoginRedirectUri());
-        model.addAttribute("redirectLogoutUri", kakaoOauth.getKakaoLogoutRedirectUri());
         return "login/login";
+    }
+
+    @GetMapping("/auth/kakao/login")
+    public String redirectToKakao() {
+        String kakaoLoginUrl = String.format(
+                "https://kauth.kakao.com/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code",
+                kakaoOauth.getKakaoApiKey(), kakaoOauth.getKakaoLoginRedirectUri());
+
+        return "redirect:" + kakaoLoginUrl;
     }
 
 

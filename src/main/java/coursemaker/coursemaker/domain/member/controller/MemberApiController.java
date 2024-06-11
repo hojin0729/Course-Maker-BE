@@ -214,4 +214,11 @@ public class MemberApiController {
                 .value());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+    @Operation(summary = "이메일 인증코드 검증", description = "인증코드의 유효성을 검증한다.")
+    @PostMapping("/signup/verify-validate")
+    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
+        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
+        return ResponseEntity.ok(emailCodeVerifyResponse);
+    }
+
 }
