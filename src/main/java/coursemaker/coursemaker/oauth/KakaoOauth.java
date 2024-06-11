@@ -30,11 +30,21 @@ public class KakaoOauth {
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     private String kakaoClientSecret; // 추가: client_secret 값
 
-    private final String kakaoLoginRedirectUri = "http://localhost:8080/login/oauth2/code/kakao";
-    private final String kakaoLogoutRedirectUri = "http://localhost:8080/auth/logout";
-    private final String kakaoTokenUri = "https://kauth.kakao.com/oauth/token";
-    private final String userInfoUri = "https://kapi.kakao.com/v2/user/me";
-    private final String expireKakaoTokenUri = "https://kapi.kakao.com/v1/user/logout";
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String kakaoLoginRedirectUri;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    private String kakaoTokenUri;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    private String userInfoUri;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.logout-redirect-uri}")
+    private String kakaoLogoutRedirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.expire-token-uri}")
+    private String expireKakaoTokenUri;
 
     public String getKakaoAccessToken(String code) {
         String kakaoAccessToken = "";
@@ -96,13 +106,13 @@ public class KakaoOauth {
         return kakaoAccessToken;
     }
 
-    public HashMap<String, Object> getUserInfoFromKakaoToken(String kakakoAccessToken) {
+    public HashMap<String, Object> getUserInfoFromKakaoToken(String kakaoAccessToken) {
         HashMap<String, Object> userInfo = new HashMap<>();
         try{
             URL url = new URL(userInfoUri);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer " + kakakoAccessToken);
+            conn.setRequestProperty("Authorization", "Bearer " + kakaoAccessToken);
             conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
             int responseCode = conn.getResponseCode();
