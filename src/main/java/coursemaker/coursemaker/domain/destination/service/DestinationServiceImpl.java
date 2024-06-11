@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.destination.service;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.exception.DestinationDuplicatedException;
 import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
 import coursemaker.coursemaker.domain.destination.exception.IllegalDestinationArgumentException;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
@@ -45,6 +46,11 @@ public class DestinationServiceImpl implements DestinationService {
         // 멤버를 가져옴
         Member member = memberService.findByNickname(requestDto.getNickname());
 
+        // 여행지 이름 중복 확인
+        if (destinationRepository.existsByName(requestDto.getName())) {
+            throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
+        }
+
         // DTO를 엔티티로 변환
         Destination destination = requestDto.toEntity(member);
 
@@ -64,6 +70,11 @@ public class DestinationServiceImpl implements DestinationService {
         // 기존 여행지 엔티티를 찾고 없으면 예외 처리
         Destination destination = destinationRepository.findById(id)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+
+        // 여행지 이름 중복 확인 (본인 제외)
+        if (destinationRepository.existsByNameAndIdNot(requestDto.getName(), id)) {
+            throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
+        }
 
         // 멤버 정보는 유지하고, 업데이트할 정보를 다시 설정
         destination.setName(requestDto.getName());
