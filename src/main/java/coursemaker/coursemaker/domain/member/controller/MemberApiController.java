@@ -43,10 +43,12 @@ public class MemberApiController {
             responseCode = "409", description = "이미 존재하는 회원입니다.", content = @Content
     )
     @PostMapping
-    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         // TODO: 이메일 인증 등의 절차가 모두 완료되었는지 확인 후 회원가입이 진행되어야 함
-        memberService.signUp(signUpRequest);
-        return ResponseEntity.ok().build();
+        String nickname = memberService.signUp(signUpRequest).getNickname();
+        SignUpResponse signUpResponse = new SignUpResponse();
+        signUpResponse.setNickname(nickname);
+        return ResponseEntity.ok().body(signUpResponse);
     }
 
     @Operation(summary = "회원 정보 수정", description = "로그인한 회원의 정보를 수정한다.")
