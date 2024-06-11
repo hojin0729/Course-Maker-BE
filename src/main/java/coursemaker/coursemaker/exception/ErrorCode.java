@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_DESTINATION(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 여행지가 없습니다.", "DEST-001"),
     DUPLICATED_DESTINATION(HttpStatus.CONFLICT, "Duplicated item", "해당 여행지가 이미 존재합니다.", "DEST-002"),
     ILLEGAL_DESTINATION_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "여행지에 알맞은 인자값이 아닙니다.", "DEST-003"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden", "해당 자원에 접근할 권한이 없습니다.", "DEST-004"),
 
     PICTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 사진이 없습니다.", "PICTURE-001"),
     PICTURE_OVER_SIZE(HttpStatus.PAYLOAD_TOO_LARGE, "Out of range size", "허용하는 사진 용량(15MB)을 초과했습니다.", "PICTURE-002"),
