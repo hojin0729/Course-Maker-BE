@@ -167,6 +167,19 @@ public class MemberApiController {
         return ResponseEntity.ok(validateEmailResponse);
     }
 
+    @Operation(summary = "인증코드 검증", description = "이메일 인증코드의 유효성을 검증한다.")
+    @ApiResponse(
+            responseCode = "200", description = "이메일 인증 코드가 일치합니다."
+    )
+    @ApiResponse(
+            responseCode = "400", description = "잘못된 요청입니다.", content = @Content
+    )
+    @PostMapping("/signup/verify-validate")
+    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
+        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
+        return ResponseEntity.ok(emailCodeVerifyResponse);
+    }
+
     @ExceptionHandler(UserDuplicatedException.class)
     public ResponseEntity<ErrorResponse> handleUserDuplicatedException(UserDuplicatedException e) {
         ErrorResponse response = new ErrorResponse();
@@ -214,11 +227,4 @@ public class MemberApiController {
                 .value());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
-    @Operation(summary = "이메일 인증코드 검증", description = "인증코드의 유효성을 검증한다.")
-    @PostMapping("/signup/verify-validate")
-    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
-        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
-        return ResponseEntity.ok(emailCodeVerifyResponse);
-    }
-
 }

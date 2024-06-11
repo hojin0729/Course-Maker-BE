@@ -124,4 +124,6 @@ public class GlobalExceptionHandler {
         response.setStatus(ErrorCode.PICTURE_OVER_SIZE.getStatus().value());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+
+
 }
