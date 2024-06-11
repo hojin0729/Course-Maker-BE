@@ -1,6 +1,5 @@
 package coursemaker.coursemaker.domain.member.controller;
 
-import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.exception.IllegalUserArgumentException;
@@ -9,21 +8,17 @@ import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.service.EmailService;
 import coursemaker.coursemaker.domain.member.service.MemberService;
-import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
-import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +34,7 @@ public class MemberApiController {
 
     @Operation(summary = "회원 생성", description = "기본 회원가입 후 유저를 생성한다.")
     @ApiResponse(
-            responseCode = "201", description = "회원이 정상적으로 생성되었습니다."
+            responseCode = "200", description = "회원이 정상적으로 생성되었습니다."
     )
     @ApiResponse(
             responseCode = "400", description = "잘못된 요청입니다.", content = @Content
@@ -95,7 +90,7 @@ public class MemberApiController {
         String id = loginRequest.getLoginEmail();
         String password = loginRequest.getPassword();
         LoginResponse loginResponse = memberService.login(id, password, response);
-        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
+        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, nickname : {}, token : {}", id, loginResponse.getNickname(), loginResponse.getAccessToken());
 
         //TODO: 유저 정보 Cookie에 저장
         return ResponseEntity.ok().body(loginResponse);
