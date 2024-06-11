@@ -14,11 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 
 @Slf4j
@@ -152,6 +150,7 @@ public class MemberService {
         loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .nickname(loginUser.getNickname())
                 .build();
 
 
