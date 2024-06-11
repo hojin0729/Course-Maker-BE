@@ -63,45 +63,45 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public TravelCourse save(AddTravelCourseRequest request) {
         // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
-        if (request.getTitle() == null || request.getTitle().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
-        }
+//        if (request.getTitle() == null || request.getTitle().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
+//        }
 
         if (request.getTitle().length() > 50) {
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
 
-        if (request.getContent() == null || request.getContent().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
-        }
+//        if (request.getContent() == null || request.getContent().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
+//        }
+//
+//        if (request.getDuration() == null ) {
+//            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "duration is null");
+//        }
 
-        if (request.getDuration() == null ) {
-            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "duration is null");
-        }
-
-        if (request.getDuration() > 3 || request.getDuration() < 1) {
-            throw new IllegalTravelCourseArgumentException("여행 기간은 1~3일 사이 입니다.", "duration: " + request.getDuration());
-        }
-
-        if (request.getTravelerCount() == null || request.getTravelerCount() < 1) {
-            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "traveler count: " + request.getTravelerCount());
-        }
-
-        if (request.getTravelType() == null) {
-            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "traveler type is null");
-        }
-
-        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "image link is empty");
-        }
-
-        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "course destination is empty");
-        }
-
-        if(request.getTags() == null || request.getTags().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 태그가 존재하지 않습니다.", "tag is empty");
-        }
+//        if (request.getDuration() > 3 || request.getDuration() < 1) {
+//            throw new IllegalTravelCourseArgumentException("여행 기간은 1~3일 사이 입니다.", "duration: " + request.getDuration());
+//        }
+//
+//        if (request.getTravelerCount() == null || request.getTravelerCount() < 1) {
+//            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "traveler count: " + request.getTravelerCount());
+//        }
+//
+//        if (request.getTravelType() == null) {
+//            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "traveler type is null");
+//        }
+//
+//        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "image link is empty");
+//        }
+//
+//        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "course destination is empty");
+//        }
+//
+//        if(request.getTags() == null || request.getTags().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 태그가 존재하지 않습니다.", "tag is empty");
+//        }
 
 
         // TODO: ROW MAPPER로 엔티티 - DTO 매핑
@@ -175,45 +175,45 @@ public class CourseServiceImpl implements CourseService{
         travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id));
 
-        if (request.getTitle() == null || request.getTitle().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
-        }
+//        if (request.getTitle() == null || request.getTitle().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
+//        }
 
         if (request.getTitle().length() > 50) {
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
 
-        if (request.getContent() == null || request.getContent().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
-        }
-
-        if (request.getDuration() == null ) {
-            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "duration is null");
-        }
-
-        if (request.getDuration() > 3 || request.getDuration() < 1) {
-            throw new IllegalTravelCourseArgumentException("여행 기간은 1~3일 사이 입니다.", "duration: " + request.getDuration());
-        }
-
-        if (request.getTravelerCount() == null || request.getTravelerCount() < 1) {
-            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "traveler count: " + request.getTravelerCount());
-        }
-
-        if (request.getTravelType() == null) {
-            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "traveler type is null");
-        }
-
-        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "image link is empty");
-        }
-
-        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "course destination is empty");
-        }
-
-        if(request.getTags() == null || request.getTags().isEmpty()) {
-            throw new IllegalTravelCourseArgumentException("코스 태그가 존재하지 않습니다.", "tag is empty");
-        }
+//        if (request.getContent() == null || request.getContent().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
+//        }
+//
+//        if (request.getDuration() == null ) {
+//            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "duration is null");
+//        }
+//
+//        if (request.getDuration() > 3 || request.getDuration() < 1) {
+//            throw new IllegalTravelCourseArgumentException("여행 기간은 1~3일 사이 입니다.", "duration: " + request.getDuration());
+//        }
+//
+//        if (request.getTravelerCount() == null || request.getTravelerCount() < 1) {
+//            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "traveler count: " + request.getTravelerCount());
+//        }
+//
+//        if (request.getTravelType() == null) {
+//            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "traveler type is null");
+//        }
+//
+//        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "image link is empty");
+//        }
+//
+//        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "course destination is empty");
+//        }
+//
+//        if(request.getTags() == null || request.getTags().isEmpty()) {
+//            throw new IllegalTravelCourseArgumentException("코스 태그가 존재하지 않습니다.", "tag is empty");
+//        }
 
 
         // TODO: ROW MAPPER로 엔티티 - DTO 매핑

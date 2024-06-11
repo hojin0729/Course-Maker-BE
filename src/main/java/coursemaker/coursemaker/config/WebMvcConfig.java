@@ -1,13 +1,16 @@
 package coursemaker.coursemaker.config;
 
+import coursemaker.coursemaker.util.LoginUserArgumentResolver;
 import coursemaker.coursemaker.jwt.JwtInterceptor;
-import coursemaker.coursemaker.jwt.JwtTokenProvider;
-import coursemaker.coursemaker.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,6 +31,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(JwtInterceptor)
                 .excludePathPatterns("/v1/member")// 회원가입
                 .excludePathPatterns("/v1/member/login");// 로그인
+    }
+
+    @Autowired
+    private LoginUserArgumentResolver loginUserArgumentResolver;
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(loginUserArgumentResolver);
     }
 
 }

@@ -1,40 +1,37 @@
 package coursemaker.coursemaker.domain.course.controller;
 
+import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
+import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
+import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
-import coursemaker.coursemaker.domain.course.service.CourseService;
-import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
-import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
-import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
-
-import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
+import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
-import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
-import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
-import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
-import coursemaker.coursemaker.exception.ErrorCode;
+
+import coursemaker.coursemaker.domain.tag.service.OrderBy;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.entity.Tag;
+
+import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.validation.annotation.Validated;
-
+import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,6 +49,8 @@ import java.util.stream.Collectors;
 public class CourseApiController {
 
     private final CourseService courseService;
+
+    private final TagService tagService;
 
     private final CourseDestinationService courseDestinationService;
 
@@ -66,7 +64,8 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request) {
+    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request, @LoginUser String nickname) {
+        request.setNickname(nickname);
         TravelCourse savedTravelCourse = courseService.save(request);
 
         return (savedTravelCourse != null) ?
@@ -86,17 +85,22 @@ public class CourseApiController {
     })
     @Parameters({
             @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", schema = @Schema(type = "integer", defaultValue = "0")),
-            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)", schema = @Schema(type = "integer"))
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)", schema = @Schema(type = "integer")),
+            @Parameter(name = "tagIds", description = "태그를 선택하지 않으면 전체 태그로 조회됩니다."),
+            @Parameter(name = "orderBy", description = "정렬하는 기능을 나타냅니다. NEWEST는 최신순을 의미합니다.")
     })
     /*********스웨거 어노테이션**********/
     @GetMapping
-    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findAllTravelCourse(@RequestParam(defaultValue = "20", name = "record") Integer record,
-                                                                                           @RequestParam(defaultValue = "1", name = "page") Integer page) {
+    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findAllTravelCourse(@RequestParam(name = "tagIds", required = false) List<Long> tagIds,
+                                                                                           @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                           @RequestParam(defaultValue = "1", name = "page") Integer page,
+                                                                                           @RequestParam(defaultValue = "NEWEST", name = "orderBy") OrderBy orderBy) {
 
         Pageable pageable = PageRequest.of(page-1, record);
 
         List<TravelCourseResponse> contents = new ArrayList<>();
-        CourseMakerPagination<TravelCourse> travelCoursePage = courseService.getAllOrderByViewsDesc(pageable);
+        // CourseMakerPagination<TravelCourse> travelCoursePage = courseService.getAllOrderByViewsDesc(pageable);
+        CourseMakerPagination<TravelCourse> travelCoursePage = tagService.findAllCourseByTagIds(tagIds, pageable, orderBy);
         int totalPage = travelCoursePage.getTotalPage();//
         List<TravelCourse> travelCourses = travelCoursePage.getContents();
 
@@ -110,7 +114,11 @@ public class CourseApiController {
                     .map(courseDestinationService::toResponse)
                     .toList();
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses));
+            /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
+                            .stream().map(Tag::toResponseDto).toList();
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
         }
 
         Page<TravelCourseResponse> responsePagepage = new PageImpl<>(contents, pageable, totalPage);
@@ -138,7 +146,11 @@ public class CourseApiController {
                 .map(courseDestinationService::toResponse)
                 .toList();
 
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses));
+        /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+        List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
+                .stream().map(Tag::toResponseDto).toList();
+
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
     }
 
     // PUT
@@ -151,7 +163,8 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
-    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request) {
+    public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request, @LoginUser String nickname) {
+        request.setNickname(nickname);
         System.out.println("---------------------------------------------------id = " + id);
         TravelCourse updatedTravelCourse = courseService.update(id, request);
 
@@ -161,7 +174,10 @@ public class CourseApiController {
                 .map(courseDestinationService::toResponse)
                 .toList();
 
-        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses);
+        /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
+                .stream().map(Tag::toResponseDto).toList();
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags);
 
         return (updatedTravelCourse != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :

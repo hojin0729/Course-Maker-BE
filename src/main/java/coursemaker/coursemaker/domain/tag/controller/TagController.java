@@ -1,5 +1,10 @@
 package coursemaker.coursemaker.domain.tag.controller;
 
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.tag.service.OrderBy;
+import coursemaker.coursemaker.util.CourseMakerPagination;
+import coursemaker.coursemaker.util.LoginUser;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
@@ -7,15 +12,14 @@ import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
-import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,14 +39,38 @@ public class TagController {
     /*전체 태그 조회*/
     @Operation(summary = "전체 태그 조회")
     @GetMapping
-    public ResponseEntity<List<TagResponseDto>> getTags(HttpServletRequest request) {
-        System.out.println(request.getAttribute("user"));
+    public ResponseEntity<List<TagResponseDto>> getTags() {
+
         List<TagResponseDto> response = tagService.findAllTags()
                 .stream()
                 .map(Tag::toResponseDto)
                 .toList();
 
         return ResponseEntity.ok().body(response);
+    }
+
+    @Operation(summary = "해당 태그에 속한 여행지를 구하는 API입니다. \n현재는 raw 데이터를 응답하며, 정확한 응답 스키마는 각 도메인에서 구현할 예정입니다.", description = "현재 API 테스트 중에 있습니다. 데이터에 오류가 있을 경우(여행지에 태그가 포함되 있는데 검색이 안되거나 하는 등..) 혁진쨩★ 한테 문의 바랍니다.")
+    @GetMapping("reference/findDestinationsByTags")
+    public CourseMakerPagination<Destination> findDestinationsByTags(@RequestParam(name = "tagIds", required = false) List<Long> tagIds,
+                                                   @RequestParam(defaultValue = "20", name = "record") int record,
+                                                   @RequestParam(defaultValue = "1", name = "page") int page,
+                                                   @RequestParam(defaultValue = "NEWEST", name = "orderBy") OrderBy orderBy) {
+        Pageable pageable = PageRequest.of(page - 1, record);
+
+        return tagService.findAllDestinationByTagIds(tagIds, pageable, orderBy);
+
+    }
+
+    @Operation(summary = "해당 태그에 속한 코스를 구하는 API입니다. \n현재는 raw 데이터를 응답하며, 정확한 응답 스키마는 각 도메인에서 구현할 예정입니다.", description = "현재 API 테스트 중에 있습니다. 데이터에 오류가 있을 경우(코스에 태그가 포함되 있는데 검색이 안되거나 하는 등..) 혁진쨩★ 한테 문의 바랍니다.")
+    @GetMapping("reference/findTravelCoursesByTags")
+    public CourseMakerPagination<TravelCourse> findTravelCoursesByTags(@RequestParam(name = "tagIds", required = false) List<Long> tagIds,
+                                                    @RequestParam(defaultValue = "20", name = "record") int record,
+                                                    @RequestParam(defaultValue = "1", name = "page") int page,
+                                                    @RequestParam(defaultValue = "NEWEST", name = "orderBy") OrderBy orderBy) {
+        Pageable pageable = PageRequest.of(page - 1, record);
+
+        return tagService.findAllCourseByTagIds(tagIds, pageable, orderBy);
+
     }
 
     /*태그 생성*/
