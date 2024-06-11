@@ -202,6 +202,7 @@ public class TagServiceImpl implements TagService{
                     .stream()
                     .map(Tag::getId)
                     .collect(Collectors.toList());
+            System.out.println("------------------"+tagIds);
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
@@ -228,7 +229,7 @@ public class TagServiceImpl implements TagService{
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(courseTag.tag.id.in(tagIds))// 다중태그
                 .groupBy(courseTag.course)// 코스로 묶어서
-                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
+//                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .offset(pageable.getOffset())// 페이지네이션
                 .limit(pageable.getPageSize())
@@ -245,7 +246,7 @@ public class TagServiceImpl implements TagService{
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(courseTag.tag.id.in(tagIds))// 다중태그
                 .groupBy(courseTag.course)// 코스로 묶어서
-                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
+//                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .fetch()
                 .stream()
@@ -253,16 +254,16 @@ public class TagServiceImpl implements TagService{
                 .toList()
                 .size();
 
-        System.out.println("-----------------total = " + total);
-        for(TravelCourse course : courses){
-            System.out.println("course.getId() = " + course.getId());
-        }
+//        System.out.println("-----------------total = " + total);
+//        for(TravelCourse course : courses){
+//            System.out.println("course.getId() = " + course.getId());
+//        }
 
         Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
 
-        System.out.println("coursePage.getTotalPages() = " + coursePage.getTotalPages());
-        System.out.println("coursePage.getNumber() = " + coursePage.getNumber());
-        System.out.println("coursePage.getSize() = " + coursePage.getSize());
+//        System.out.println("coursePage.getTotalPages() = " + coursePage.getTotalPages());
+//        System.out.println("coursePage.getNumber() = " + coursePage.getNumber());
+//        System.out.println("coursePage.getSize() = " + coursePage.getSize());
 
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage);
 
@@ -401,7 +402,7 @@ public class TagServiceImpl implements TagService{
                 .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
                 .where(destinationTag.tag.id.in(tagIds))// 다중태그 조건 검색
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
-                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
+//                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .offset(pageable.getOffset())// 페이지네이션
                 .limit(pageable.getPageSize())
@@ -417,7 +418,7 @@ public class TagServiceImpl implements TagService{
                 .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
                 .where(destinationTag.tag.id.in(tagIds))// 다중태그
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
-                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
+//                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .fetch()
                 .stream()
