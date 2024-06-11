@@ -17,26 +17,25 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-    // private final RedisUtil redisUtil; // TODO: Redis 추가 후 주석 해제
     private final JavaMailSender javaMailSender;
     private final MemberRepository memberRepository;
-    private final EmailConfig emailConfig; // TODO: 이렇게 Config를 끌고와도 되는건지?
+    private final EmailConfig emailConfig;
     private String fromEmail;
 
-    @PostConstruct
+    @PostConstruct // 의존성 주입이 완료된 후 초기화를 수행하는 메서드
     private void init() {
-        fromEmail = emailConfig.getUsername(); // emailConfig 객체가 먼저 초기화된 후 getUsername() 메서드 호출
+        fromEmail = emailConfig.getUsername();
     }
 
     public String generateAuthCode() {
-        int leftLimit = 48; // 숫자 '0'의 ASCII 코드
-        int rightLimit = 122; // 알파벳 'z'의 ASCII 코드
-        int stringLength = 6;
+        int leftLimit = 48; // '0' 아스키 코드
+        int rightLimit = 122; // 'z' 아스키 코드
+        int stringLength = 6; // 인증 코드의 길이
         Random random = new Random();
 
-        return random.ints(leftLimit, rightLimit + 1) // leftLimit(포함) 부터 rightLimit+1(불포함) 사이의 난수 스트림 생성
-                .filter(i -> (i < 57 || i >= 65) && ( i <= 90 || i >= 97)) // ASCII 테이블에서 숫자, 대문자, 소문자만 사용함
-                .limit(stringLength) // 생성된 난수를 지정된 길이로 잘라냄
+        return random.ints(leftLimit, rightLimit + 1) // leftLimit 부터 rightLimit+1 사이의 난수 생성
+                .filter(i -> (i < 57 || i >= 65) && ( i <= 90 || i >= 97)) // // 영문자와 숫자만 사용
+                .limit(stringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append) // 생성된 난수를 ASCII 테이블에서 대응되는 문자로 변환
                 .toString(); // StringBuilder 객체를 문자열로 변환해 반환
     }
@@ -62,9 +61,8 @@ public class EmailService {
                 ;
 
         sendMail(toEmail, title, content); // 생성된 메일 발송
-//        redisUtil.setDataExpire(toEmail, authCode, 60 * 30L); // TODO: Redis에 인증코드 유효시간 설정
 
-        log.info("[sendValidateSigunupResult] 인증코드 메일이 발송됨. 수신자 id : {}", memberRepository.findByEmail(toEmail));
+        log.info("[sendValidateSignupResult] 인증코드 메일이 발송됨. 수신자 id : {}", memberRepository.findByEmail(toEmail));
         ValidateEmailResponse validateEmailResponse = ValidateEmailResponse.builder()
                 .fromMail(fromEmail)
                 .toMail(toEmail)

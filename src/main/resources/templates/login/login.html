@@ -72,44 +72,7 @@
             카카오로그인
         </a>
     </div>
-    <div class="text-center">
-        <button id="logoutButton" th:attr="data-token=${jwtToken}">카카오 로그아웃</button>
-    </div>
 </div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    document.getElementById('logoutButton').addEventListener('click', function() {
-        // JWT 토큰을 버튼의 data-token 속성에서 가져오기
-        var token = /*[[${jwtToken}]]*/ '';
-
-        if (!token) {
-            alert('로그인된 토큰이 없습니다.');
-            return;
-        }
-
-        // 로그아웃 요청 보내기
-        fetch('/auth/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('로그아웃 성공');
-                // 로그아웃 후 페이지 리디렉션
-                window.location.href = '/login';
-            } else {
-                alert('로그아웃 실패');
-            }
-        })
-        .catch(error => {
-            console.error('로그아웃 중 에러 발생:', error);
-        });
-    });
-    /*]]>*/
-</script>
 </body>
 </html>
