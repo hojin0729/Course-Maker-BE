@@ -18,7 +18,7 @@ public class UpdateRequest {
     private String name;
 
     @Schema(description = "닉네임", example = "nickname123")
-    @Pattern(regexp = "[a-zA-Z가-힣]{2,10}", message = "닉네임은 2~10자의 영문자, 한글로 구성되어야 합니다.")
+    @Pattern(regexp = "[a-z0-9가-힣]{2,10}", message = "닉네임은 2~10자의 영문 소문자, 숫자, 한글로 구성되어야 합니다.")
     private String nickname;
 
     @Schema(description = "비밀번호", example = "your_password")
@@ -39,8 +39,8 @@ public class UpdateRequest {
         if (name != null && !name.isBlank() && !name.matches("[a-zA-Z가-힣]{2,10}")) {
             throw new IllegalUserArgumentException("이름은 2~10자의 영문자, 한글로 구성되어야 합니다.", "invalid name format");
         }
-        if (nickname != null && !nickname.isBlank() && !nickname.matches("[a-zA-Z가-힣]{2,10}")) {
-            throw new IllegalUserArgumentException("닉네임은 2~10자의 영문자, 한글로 구성되어야 합니다.", "invalid nickname format");
+        if (nickname != null && !nickname.isBlank() && !nickname.matches("[a-z0-9가-힣]{2,10}")) {
+            throw new IllegalUserArgumentException("닉네임은 2~10자의 영문 소문자, 숫자, 한글로 구성되어야 합니다.", "invalid nickname format");
         }
         if (password != null && !password.isBlank() && (password.length() < 4 || password.length() > 15)) {
             throw new IllegalUserArgumentException("비밀번호는 최소 4자 이상 15자 이하이어야 합니다.", "password is too short");
