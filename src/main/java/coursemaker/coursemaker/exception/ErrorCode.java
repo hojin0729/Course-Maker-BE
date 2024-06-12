@@ -24,6 +24,7 @@ public enum ErrorCode {
     DUPLICATED_COURSE(HttpStatus.CONFLICT, "Duplicated item", "해당 코스가 이미 존재합니다.", "COURSE-002"),
     ILLEGAL_COURSE_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "코스에 알맞은 인자값이 아닙니다.", "COURSE-003"),
     ALREADY_DELETED_COURSE(HttpStatus.CONFLICT, "Already deleted", "해당 코스는 이미 삭제되었습니다.", "COURSE-004"),
+    COURSE_FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden", "해당 코스에 접근할 권한이 없습니다.", "COURSE-005"),
 
     /*Member 도메인 예외*/
     /* 회원가입, 로그인 시 */

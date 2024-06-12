@@ -54,13 +54,14 @@ public class CourseApiController {
 
     private final CourseDestinationService courseDestinationService;
 
-    // POST
+     // POST
     /*********스웨거 어노테이션**********/
     @Operation(summary = "코스 등록", description = "유저가 코스를 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201",
                     description = "코스 등록 성공, 헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content)
+            @ApiResponse(responseCode = "400", description = "생성하려는 여행지의 인자값이 올바르지 않을 때 반환합니다.", content = @Content),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content)
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
@@ -84,8 +85,8 @@ public class CourseApiController {
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
     })
     @Parameters({
-            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", schema = @Schema(type = "integer", defaultValue = "0")),
-            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)", schema = @Schema(type = "integer")),
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)"),
             @Parameter(name = "tagIds", description = "태그를 선택하지 않으면 전체 태그로 조회됩니다."),
             @Parameter(name = "orderBy", description = "정렬하는 기능을 나타냅니다. NEWEST는 최신순을 의미합니다.")
     })
@@ -132,8 +133,8 @@ public class CourseApiController {
     /*********스웨거 어노테이션**********/
     @Operation(summary = "ID로 여행 코스 조회", description = "ID를 사용하여 특정 여행 코스를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
+            @ApiResponse(responseCode = "200", description = "해당 Id에 맞는 코스 상세 정보 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 Id에 맞는 코스를 찾지 못할 때 반환합니다.", content = @Content)
     })
     /*********스웨거 어노테이션**********/
     @GetMapping("/{id}")
@@ -158,7 +159,9 @@ public class CourseApiController {
     @Operation(summary = "코스 수정", description = "유저가 등록한 코스를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content),
+            @ApiResponse(responseCode = "400", description = "수정하려는 코스의 인자값이 올바르지 않을 때 반환합니다.", content = @Content),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "해당 코스에 접근 권한이 없을 때 반환합니다.", content = @Content),
             @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
     })
     /*********스웨거 어노테이션**********/
@@ -166,7 +169,7 @@ public class CourseApiController {
     public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request, @LoginUser String nickname) {
         request.setNickname(nickname);
         System.out.println("---------------------------------------------------id = " + id);
-        TravelCourse updatedTravelCourse = courseService.update(id, request);
+        TravelCourse updatedTravelCourse = courseService.update(id, request, nickname);
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(updatedTravelCourse)
@@ -189,12 +192,14 @@ public class CourseApiController {
     @Operation(summary = "여행 코스 삭제", description = "ID를 사용하여 특정 여행 코스를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content)
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "해당 코스에 접근 권한이 없을 때 반환합니다.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "삭제하려는 코스의 id를 찾지 못할 때 반환합니다.", content = @Content)
     })
     /*********스웨거 어노테이션**********/
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id) {
-        courseService.delete(id);
+    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id, @LoginUser String nickname) {
+        courseService.delete(id, nickname);
 
         return ResponseEntity.ok()
                 .build();
