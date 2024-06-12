@@ -6,6 +6,7 @@ import coursemaker.coursemaker.domain.course.dto.UpdateCourseDestinationRequest;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.course.exception.CourseForbiddenException;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
@@ -58,47 +59,10 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public TravelCourse save(AddTravelCourseRequest request) {
-        // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
-//        if (request.getTitle() == null || request.getTitle().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
-//        }
 
         if (request.getTitle().length() > 50) {
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
-
-//        if (request.getContent() == null || request.getContent().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
-//        }
-//
-//        if (request.getDuration() == null ) {
-//            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "duration is null");
-//        }
-
-//        if (request.getDuration() > 3 || request.getDuration() < 1) {
-//            throw new IllegalTravelCourseArgumentException("여행 기간은 1~3일 사이 입니다.", "duration: " + request.getDuration());
-//        }
-//
-//        if (request.getTravelerCount() == null || request.getTravelerCount() < 1) {
-//            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "traveler count: " + request.getTravelerCount());
-//        }
-//
-//        if (request.getTravelType() == null) {
-//            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "traveler type is null");
-//        }
-//
-//        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "image link is empty");
-//        }
-//
-//        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "course destination is empty");
-//        }
-//
-//        if(request.getTags() == null || request.getTags().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 태그가 존재하지 않습니다.", "tag is empty");
-//        }
-
 
         // TODO: ROW MAPPER로 엔티티 - DTO 매핑
         /***************DTO - entity 변환**************/
@@ -164,58 +128,19 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public TravelCourse update(Long id, UpdateTravelCourseRequest request/*, @LoginUser String nickname*/) {
+    public TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname) {
 
-        // Optional<TravelCourse> existingCourse = travelCourseRepository.findByTitle(request.getTitle());
-
-        // Todo: 로그인 하지 않은 상태에서 업데이트와 딜리트는 고도화 때 예외처리 구현하기
-//        if (request.getNickname() != nickname) {
-//            throw new
-//        }
+        String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();
+        if (!existingCourseNickname.equals(nickname)) {
+            throw new CourseForbiddenException("Course Forbidden", "사용자가 해당 코스에 접근할 권한이 없습니다.");
+        }
 
         travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id));
 
-//        if (request.getTitle() == null || request.getTitle().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 이름이 존재하지 않습니다.", "title is empty");
-//        }
-
         if (request.getTitle().length() > 50) {
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
-
-//        if (request.getContent() == null || request.getContent().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 내용이 존재하지 않습니다.", "course is empty");
-//        }
-//
-//        if (request.getDuration() == null ) {
-//            throw new IllegalTravelCourseArgumentException("여행 기간이 존재하지 않습니다.", "duration is null");
-//        }
-//
-//        if (request.getDuration() > 3 || request.getDuration() < 1) {
-//            throw new IllegalTravelCourseArgumentException("여행 기간은 1~3일 사이 입니다.", "duration: " + request.getDuration());
-//        }
-//
-//        if (request.getTravelerCount() == null || request.getTravelerCount() < 1) {
-//            throw new IllegalTravelCourseArgumentException("여행 인원이 존재하지 않습니다.", "traveler count: " + request.getTravelerCount());
-//        }
-//
-//        if (request.getTravelType() == null) {
-//            throw new IllegalTravelCourseArgumentException("여행 타입이 존재하지 않습니다.", "traveler type is null");
-//        }
-//
-//        if (request.getPictureLink() == null || request.getPictureLink().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("이미지 링크가 존재하지 않습니다.", "image link is empty");
-//        }
-//
-//        if (request.getCourseDestinations() == null || request.getCourseDestinations().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 여행지가 존재하지 않습니다.", "course destination is empty");
-//        }
-//
-//        if(request.getTags() == null || request.getTags().isEmpty()) {
-//            throw new IllegalTravelCourseArgumentException("코스 태그가 존재하지 않습니다.", "tag is empty");
-//        }
-
 
         // TODO: ROW MAPPER로 엔티티 - DTO 매핑
         /***************DTO - entity 변환**************/
@@ -265,12 +190,12 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
-    public void delete(Long id/*, @LoginUser String nickname*/) {
+    public void delete(Long id, String nickname) {
 
-        // Todo: 로그인 하지 않은 상태에서 업데이트와 딜리트는 고도화 때 예외처리 구현하기
-//        if (request.getNickname() != nickname) {
-//            throw new
-//        }
+        String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();
+        if (!existingCourseNickname.equals(nickname)) {
+            throw new CourseForbiddenException("Course Forbidden", "사용자가 해당 코스에 접근할 권한이 없습니다.");
+        }
 
         TravelCourse travelCourse = travelCourseRepository.findById(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id));
@@ -281,14 +206,6 @@ public class CourseServiceImpl implements CourseService{
 
         travelCourse.setDeletedAt(LocalDateTime.now());
         travelCourseRepository.save(travelCourse);
-//        if (!travelCourseRepository.existsById(id)) {
-//            throw new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id);
-//        }
-//        // Todo:  실제로 날리지 말고 soft 딜리트로 하자. 컬럼 추가: deleteAt 추가. deleteAt에 특정 날짜 추가 (디폴트 벨류 null)
-//        // 오늘 삭제하면 오늘 들어가게 된다. 데이터는 날리면 안 된다.
-//        // null이면 데이터 조회가 되고, 날짜값이 있으면 조회가 안 되게 해야한다.
-//        courseDestinationRepository.deleteAllByTravelCourseId(id);
-//        travelCourseRepository.deleteById(id);
     }
 
     @Override

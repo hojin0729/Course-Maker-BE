@@ -1,17 +1,10 @@
 package coursemaker.coursemaker.domain.course.service;
 
-import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
-import coursemaker.coursemaker.domain.course.dto.UpdateCourseDestinationRequest;
-import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface CourseService {
 
@@ -19,8 +12,8 @@ public interface CourseService {
     CourseMakerPagination<TravelCourse> findAll(Pageable pageable);
     CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable);
     TravelCourse findById(Long id);
-    TravelCourse update(Long id, UpdateTravelCourseRequest request);
-    void delete(Long id);
+    TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname);
+    void delete(Long id, String nickname);
     TravelCourse incrementViews(Long id);
     void addPictureLink(Long courseId, String pictureLink);
 
