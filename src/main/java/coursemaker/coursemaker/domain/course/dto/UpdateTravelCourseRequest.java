@@ -30,10 +30,10 @@ public class UpdateTravelCourseRequest {
     @Min(value = 1, message = "여행 인원은 1명 이상이어야 합니다.")
     private Integer travelerCount;
 
-    @Schema(description = "여행 타입", example = "1")
-    @NotNull(message = "여행 타입을 선택하셔야 합니다.")
-    @Min(value = 0, message = "여행 타입을 선택하셔야 합니다.")
-    private Integer travelType;
+    @Schema(description = "여행 타입", example = "0", nullable = true)
+//    @NotNull(message = "여행 타입을 선택하셔야 합니다.")
+//    @Min(value = 0, message = "여행 타입을 선택하셔야 합니다.")
+    private Integer travelType = 0;
 
     @Schema(description = "코스 대표 이미지 주소", example = "http://example.com/course2.jpg")
     @NotBlank(message = "이미지 링크를 넣어야 합니다.")

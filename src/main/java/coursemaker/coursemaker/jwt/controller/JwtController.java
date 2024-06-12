@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.jwt.controller;
 
 import coursemaker.coursemaker.jwt.JwtUtil;
+import coursemaker.coursemaker.jwt.dto.JwtResponse;
 import coursemaker.coursemaker.jwt.exception.InvalidTokenException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,14 +25,16 @@ public class JwtController {
 
     @Operation(summary = "access 토큰 재발급", description = "토큰 만료 시 AccessToken 재발급")
     @PostMapping("/reissue")
-    public ResponseEntity<String> reIssueAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<JwtResponse> reIssueAccessToken(HttpServletRequest request, HttpServletResponse response) {
         log.info("[reIssueToken] AccessToken 재발급 시작");
 
         boolean isRefreshed = jwtUtil.refreshAuthentication(request, response);
 
         if (isRefreshed) {
             log.info("[reIssueToken] AccessToken 갱신 완료");
-            return ResponseEntity.ok().body(response.getHeader("Authorization"));
+            JwtResponse jwtResponse = new JwtResponse();
+            jwtResponse.setAccessToken(response.getHeader("Authorization"));
+            return ResponseEntity.ok().body(jwtResponse);
         } else {
             log.warn("[reIssueToken] RefreshToken이 만료되었습니다. 재로그인 필요합니다.");
             throw new InvalidTokenException("RefreshToken이 만료되었습니다. 재로그인해주세요.", "expired refreshToken");

@@ -32,7 +32,7 @@ public class TravelCourseResponse {
     @Schema(description = "여행 인원", example = "5")
     private final Integer travelerCount;
 
-    @Schema(description = "여행 타입", example = "0")
+    @Schema(description = "여행 타입", example = "0", nullable = true)
     private final Integer travelType;
 
     @Schema(description = "코스 대표 이미지 주소", example = "http://example.com/course1.jpg")
