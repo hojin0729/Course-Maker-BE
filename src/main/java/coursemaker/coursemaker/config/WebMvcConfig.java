@@ -30,7 +30,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(JwtInterceptor)
                 .excludePathPatterns("/v1/member")// 회원가입
-                .excludePathPatterns("/v1/member/login");// 로그인
+                .excludePathPatterns("/v1/member/login")// 로그인
+                .excludePathPatterns("/v1/member/logout")// 로그아웃
+                .excludePathPatterns("/jwt/reissue")// 토큰 재발급
+                .excludePathPatterns("/login/oauth2/code/kakao")// 카카오 로그인
+                .excludePathPatterns("/auth/logout");// 카카오 로그아웃
     }
 
     @Autowired
