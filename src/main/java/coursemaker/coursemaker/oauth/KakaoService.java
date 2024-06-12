@@ -3,6 +3,7 @@ package coursemaker.coursemaker.oauth;
 import coursemaker.coursemaker.domain.member.dto.LoginResponse;
 import coursemaker.coursemaker.domain.member.dto.LogoutResponse;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.member.service.MemberService;
@@ -36,6 +37,10 @@ public class KakaoService {
         log.info("카카오 회원가입 시작");
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String generatedNickname = kakaoNickname;
+
+        if (memberRepository.findByNickname(kakaoNickname).isPresent()) {
+            throw new UserDuplicatedException("이미 존재하는 닉네임 입니다. ", "닉네임: " + kakaoNickname);
+        }
 
         Member builtUser = Member.addMemberBuilder()
                 .email(kakaoUserId+"@coursemaker.com")
