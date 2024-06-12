@@ -20,8 +20,8 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;
-    private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;
+    private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30;//30분
+    private final long REFRESHTOKEN_VALID_MILISECOND = 1000L * 60 * 60 * 24 * 7;//일주일
 
     private final RefreshTokenService refreshTokenService;
 

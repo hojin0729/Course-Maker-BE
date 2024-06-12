@@ -30,10 +30,10 @@ public class JwtUtil {
 
 
     public boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = getTokenFromRequest(request);
-        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
+        String accessToken = getTokenFromRequest(request); // 클라이언트에서 보낸 access 토큰
+        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken) //access토큰 통해 저장되어있는 refresh토큰 찾기
                 .orElseThrow();
-        Member loginUser = memberService.findById(Long.valueOf(refreshToken.getId()));
+        Member loginUser = memberService.findById(Long.valueOf(refreshToken.getId()));//refresh토큰으로 로그인한 회원 찾기
 
         log.info("Refresh Token: {}", refreshToken.getRefreshToken());
 
