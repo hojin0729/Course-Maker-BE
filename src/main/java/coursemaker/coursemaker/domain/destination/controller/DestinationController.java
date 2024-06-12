@@ -56,7 +56,7 @@ public class DestinationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "전체 여행지 목록 조회 성공"
-                   ),
+            ),
     })
     @Parameter(name = "tagIds", description = "필터링할 태그 ID 목록(선택 안할 시 전체 태그 조회)", example = "[1, 2, 3]")
     @Parameter(name = "record", description = "한 페이지 당 표시할 데이터 수")
@@ -201,99 +201,5 @@ public class DestinationController {
         // 여행지 자체를 삭제합니다.
         destinationService.deleteById(id);
         return ResponseEntity.ok(id);
-    }
-
-    @ExceptionHandler(DestinationDuplicatedException.class)
-    public ResponseEntity<ErrorResponse> handleDestinationDuplicatedException(DestinationDuplicatedException e) {
-        ErrorResponse response = new ErrorResponse();
-
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @ExceptionHandler(DestinationNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleDestinationNotFoundException(DestinationNotFoundException e) {
-        ErrorResponse response = new ErrorResponse();
-
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @ExceptionHandler(IllegalDestinationArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalDestinationArgumentException(IllegalDestinationArgumentException e) {
-        ErrorResponse response = new ErrorResponse();
-
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @ExceptionHandler(PictureNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePictureNotFoundException(PictureNotFoundException e) {
-        ErrorResponse response = new ErrorResponse();
-
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @ExceptionHandler(TagDuplicatedException.class)
-    public ResponseEntity<ErrorResponse> handleTagDuplicatedException(TagDuplicatedException e) {
-        ErrorResponse response = new ErrorResponse();
-
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity
-                .status(response.getStatus())
-                .body(response);
-    }
-
-    @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleTagNotFoundException(TagNotFoundException e) {
-        ErrorResponse response = new ErrorResponse();
-
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity
-                .status(response.getStatus())
-                .body(response);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
-        ErrorResponse response = new ErrorResponse();
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode()
-                .getStatus()
-                .value());
-
-        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }
