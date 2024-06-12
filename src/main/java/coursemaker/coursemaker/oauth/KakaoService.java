@@ -61,6 +61,7 @@ public class KakaoService {
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .nickname(loginUser.getNickname())
                 .build();
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
