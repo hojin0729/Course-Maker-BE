@@ -33,7 +33,7 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Invalid item", "회원 정보가 없습니다.", "MEMBER-003"),
     ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "Illegal argument", "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-005"),
-    INVALID_TOKEN(HttpStatus.CONFLICT, "Illegal argument", "토큰 형식이 잘못되었습니다.", "MEMBER-006");
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Illegal argument", "토큰 형식이 잘못되었습니다.", "MEMBER-006");
 
 
 
