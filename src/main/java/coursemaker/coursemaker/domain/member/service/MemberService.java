@@ -57,8 +57,8 @@ public class MemberService {
         String rawPassword = signUpRequest.getPassword();
         String phoneNumber = signUpRequest.getPhoneNumber();
         String encodedPassword = passwordEncoder.encode(rawPassword);
-        String profileImg = signUpRequest.getProfileImgUrl();
-        String profileDescription = signUpRequest.getProfileDescription();
+//        String profileImg = signUpRequest.getProfileImgUrl();
+//        String profileDescription = signUpRequest.getProfileDescription();
         String roles = "ROLE_USER"; // 기본값
 
         Member builtUser = Member.addMemberBuilder()
@@ -68,8 +68,8 @@ public class MemberService {
                 .nickname(nickname)
                 .password(encodedPassword)
                 .phoneNumber(phoneNumber)
-                .profileImgUrl(profileImg)
-                .profileDescription(profileDescription)
+//                .profileImgUrl(profileImg)
+//                .profileDescription(profileDescription)
                 .roles(roles)
                 .build();
 
@@ -96,12 +96,12 @@ public class MemberService {
         if (updateRequest.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
         }
-        if (updateRequest.getProfileImgUrl() != null) {
-            user.setProfileImgUrl(updateRequest.getProfileImgUrl());
-        }
-        if (updateRequest.getProfileDescription() != null) {
-            user.setProfileDescription(updateRequest.getProfileDescription());
-        }
+//        if (updateRequest.getProfileImgUrl() != null) {
+//            user.setProfileImgUrl(updateRequest.getProfileImgUrl());
+//        }
+//        if (updateRequest.getProfileDescription() != null) {
+//            user.setProfileDescription(updateRequest.getProfileDescription());
+//        }
 
         return memberRepository.save(user);
     }

@@ -25,12 +25,12 @@ public class UpdateRequest {
     @Size(min = 4, max = 15, message = "비밀번호는 최소 4자 이상 15자 이하이어야 합니다.")
     private String password;
 
-    @Schema(description = "프로필 이미지 URL", example = "http://example.com/profile.jpg")
-    @Pattern(regexp = "^(http|https)://.*$", message = "유효하지 않은 프로필 이미지 URL입니다.")
-    private String profileImgUrl;
-
-    @Schema(description = "프로필 설명", example = "이것은 프로필 설명입니다.")
-    private String profileDescription;
+//    @Schema(description = "프로필 이미지 URL", example = "http://example.com/profile.jpg")
+//    @Pattern(regexp = "^(http|https)://.*$", message = "유효하지 않은 프로필 이미지 URL입니다.")
+//    private String profileImgUrl;
+//
+//    @Schema(description = "프로필 설명", example = "이것은 프로필 설명입니다.")
+//    private String profileDescription;
 
     public void validate() {
 //        if (userId == null) {
@@ -45,9 +45,9 @@ public class UpdateRequest {
         if (password != null && !password.isBlank() && (password.length() < 4 || password.length() > 15)) {
             throw new IllegalUserArgumentException("비밀번호는 최소 4자 이상 15자 이하이어야 합니다.", "password is too short");
         }
-        if (profileImgUrl != null && !profileImgUrl.isBlank() && !profileImgUrl.matches("^(http|https)://.*$")) {
-            throw new IllegalUserArgumentException("유효하지 않은 프로필 이미지 URL입니다.", "invalid profile image URL format");
-        }
+//        if (profileImgUrl != null && !profileImgUrl.isBlank() && !profileImgUrl.matches("^(http|https)://.*$")) {
+//            throw new IllegalUserArgumentException("유효하지 않은 프로필 이미지 URL입니다.", "invalid profile image URL format");
+//        }
     }
 }
 
