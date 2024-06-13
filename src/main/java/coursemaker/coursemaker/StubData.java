@@ -50,8 +50,8 @@ public class StubData implements CommandLineRunner {
             dto.setNickname("nickname" + i);
             dto.setPassword("password" + i);
             dto.setPhoneNumber("010-0000-000" + i);
-            dto.setProfileImgUrl("http://example.com/user" + i + ".jpg");
-            dto.setProfileDescription("Profile description for User" + i);
+//            dto.setProfileImgUrl("http://example.com/user" + i + ".jpg");
+//            dto.setProfileDescription("Profile description for User" + i);
             memberService.signUp(dto);
         }
     }

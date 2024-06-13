@@ -37,11 +37,11 @@ public class SignUpRequest {
     @Pattern(regexp = "\\d{3}-\\d{3,4}-\\d{4}", message = "유효하지 않은 전화번호 형식입니다.")
     private String phoneNumber;
 
-    @Schema(description = "프로필 이미지 URL", example = "http://example.com/profile.jpg")
-    private String profileImgUrl;
-
-    @Schema(description = "프로필 설명", example = "이것은 프로필 설명입니다.")
-    private String profileDescription;
+//    @Schema(description = "프로필 이미지 URL", example = "http://example.com/profile.jpg")
+//    private String profileImgUrl;
+//
+//    @Schema(description = "프로필 설명", example = "이것은 프로필 설명입니다.")
+//    private String profileDescription;
 
     public void validate() {
         if (email == null || email.isBlank()) {
@@ -74,9 +74,9 @@ public class SignUpRequest {
         if (!phoneNumber.matches("\\d{3}-\\d{3,4}-\\d{4}")) {
             throw new IllegalUserArgumentException("유효하지 않은 전화번호 형식입니다.", "invalid phone number format");
         }
-        if (profileImgUrl != null && !profileImgUrl.isBlank() && !profileImgUrl.matches("^(http|https)://.*$")) {
-            throw new IllegalUserArgumentException("유효하지 않은 프로필 이미지 URL입니다.", "invalid profile image URL format");
-        }
+//        if (profileImgUrl != null && !profileImgUrl.isBlank() && !profileImgUrl.matches("^(http|https)://.*$")) {
+//            throw new IllegalUserArgumentException("유효하지 않은 프로필 이미지 URL입니다.", "invalid profile image URL format");
+//        }
     }
 }
 
