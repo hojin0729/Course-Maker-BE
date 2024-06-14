@@ -46,6 +46,8 @@ public class JwtInterceptor implements HandlerInterceptor {
                 if (accessToken != null && jwtTokenProvider.validateToken(accessToken, request)) {
                     log.info("[preHandle] accessToken 유효성 체크 완료");
                     response.addHeader("Authorization", accessToken); //응답 헤더에 Access Token을 추가
+
+                    //Access 토큰이 유효한 경우,기본 preHandle 동작을 유지하며 요청을 컨트롤러로 전달
                     return HandlerInterceptor.super.preHandle(request, response, handler);
                 } else {
                     log.warn("[preHandle] AccessToken이 만료되었습니다.");
