@@ -10,6 +10,7 @@ import lombok.Data;
 public class TagResponseDto {
 
     @Schema(description = "태그의 Id", example = "1")
+    @NotNull(message = "태그 ID를 입력해주세요.")
     private Long id;
 
     @Schema(description = "태그 이름", example = "연인")
