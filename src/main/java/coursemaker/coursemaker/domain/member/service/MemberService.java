@@ -155,10 +155,7 @@ public class MemberService {
 
 
         log.info("[LogInResult] LogInResponse 객체에 값 주입");
-        var cookie1 = new Cookie("Authorization", URLEncoder.encode("Bearer " + loginResponse.getAccessToken(), StandardCharsets.UTF_8));
-        cookie1.setPath("/");
-        cookie1.setMaxAge(60 * 60);
-        response.addCookie(cookie1);
+        response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
 
         /*db에 리프레시토큰이랑 엑세스토큰 저장*/
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);

@@ -55,10 +55,12 @@ public class KakaoController {
         String id = (String) userInfo.get("id");
         String nickname = (String) userInfo.get("nickname");
 
+        // 회원이 존재하지 않으면 회원가입 진행
         if(!memberService.checkExistByEmail(id + "@coursemaker.com")){
             kakaoService.kakaoSignUp(id, nickname);
         }
 
+        // 존재하는 회원이면 바로 로그인 진행
         LoginResponse loginResponse = kakaoService.kakaoLogin(id, response, kakaoAccessToken);
 
         log.info("[kakaoLogin] 카카오 닉네임: {}", nickname);

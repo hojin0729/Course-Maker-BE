@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -38,6 +39,10 @@ public class KakaoService {
 
     public void kakaoSignUp(String kakaoUserId, String kakaoNickname){
         log.info("카카오 회원가입 시작");
+        if (memberRepository.findByEmail(kakaoUserId + "@coursemaker.com").isPresent()) {
+            log.info("이미 존재하는 회원입니다: {}", kakaoUserId);
+            return;
+        }
         String randomPassword = String.valueOf(UUID.randomUUID()).substring(0,8);
         String generatedNickname = kakaoNickname;
 
@@ -63,6 +68,14 @@ public class KakaoService {
         Member loginUser = memberRepository.findByEmail(kakaoUserId+"@coursemaker.com")
                 .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다.", "User ID: " + kakaoUserId));
 
+        //만약 회원의 닉네임이 없거나 비어있다면, 카카오로부터 닉네임을 가져와서 업데이트하고 저장
+        if (loginUser.getNickname() == null || loginUser.getNickname().isEmpty()) {
+            Map<String, Object> userInfo = kakaoOauth.getUserInfoFromKakaoToken(kakaoToken);
+            String nickname = (String) userInfo.get("nickname");
+            loginUser.setNickname(nickname);
+            memberRepository.save(loginUser);
+        }
+
         String accessToken = jwtTokenProvider.createAccessTokenKakao(loginUser.getId(), kakaoToken, loginUser.getLoginType());
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
@@ -74,7 +87,6 @@ public class KakaoService {
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
         response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
-
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
         kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken, accessToken);
