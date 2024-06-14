@@ -15,7 +15,10 @@ import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -51,15 +54,23 @@ public class TagController {
 
     /*태그 생성*/
     @Operation(summary = "태그 생성")
-    @ApiResponse(
-            responseCode = "201", description = "헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."
-    )
-    @ApiResponse(
-            responseCode = "400", description = "생성하려는 태그의 인자값이 올바르지 않을때 반환합니다.", content = @Content
-    )
-    @ApiResponse(
-            responseCode = "409", description = "생성하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
+            @ApiResponse(responseCode = "400", description = "생성하려는 태그의 인자값이 올바르지 않을때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"태그 이름은 공백 혹은 빈 문자는 허용하지 않습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "409", description = "생성하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"태그 이름이 이미 존재합니다.\"}"
+                    )
+            ))
+    })
     @PostMapping
     public ResponseEntity<Void> addTag(@Valid @RequestBody TagPostDto request) {
         TagResponseDto response = tagService.createTag(request.toEntity())
@@ -70,18 +81,30 @@ public class TagController {
 
     /*태그 수정*/
     @Operation(summary = "태그 수정")
-    @ApiResponse(
-            responseCode = "200", description = "태그가 제대로 변경됩니다."
-    )
-    @ApiResponse(
-            responseCode = "400", description = "수정하려는 태그의 인자값이 올바르지 않을때 반환합니다.", content = @Content
-    )
-    @ApiResponse(
-            responseCode = "404", description = "수정하려는 태그의 id를 찾지 못할때 반환합니다.", content = @Content
-    )
-    @ApiResponse(
-            responseCode = "409", description = "수정하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "태그가 제대로 변경됩니다."),
+            @ApiResponse(responseCode = "400", description = "수정하려는 태그의 인자값이 올바르지 않을때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"태그 이름은 공백 혹은 빈 문자는 허용하지 않습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "수정하려는 태그의 id를 찾지 못할때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 태그가 없습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "409", description = "수정하려는 태그의 이름이 이미 있을때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"태그 이름이 이미 존재합니다.\"}"
+                    )
+            ))
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<TagResponseDto> updateTag(@PathVariable(name = "id") Long id
                                                     ,@Valid @RequestBody TagPostDto request) {
@@ -96,12 +119,16 @@ public class TagController {
 
     /*태그 삭제*/
     @Operation(summary = "태그 삭제")
-    @ApiResponse(
-            responseCode = "200", description = "태그가 제대로 삭제됩니다."
-    )
-    @ApiResponse(
-            responseCode = "404", description = "삭제하려는 태그의 id를 찾지 못할때 반환합니다.", content = @Content
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "태그가 제대로 삭제됩니다."),
+            @ApiResponse(responseCode = "404", description = "삭제하려는 태그의 id를 찾지 못할때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 태그가 없습니다.\"}"
+                    )
+            ))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable(name = "id") Long id) {
         tagService.deleteById(id);
