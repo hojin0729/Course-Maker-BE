@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 public class DestinationDto {
     @Schema(description = "여행지 Id", example = "1")
+    @NotNull(message = "여행지 ID를 입력해주세요.")
     private Long id;
 
     @Schema(description = "유저 닉네임", example = "coursemaker")
