@@ -21,7 +21,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtUtil jwtUtil;
 
-    @Override
+    @Override //컨트롤러가 요청을 처리하기 전에 수행
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         log.info("@@@@@@@@@@@@인터셉터 쌈@뽕 하게 동작중@@@@@@@@@@@@@@@");
 
@@ -37,11 +37,11 @@ public class JwtInterceptor implements HandlerInterceptor {
             if (requiresAuthorization) {
                 String accessToken = jwtUtil.getTokenFromRequest(request);
 
-                log.info("[preHandle] accessToken 값 추출 완료, token: {}", accessToken);
-                log.info("[preHandle] accessToken 값 유효성 체크 시작");
+                log.info("[preHandle] accessToken 추출 완료, token: {}", accessToken);
+                log.info("[preHandle] accessToken 유효성 체크 시작");
 
                 if (accessToken != null && jwtTokenProvider.validateToken(accessToken, request)) {
-                    log.info("[preHandle] accessToken 값 유효성 체크 완료");
+                    log.info("[preHandle] accessToken 유효성 체크 완료");
                     response.addHeader("Authorization", accessToken);
                     return HandlerInterceptor.super.preHandle(request, response, handler);
                 } else {
