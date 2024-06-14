@@ -4,6 +4,7 @@ import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class AddCourseDestinationRequest {
 
     @Schema(description = "여행지")
     @NotNull(message = "코스롤 동륵할 여행지가 있어야 합니다.")
+    @Valid
     private DestinationDto destination;
 
 
