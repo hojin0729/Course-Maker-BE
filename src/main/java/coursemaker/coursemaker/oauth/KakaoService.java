@@ -11,6 +11,7 @@ import coursemaker.coursemaker.jwt.JwtTokenProvider;
 import coursemaker.coursemaker.jwt.JwtUtil;
 import coursemaker.coursemaker.jwt.RefreshTokenService;
 import coursemaker.coursemaker.jwt.exception.InvalidTokenException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
 
@@ -70,7 +73,8 @@ public class KakaoService {
                 .build();
 
         log.info("[getLogInResult] LogInResponse 객체에 값 주입");
-        response.addHeader("Authorization", "Bearer " + accessToken);
+        response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
+
 
         refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
         kakaoTokenService.saveKakaoTokenInfo(loginUser.getId(), kakaoToken, accessToken);

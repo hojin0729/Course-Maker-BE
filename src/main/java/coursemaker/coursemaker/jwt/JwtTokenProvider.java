@@ -102,10 +102,10 @@ public class JwtTokenProvider {
         log.info("[validateToken] 토큰 유효 체크 시작 ");
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build()
-                    .parseClaimsJws(jwtToken);
-            request.setAttribute("user", claims.getBody().get("nickname"));
+                    .parseClaimsJws(jwtToken); //서명검증
+            request.setAttribute("user", claims.getBody().get("nickname"));//사용자 정보를 추출하여 HttpServletRequest의 속성에 저장
             System.out.println(claims.toString());
-            return !claims.getBody().getExpiration().before(new Date());
+            return !claims.getBody().getExpiration().before(new Date()); //토큰이 만료되지 않았는지 확인
         } catch (Exception e) {
             log.info("[validateToken] 토큰 유효 체크 예외 발생");
             return false;

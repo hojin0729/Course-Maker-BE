@@ -47,18 +47,24 @@ public class KakaoOauth {
     private String expireKakaoTokenUri;
 
     public String getKakaoAccessToken(String code) {
+        // 액세스 토큰을 저장할 변수 초기화
         String kakaoAccessToken = "";
 
         try{
+            // 카카오 토큰 요청 URL 생성
             URL url = new URL(kakaoTokenUri);
+            // URL 연결 객체 생성
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
+            // HTTP 요청 헤더 설정
             conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
             conn.setDoOutput(true);
 
+            //HTTP 요청 바디 작성
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
             StringBuilder sb = new StringBuilder();
 
+            //카카오 API에 필요한 파라미터들을 설정
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=").append(kakaoApiKey);
             sb.append("&client_secret=").append(kakaoClientSecret); // 추가: client_secret 값
@@ -68,9 +74,12 @@ public class KakaoOauth {
             bw.write(sb.toString());
             bw.flush();
 
+            //응답 코드 확인
             int responseCode = conn.getResponseCode();
             log.info("[KakaoApi.getAccessToken] responseCode = {}", responseCode);
 
+
+            //응답 읽기
             BufferedReader br;
             if (responseCode >= 200 && responseCode <= 300) {
                 br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -83,6 +92,8 @@ public class KakaoOauth {
             while((line = br.readLine()) != null){
                 responseSb.append(line);
             }
+
+            //JSON 파싱
             String result = responseSb.toString();
             log.info("responseBody = {}", result);
 
@@ -90,6 +101,8 @@ public class KakaoOauth {
 
             JsonObject jsonObject = element.getAsJsonObject();
 
+
+            //액세스 토큰 추출
             if (jsonObject != null && jsonObject.has("access_token")) {
                 kakaoAccessToken = jsonObject.get("access_token").getAsString();
             } else {
@@ -107,38 +120,51 @@ public class KakaoOauth {
     }
 
     public HashMap<String, Object> getUserInfoFromKakaoToken(String kakaoAccessToken) {
+        // 사용자 정보를 저장할 HashMap 초기화
         HashMap<String, Object> userInfo = new HashMap<>();
         try{
+            // 사용자 정보 요청 URL 생성
             URL url = new URL(userInfoUri);
+            // URL 연결 객체 생성
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            // HTTP 요청 메서드 설정
             conn.setRequestMethod("POST");
+            // HTTP 요청 헤더 설정: Authorization 및 Content-type
             conn.setRequestProperty("Authorization", "Bearer " + kakaoAccessToken);
             conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
+            // 응답 코드 확인
             int responseCode = conn.getResponseCode();
             log.info("[KakaoApi.getUserInfo] responseCode : {}",  responseCode);
 
+            // 응답 데이터를 읽기 위한 BufferedReader 생성
             BufferedReader br;
+            // 응답 코드가 200-300 사이일 경우 입력 스트림을 사용
             if (responseCode >= 200 && responseCode <= 300) {
                 br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            } else {
+            } else { //// 그렇지 않을 경우 에러 스트림을 사용
                 br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
             }
-
+            // 응답 데이터를 읽기 위해 StringBuilder 사용
             String line = "";
             StringBuilder responseSb = new StringBuilder();
             while((line = br.readLine()) != null){
                 responseSb.append(line);
             }
+
+            // 응답 결과를 String으로 변환
             String result = responseSb.toString();
             log.info("responseBody = {}", result);
 
+            // JSON 형식의 응답 결과 파싱
             JsonElement element = JsonParser.parseString(result);
 
+            // properties 객체에서 닉네임 추출
             JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
             String id = element.getAsJsonObject().get("id").getAsString();
             String nickname = properties.getAsJsonObject().get("nickname").getAsString();
 
+            // 사용자 정보를 HashMap에 저장
             userInfo.put("id", id);
             userInfo.put("nickname", nickname);
 

@@ -23,7 +23,7 @@ public class JwtController {
 
     private final JwtUtil jwtUtil;
 
-    @Operation(summary = "access 토큰 재발급", description = "토큰 만료 시 AccessToken 재발급")
+    @Operation(summary = "access 토큰 재발급(고도화 때 적용예정)", description = "토큰 만료 시 AccessToken 재발급")
     @PostMapping("/reissue")
     public ResponseEntity<JwtResponse> reIssueAccessToken(HttpServletRequest request, HttpServletResponse response) {
         log.info("[reIssueToken] AccessToken 재발급 시작");
