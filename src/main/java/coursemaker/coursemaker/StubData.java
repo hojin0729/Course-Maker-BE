@@ -384,8 +384,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location6 = new LocationDto();
-        location6.setLatitude(BigDecimal.valueOf(35.076269817));
-        location6.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location6.setLatitude(BigDecimal.valueOf(35.10923055371));
+        location6.setLongitude(BigDecimal.valueOf(128.9427042109));
         location6.setAddress("부산광역시 사하구 낙동남로 1191");
         dto6.setLocation(location6);
 
@@ -402,8 +402,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location7 = new LocationDto();
-        location7.setLatitude(BigDecimal.valueOf(35.076269817));
-        location7.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location7.setLatitude(BigDecimal.valueOf(35.158294650018));
+        location7.setLongitude(BigDecimal.valueOf(129.06384886647));
         location7.setAddress("부산광역시 부산진구 서전로37번길 20");
         dto7.setLocation(location7);
 
@@ -420,8 +420,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location8 = new LocationDto();
-        location8.setLatitude(BigDecimal.valueOf(35.076269817));
-        location8.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location8.setLatitude(BigDecimal.valueOf(35.15538169469));
+        location8.setLongitude(BigDecimal.valueOf(128.97189729558));
         location8.setAddress("부산광역시 사상구 감전동 873");
         dto8.setLocation(location8);
 
@@ -438,8 +438,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location9 = new LocationDto();
-        location9.setLatitude(BigDecimal.valueOf(35.076269817));
-        location9.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location9.setLatitude(BigDecimal.valueOf(35.227524));
+        location9.setLongitude(BigDecimal.valueOf(129.128325));
         location9.setAddress("부산광역시 해운대구 석대동 77");
         dto9.setLocation(location9);
 
@@ -456,8 +456,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location10 = new LocationDto();
-        location10.setLatitude(BigDecimal.valueOf(35.076269817));
-        location10.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location10.setLatitude(BigDecimal.valueOf(35.29377675985));
+        location10.setLongitude(BigDecimal.valueOf(129.26057098227));
         location10.setAddress("부산광역시 기장군 일광면 신평리 11-1");
         dto10.setLocation(location10);
 
@@ -474,8 +474,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location11 = new LocationDto();
-        location11.setLatitude(BigDecimal.valueOf(35.076269817));
-        location11.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location11.setLatitude(BigDecimal.valueOf(35.09466175001));
+        location11.setLongitude(BigDecimal.valueOf(129.03677556292));
         location11.setAddress("부산광역시 영도구 태종로 46");
         dto11.setLocation(location11);
 
@@ -492,8 +492,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location12 = new LocationDto();
-        location12.setLatitude(BigDecimal.valueOf(35.076269817));
-        location12.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location12.setLatitude(BigDecimal.valueOf(35.025854));
+        location12.setLongitude(BigDecimal.valueOf(128.815284));
         location12.setAddress("부산광역시 강서구 가덕해안로 21");
         dto12.setLocation(location12);
 
@@ -510,8 +510,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location13 = new LocationDto();
-        location13.setLatitude(BigDecimal.valueOf(35.076269817));
-        location13.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location13.setLatitude(BigDecimal.valueOf(35.20463768723));
+        location13.setLongitude(BigDecimal.valueOf(129.21273187220));
         location13.setAddress("부산광역시 기장군 기장읍 동부산관광6로 59");
         dto13.setLocation(location13);
 
@@ -528,8 +528,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location14 = new LocationDto();
-        location14.setLatitude(BigDecimal.valueOf(35.076269817));
-        location14.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location14.setLatitude(BigDecimal.valueOf(35.18333170556));
+        location14.setLongitude(BigDecimal.valueOf(129.02189032784));
         location14.setAddress("부산광역시 부산진구 당감동");
         dto14.setLocation(location14);
 
@@ -546,8 +546,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location15 = new LocationDto();
-        location15.setLatitude(BigDecimal.valueOf(35.076269817));
-        location15.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location15.setLatitude(BigDecimal.valueOf(35.16915289941));
+        location15.setLongitude(BigDecimal.valueOf(129.1362446983));
         location15.setAddress("부산광역시 해운대구 APEC로 55");
         dto15.setLocation(location15);
 
@@ -564,8 +564,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location16 = new LocationDto();
-        location16.setLatitude(BigDecimal.valueOf(35.076269817));
-        location16.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location16.setLatitude(BigDecimal.valueOf(35.185218323534));
+        location16.setLongitude(BigDecimal.valueOf(129.04156904769));
         location16.setAddress("부산광역시 부산진구 새싹로 295");
         dto16.setLocation(location16);
 
@@ -582,8 +582,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location17 = new LocationDto();
-        location17.setLatitude(BigDecimal.valueOf(35.076269817));
-        location17.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location17.setLatitude(BigDecimal.valueOf(35.099766699153));
+        location17.setLongitude(BigDecimal.valueOf(129.01251298135));
         location17.setAddress("부산광역시 서구 아미로49");
         dto17.setLocation(location17);
 
@@ -600,8 +600,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location18 = new LocationDto();
-        location18.setLatitude(BigDecimal.valueOf(35.076269817));
-        location18.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location18.setLatitude(BigDecimal.valueOf(35.20591539768));
+        location18.setLongitude(BigDecimal.valueOf(129.22781617477));
         location18.setAddress("부산광역시 기장군 기장읍 기장해안로 340");
         dto18.setLocation(location18);
 
@@ -618,8 +618,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location19 = new LocationDto();
-        location19.setLatitude(BigDecimal.valueOf(35.076269817));
-        location19.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location19.setLatitude(BigDecimal.valueOf(35.20071755418));
+        location19.setLongitude(BigDecimal.valueOf(129.00195813902));
         location19.setAddress("부산광역시 북구 낙동북로 755");
         dto19.setLocation(location19);
 
@@ -636,8 +636,8 @@ public class StubData implements CommandLineRunner {
 
         // Location 객체 생성 및 설정
         LocationDto location20 = new LocationDto();
-        location20.setLatitude(BigDecimal.valueOf(35.076269817));
-        location20.setLongitude(BigDecimal.valueOf(129.0236624271));
+        location20.setLatitude(BigDecimal.valueOf(35.170911698023));
+        location20.setLongitude(BigDecimal.valueOf(129.11433596434));
         location20.setAddress("부산광역시 수영구 수영성로 43");
         dto20.setLocation(location20);
 
