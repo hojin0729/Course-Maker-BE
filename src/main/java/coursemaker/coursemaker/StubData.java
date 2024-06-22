@@ -64,145 +64,145 @@ public class StubData implements CommandLineRunner {
         dto = new TagPostDto();
         dto.setName("바다");
         dto.setDescription("자연");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("자연속휴식");
         dto.setDescription("자연");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("등산");
         dto.setDescription("자연");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("둘레길");
         dto.setDescription("자연");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         // 동행
 
         dto = new TagPostDto();
         dto.setName("나홀로 여행");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("유아동반");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("장애인");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("어린이여행");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("부모님");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("연인");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("배우자");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("친구");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("애견동반");
         dto.setDescription("동행");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         // 활동
 
         dto = new TagPostDto();
         dto.setName("액티비티");
         dto.setDescription("활동");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("문화거리");
         dto.setDescription("활동");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("축제");
         dto.setDescription("활동");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("체험여행");
         dto.setDescription("활동");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("힐링");
         dto.setDescription("활동");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("문화/유적지");
         dto.setDescription("활동");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         // 음식
 
         dto = new TagPostDto();
         dto.setName("식도락");
         dto.setDescription("음식");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("전통시장");
         dto.setDescription("음식");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("방송 맛집");
         dto.setDescription("음식");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("빵지순례");
         dto.setDescription("음식");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("카페투어");
         dto.setDescription("음식");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         // 날씨
 
         dto = new TagPostDto();
         dto.setName("우천시 운영");
         dto.setDescription("날씨");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("실내공간");
         dto.setDescription("날씨");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
         dto = new TagPostDto();
         dto.setName("피서지");
         dto.setDescription("날씨");
-        tagService.createTag(dto.toEntity());
+        tagService.createTag(dto);
 
     }
 

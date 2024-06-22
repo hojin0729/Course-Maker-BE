@@ -9,6 +9,9 @@ import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.entity.QDestination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.dto.TagUpdateDto;
 import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.QDestinationTag;
@@ -56,51 +59,70 @@ public class TagServiceImpl implements TagService{
 
     /*****태그 기본 CRUD*****/
     @Override
-    public Tag createTag(Tag tag){
+    public TagResponseDto createTag(TagPostDto tag){
 
         /*태그의 이름은 고유해야 한다.*/
         if(tagRepository.findByname(tag.getName()).isPresent()) {
             throw new TagDuplicatedException("이미 존재하는 태그입니다.", "tag name: " + tag.getName() );
         }
 
-        return tagRepository.save(tag);
+        Tag created = tag.toEntity();
+
+        created = tagRepository.save(created);
+
+        TagResponseDto response = created.toResponseDto();
+
+        return response;
     }
 
     @Override
-    public Tag findById(Long id){
+    public TagResponseDto findById(Long id){
         return tagRepository.findById(id)
-                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag id: " + id ));
+                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag id: " + id ))
+                .toResponseDto();
     }
 
     @Override
-    public Tag findByTagName(String name){
+    public TagResponseDto findByTagName(String name){
         return tagRepository.findByname(name)
-                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag name: " + name ));
+                .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag name: " + name ))
+                .toResponseDto();
     }
 
     @Override
-    public List<Tag> findAllTags(){
-        return tagRepository.findAll();
+    public List<TagResponseDto> findAllTags(){
+        return tagRepository.findAll()
+                .stream()
+                .map(Tag::toResponseDto)
+                .toList();
     }
 
     @Override
-    public Tag updateTag(Tag tag){
+    public TagResponseDto updateTag(TagUpdateDto tag){
+
+        /*업데이트할 엔티티 생성*/
+        Tag updatedTag = new Tag();
+        tag.setId(tag.getId());
+        tag.setName(tag.getName());
+        tag.setDescription(tag.getDescription());
 
         /*변경할 타겟 태그를 못찾음.*/
-        tagRepository.findById(tag.getId()).orElseThrow(() ->
+        tagRepository.findById(updatedTag.getId()).orElseThrow(() ->
                 new TagNotFoundException("변경할 태그를 찾지 못했습니다.",
                         "tag id: " + tag.getId() ));
 
         /*태그의 이름 중복 확인*/
-        Optional<Tag> tagByName = tagRepository.findByname(tag.getName());
+        Optional<Tag> tagByName = tagRepository.findByname(updatedTag.getName());
         if(tagByName.isPresent()
-                && !tagByName.get().getId().equals(tag.getId()))// 태그의 설명만 바꾸는 경우가 아닐때
+                && !tagByName.get().getId().equals(updatedTag.getId()))// 태그의 설명만 바꾸는 경우가 아닐때
         {
-            throw new TagDuplicatedException("이미 존재하는 태그 이름입니다.", "tag name: " + tag.getName() );
+            throw new TagDuplicatedException("이미 존재하는 태그 이름입니다.", "tag name: " + updatedTag.getName() );
         }
 
+        updatedTag  = tagRepository.save(updatedTag);
 
-        return tagRepository.save(tag);
+
+        return updatedTag.toResponseDto();
     }
 
 
@@ -181,13 +203,14 @@ public class TagServiceImpl implements TagService{
 
 
     @Override
-    public List<Tag> findAllByCourseId(Long courseId){
+    public List<TagResponseDto> findAllByCourseId(Long courseId){
         List<CourseTag> courseTags = courseTagRepository.findAllByCourseId(courseId);
 
         // CourseTag에서 태그 추출
-        List<Tag> tags = courseTags
+        List<TagResponseDto> tags = courseTags
                 .stream()
                 .map(CourseTag::getTag)
+                .map(Tag::toResponseDto)
                 .collect(Collectors.toList());
 
         return tags;
@@ -273,16 +296,21 @@ public class TagServiceImpl implements TagService{
 
 
     @Override
-    public void deleteTagByCourse(Long courseId, List<Tag> tags){
+    public void deleteTagByCourse(Long courseId, List<TagResponseDto> tags){
 
         if(tags==null || tags.isEmpty()){
             throw new IllegalTagArgumentException("코스에서 삭제할 태그가 없습니다.", "course id: " + courseId );
         }
 
+        List<Tag> tagEntitys = tags
+                .stream()
+                .map(TagResponseDto::toEntity)
+                .toList();
+
         // 코스에 태그들 삭제
         queryFactory
                 .delete(courseTag)
-                .where(courseTag.course.id.eq(courseId), courseTag.tag.in(tags))
+                .where(courseTag.course.id.eq(courseId), courseTag.tag.in(tagEntitys))
                 .execute();
     }
 
@@ -352,14 +380,15 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public List<Tag> findAllByDestinationId(Long destinationId){
+    public List<TagResponseDto> findAllByDestinationId(Long destinationId){
         List<DestinationTag> destinationTags = destinationTagRepository.findAllByDestinationId(destinationId);
-        List<Tag> tags = new ArrayList<>();
+        List<TagResponseDto> tags = new ArrayList<>();
 
         // CourseTag에서 태그 추출
         tags = destinationTags
                 .stream()
                 .map(DestinationTag::getTag)
+                .map(Tag::toResponseDto)
                 .collect(Collectors.toList());
 
         return tags;
@@ -435,15 +464,20 @@ public class TagServiceImpl implements TagService{
 
 
     @Override
-    public void deleteTagByDestination(Long destinationId, List<Tag> tags){
+    public void deleteTagByDestination(Long destinationId, List<TagResponseDto> tags){
 
         if(tags==null || tags.isEmpty()){
             throw new IllegalTagArgumentException("삭제할 태그가 없습니다.", "destination id: " + destinationId );
         }
 
+        List<Tag> tagsEntitys = tags
+                .stream()
+                .map(TagResponseDto::toEntity)
+                .toList();
+
         queryFactory
                 .delete(destinationTag)
-                .where(destinationTag.destination.id.eq(destinationId), destinationTag.tag.in(tags))
+                .where(destinationTag.destination.id.eq(destinationId), destinationTag.tag.in(tagsEntitys))
                 .execute();
 
     }
