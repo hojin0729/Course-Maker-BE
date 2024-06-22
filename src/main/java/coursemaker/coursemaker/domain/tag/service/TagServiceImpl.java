@@ -225,7 +225,7 @@ public class TagServiceImpl implements TagService{
                     .stream()
                     .map(Tag::getId)
                     .collect(Collectors.toList());
-            System.out.println("------------------"+tagIds);
+//            System.out.println("------------------"+tagIds);
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
@@ -264,7 +264,7 @@ public class TagServiceImpl implements TagService{
         // TODO: 쿼리 최적화
 
         long total = queryFactory
-                .select(courseTag, courseTag.course.count())
+                .select(courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
                 .where(courseTag.tag.id.in(tagIds).and(travelCourse.deletedAt.isNull()))// 다중태그 및 삭제되지 않은 코스 필터링
@@ -273,22 +273,16 @@ public class TagServiceImpl implements TagService{
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .fetch()
                 .stream()
-                .map(n -> n.get(courseTag).getCourse())
-                .toList()
-                .size();
+                .toList().get(0);
 
-//        System.out.println("-----------------total = " + total);
-//        for(TravelCourse course : courses){
-//            System.out.println("course.getId() = " + course.getId());
-//        }
-
+        // TODO: 페이지네이션 전체 요소 수 오류 수정
         Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
 
 //        System.out.println("coursePage.getTotalPages() = " + coursePage.getTotalPages());
 //        System.out.println("coursePage.getNumber() = " + coursePage.getNumber());
 //        System.out.println("coursePage.getSize() = " + coursePage.getSize());
 
-        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage);
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage, total);
 
         return courseMakerPagination;
     }
@@ -442,22 +436,20 @@ public class TagServiceImpl implements TagService{
 
         // TODO: 쿼리 최적화
         long total = queryFactory
-                .select(destinationTag, destinationTag.destination.count())
+                .select(destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
                 .where(destinationTag.tag.id.in(tagIds))// 다중태그
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
-//                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
+//                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출함.fetch()
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .fetch()
                 .stream()
-                .map(n -> n.get(destinationTag).getDestination())
-                .toList()
-                .size();
+                .toList().get(0);
 
         Page<Destination> destinationPage = new PageImpl<>(destinations, pageable, total);
 
-        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, destinationPage);
+        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, destinationPage, total);
 
         return courseMakerPagination;
     }
