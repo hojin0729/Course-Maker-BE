@@ -423,7 +423,7 @@ public class TagServiceImpl implements TagService{
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
-                .where(destinationTag.tag.id.in(tagIds))// 다중태그 조건 검색
+                .where(destinationTag.tag.id.in(tagIds).and(destination.deletedAt.isNull()))// 다중태그 조건 검색
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
 //                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
@@ -439,7 +439,7 @@ public class TagServiceImpl implements TagService{
                 .select(destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
-                .where(destinationTag.tag.id.in(tagIds))// 다중태그
+                .where(destinationTag.tag.id.in(tagIds).and(destination.deletedAt.isNull()))// 다중태그
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
 //                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출함.fetch()
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
