@@ -31,10 +31,7 @@ public class CourseDestinationService {
     }
 
     public CourseDestinationResponse toResponse(CourseDestination courseDestination) {
-        List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId())
-                .stream()
-                .map(Tag::toResponseDto)
-                .collect(Collectors.toList());
+        List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId());
         DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }

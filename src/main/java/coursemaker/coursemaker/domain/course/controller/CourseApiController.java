@@ -146,15 +146,17 @@ public class CourseApiController {
                     .toList();
 
             /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
-            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
-                            .stream().map(Tag::toResponseDto).toList();
+//            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
+//                            .stream().map(Tag::toResponseDto).toList();
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
 
             contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
         }
 
         Page<TravelCourseResponse> responsePagepage = new PageImpl<>(contents, pageable, totalPage);
 
-        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePagepage);
+        long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePagepage, total);
 
         return ResponseEntity.ok(response);
     }
@@ -184,8 +186,9 @@ public class CourseApiController {
                 .toList();
 
         /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
-        List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
-                .stream().map(Tag::toResponseDto).toList();
+//        List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
+//                .stream().map(Tag::toResponseDto).toList();
+        List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
 
         return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
     }
@@ -245,8 +248,10 @@ public class CourseApiController {
                 .toList();
 
         /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
-        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
-                .stream().map(Tag::toResponseDto).toList();
+//        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
+//                .stream().map(Tag::toResponseDto).toList();
+        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId());
+
         TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags);
 
         return (updatedTravelCourse != null) ?
