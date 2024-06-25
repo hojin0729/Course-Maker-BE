@@ -216,74 +216,74 @@ public class StubData implements CommandLineRunner {
         Member member4 = memberService.findById(4L);
         Member member5 = memberService.findById(5L);
 
-        List<Tag> tags = tagService.findAllTags();
+        List<TagResponseDto> tags = tagService.findAllTags();
         // 태그 찾기
 
         // 자연
-        Tag seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
+        TagResponseDto seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "바다 태그"));
-        Tag natureTag = tags.stream().filter(tag -> "자연속휴식".equals(tag.getName())).findFirst()
+        TagResponseDto natureTag = tags.stream().filter(tag -> "자연속휴식".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "자연속휴식 태그"));
-        Tag hikingTag = tags.stream().filter(tag -> "등산".equals(tag.getName())).findFirst()
+        TagResponseDto hikingTag = tags.stream().filter(tag -> "등산".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "등산 태그"));
-        Tag walkingTag = tags.stream().filter(tag -> "둘레길".equals(tag.getName())).findFirst()
+        TagResponseDto walkingTag = tags.stream().filter(tag -> "둘레길".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "둘레길 태그"));
 
         // 동행
-        Tag aloneTag = tags.stream().filter(tag -> "나홀로 여행".equals(tag.getName())).findFirst()
+        TagResponseDto aloneTag = tags.stream().filter(tag -> "나홀로 여행".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "나홀로 여행 태그"));
-        Tag withChildTag = tags.stream().filter(tag -> "유아동반".equals(tag.getName())).findFirst()
+        TagResponseDto withChildTag = tags.stream().filter(tag -> "유아동반".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "유아동반 태그"));
-        Tag disabledTag = tags.stream().filter(tag -> "장애인".equals(tag.getName())).findFirst()
+        TagResponseDto disabledTag = tags.stream().filter(tag -> "장애인".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "장애인 태그"));
-        Tag ChildrenTag = tags.stream().filter(tag -> "어린이여행".equals(tag.getName())).findFirst()
+        TagResponseDto ChildrenTag = tags.stream().filter(tag -> "어린이여행".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "어린이여행 태그"));
-        Tag parentTag = tags.stream().filter(tag -> "부모님".equals(tag.getName())).findFirst()
+        TagResponseDto parentTag = tags.stream().filter(tag -> "부모님".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "부모님 태그"));
-        Tag coupleTag = tags.stream().filter(tag -> "연인".equals(tag.getName())).findFirst()
+        TagResponseDto coupleTag = tags.stream().filter(tag -> "연인".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "연인 태그"));
-        Tag withHoneyTag = tags.stream().filter(tag -> "배우자".equals(tag.getName())).findFirst()
+        TagResponseDto withHoneyTag = tags.stream().filter(tag -> "배우자".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "배우자 태그"));
-        Tag friendTag = tags.stream().filter(tag -> "친구".equals(tag.getName())).findFirst()
+        TagResponseDto friendTag = tags.stream().filter(tag -> "친구".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "친구 태그"));
-        Tag PetTag = tags.stream().filter(tag -> "애견동반".equals(tag.getName())).findFirst()
+        TagResponseDto PetTag = tags.stream().filter(tag -> "애견동반".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "애견동반 태그"));
 
 
         // 활동
-        Tag activityTag = tags.stream().filter(tag -> "액티비티".equals(tag.getName())).findFirst()
+        TagResponseDto activityTag = tags.stream().filter(tag -> "액티비티".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "액티비티 태그"));
-        Tag cultureStreetTag = tags.stream().filter(tag -> "문화거리".equals(tag.getName())).findFirst()
+        TagResponseDto cultureStreetTag = tags.stream().filter(tag -> "문화거리".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "문화거리 태그"));
-        Tag festivalTag = tags.stream().filter(tag -> "축제".equals(tag.getName())).findFirst()
+        TagResponseDto festivalTag = tags.stream().filter(tag -> "축제".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "축제 태그"));
-        Tag experienceTag = tags.stream().filter(tag -> "체험여행".equals(tag.getName())).findFirst()
+        TagResponseDto experienceTag = tags.stream().filter(tag -> "체험여행".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "체험여행 태그"));
-        Tag healingTag = tags.stream().filter(tag -> "힐링".equals(tag.getName())).findFirst()
+        TagResponseDto healingTag = tags.stream().filter(tag -> "힐링".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "힐링 태그"));
-        Tag historyTag = tags.stream().filter(tag -> "문화/유적지".equals(tag.getName())).findFirst()
+        TagResponseDto historyTag = tags.stream().filter(tag -> "문화/유적지".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "문화/유적지 태그"));
 
 
         // 음식
-        Tag foodTripTag = tags.stream().filter(tag -> "식도락".equals(tag.getName())).findFirst()
+        TagResponseDto foodTripTag = tags.stream().filter(tag -> "식도락".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "식도락 태그"));
-        Tag TraditionalTag = tags.stream().filter(tag -> "전통시장".equals(tag.getName())).findFirst()
+        TagResponseDto TraditionalTag = tags.stream().filter(tag -> "전통시장".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "전통시장 태그"));
-        Tag famousRestaurantTag = tags.stream().filter(tag -> "방송 맛집".equals(tag.getName())).findFirst()
+        TagResponseDto famousRestaurantTag = tags.stream().filter(tag -> "방송 맛집".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "방송 맛집 태그"));
-        Tag breadTag = tags.stream().filter(tag -> "빵지순례".equals(tag.getName())).findFirst()
+        TagResponseDto breadTag = tags.stream().filter(tag -> "빵지순례".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "빵지순례 태그"));
-        Tag cafeTag = tags.stream().filter(tag -> "카페투어".equals(tag.getName())).findFirst()
+        TagResponseDto cafeTag = tags.stream().filter(tag -> "카페투어".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "카페투어 태그"));
 
 
         // 날씨
-        Tag rainTag = tags.stream().filter(tag -> "우천시 운영".equals(tag.getName())).findFirst()
+        TagResponseDto rainTag = tags.stream().filter(tag -> "우천시 운영".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "우천시 운영 태그"));
-        Tag indoorTag = tags.stream().filter(tag -> "실내공간".equals(tag.getName())).findFirst()
+        TagResponseDto indoorTag = tags.stream().filter(tag -> "실내공간".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "실내공간 태그"));
-        Tag summerResortTag = tags.stream().filter(tag -> "피서지".equals(tag.getName())).findFirst()
+        TagResponseDto summerResortTag = tags.stream().filter(tag -> "피서지".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "피서지 태그"));
 
         // ---------- 1 번째 여행지 ----------
@@ -301,7 +301,7 @@ public class StubData implements CommandLineRunner {
 
         dto1.setPictureLink("https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20150831_219%2F1440992305953sjrCF_JPEG%2F157155537056075_0.jpg");
         dto1.setNickname(member1.getNickname());
-        dto1.setTags(List.of(seaTag.toResponseDto(), disabledTag.toResponseDto(), PetTag.toResponseDto(), friendTag.toResponseDto(), aloneTag.toResponseDto(), coupleTag.toResponseDto(), withChildTag.toResponseDto(), summerResortTag.toResponseDto()));
+        dto1.setTags(List.of(seaTag, disabledTag, PetTag, friendTag, aloneTag, coupleTag, withChildTag, summerResortTag));
         destinationService.save(dto1);
 
         // ---------- 2 번째 여행지 ----------
@@ -319,7 +319,7 @@ public class StubData implements CommandLineRunner {
 
         dto2.setPictureLink("https://www.hotelnongshim.com/kr/_Img/Contents/hsc_gall_img01.jpg");
         dto2.setNickname(member2.getNickname());
-        dto2.setTags(List.of(friendTag.toResponseDto(), parentTag.toResponseDto(), aloneTag.toResponseDto(), indoorTag.toResponseDto()));
+        dto2.setTags(List.of(friendTag, parentTag, aloneTag, indoorTag));
         destinationService.save(dto2);
 
         // ---------- 3 번째 여행지 ----------
@@ -337,7 +337,7 @@ public class StubData implements CommandLineRunner {
 
         dto3.setPictureLink("https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/SEA_LIFE_%EB%B6%80%EC%82%B0%EC%95%84%EC%BF%A0%EC%95%84%EB%A6%AC%EC%9B%80_%EB%A1%9C%EA%B3%A0.png/440px-SEA_LIFE_%EB%B6%80%EC%82%B0%EC%95%84%EC%BF%A0%EC%95%84%EB%A6%AC%EC%9B%80_%EB%A1%9C%EA%B3%A0.png");
         dto3.setNickname(member3.getNickname());
-        dto3.setTags(List.of(coupleTag.toResponseDto(), ChildrenTag.toResponseDto(), withChildTag.toResponseDto(), rainTag.toResponseDto(), indoorTag.toResponseDto()));
+        dto3.setTags(List.of(coupleTag, ChildrenTag, withChildTag, rainTag, indoorTag));
         destinationService.save(dto3);
 
         // ---------- 4 번째 여행지 ----------
@@ -355,7 +355,7 @@ public class StubData implements CommandLineRunner {
 
         dto4.setPictureLink("http://www.ydculture.com/wp-content/uploads/2019/08/tourspot03.jpg");
         dto4.setNickname(member4.getNickname());
-        dto4.setTags(List.of(coupleTag.toResponseDto(), cafeTag.toResponseDto(), breadTag.toResponseDto(), cultureStreetTag.toResponseDto(), parentTag.toResponseDto(), PetTag.toResponseDto(), walkingTag.toResponseDto(), seaTag.toResponseDto(), healingTag.toResponseDto(), withHoneyTag.toResponseDto()));
+        dto4.setTags(List.of(coupleTag, cafeTag, breadTag, cultureStreetTag, parentTag, PetTag, walkingTag, seaTag, healingTag, withHoneyTag));
         destinationService.save(dto4);
 
         // ---------- 5 번째 여행지 ----------
@@ -373,7 +373,7 @@ public class StubData implements CommandLineRunner {
 
         dto5.setPictureLink("https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20220801_106%2F1659333137309JPSiA_JPEG%2F%25BC%25DB%25B5%25B5_%25BD%25E6%25B3%25D7%25C0%25CF_%25C5%25B8%25C0%25CC%25C6%25B2X.jpg");
         dto5.setNickname(member5.getNickname());
-        dto5.setTags(List.of(seaTag.toResponseDto(), coupleTag.toResponseDto(), withChildTag.toResponseDto(), friendTag.toResponseDto(), parentTag.toResponseDto(), disabledTag.toResponseDto()));
+        dto5.setTags(List.of(seaTag, coupleTag, withChildTag, friendTag, parentTag, disabledTag));
         destinationService.save(dto5);
 
         // ---------- 6 번째 여행지 ----------
@@ -391,7 +391,7 @@ public class StubData implements CommandLineRunner {
 
         dto6.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230707174450394");
         dto6.setNickname(member5.getNickname());
-        dto6.setTags(List.of(coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), friendTag.toResponseDto(), historyTag.toResponseDto()));
+        dto6.setTags(List.of(coupleTag, withHoneyTag, friendTag, historyTag));
         destinationService.save(dto6);
 
         // ---------- 7 번째 여행지 ----------
@@ -409,7 +409,7 @@ public class StubData implements CommandLineRunner {
 
         dto7.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20220921114402310");
         dto7.setNickname(member5.getNickname());
-        dto7.setTags(List.of(walkingTag.toResponseDto(), aloneTag.toResponseDto(), PetTag.toResponseDto(), withHoneyTag.toResponseDto(), friendTag.toResponseDto(), breadTag.toResponseDto(), cafeTag.toResponseDto(), coupleTag.toResponseDto()));
+        dto7.setTags(List.of(walkingTag, aloneTag, PetTag, withHoneyTag, friendTag, breadTag, cafeTag, coupleTag));
         destinationService.save(dto7);
 
         // ---------- 8 번째 여행지 ----------
@@ -427,7 +427,7 @@ public class StubData implements CommandLineRunner {
 
         dto8.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230723172025932");
         dto8.setNickname(member5.getNickname());
-        dto8.setTags(List.of(natureTag.toResponseDto(), withHoneyTag.toResponseDto(), coupleTag.toResponseDto(), PetTag.toResponseDto(), healingTag.toResponseDto()));
+        dto8.setTags(List.of(natureTag, withHoneyTag, coupleTag, PetTag, healingTag));
         destinationService.save(dto8);
 
         // ---------- 9 번째 여행지 ----------
@@ -445,7 +445,7 @@ public class StubData implements CommandLineRunner {
 
         dto9.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230202161355598");
         dto9.setNickname(member5.getNickname());
-        dto9.setTags(List.of(natureTag.toResponseDto(), withChildTag.toResponseDto(), parentTag.toResponseDto(), PetTag.toResponseDto(), withHoneyTag.toResponseDto(), coupleTag.toResponseDto(), healingTag.toResponseDto()));
+        dto9.setTags(List.of(natureTag, withChildTag, parentTag, PetTag, withHoneyTag, coupleTag, healingTag));
         destinationService.save(dto9);
 
         // ---------- 10 번째 여행지 ----------
@@ -463,7 +463,7 @@ public class StubData implements CommandLineRunner {
 
         dto10.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20200514115750295");
         dto10.setNickname(member5.getNickname());
-        dto10.setTags(List.of(seaTag.toResponseDto(), PetTag.toResponseDto(), ChildrenTag.toResponseDto(), coupleTag.toResponseDto()));
+        dto10.setTags(List.of(seaTag, PetTag, ChildrenTag, coupleTag));
         destinationService.save(dto10);
 
         // ---------- 11 번째 여행지 ----------
@@ -481,7 +481,7 @@ public class StubData implements CommandLineRunner {
 
         dto11.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191229150331682");
         dto11.setNickname(member5.getNickname());
-        dto11.setTags(List.of(seaTag.toResponseDto(), withChildTag.toResponseDto(), parentTag.toResponseDto(), friendTag.toResponseDto(), festivalTag.toResponseDto()));
+        dto11.setTags(List.of(seaTag, withChildTag, parentTag, friendTag, festivalTag));
         destinationService.save(dto11);
 
         // ---------- 12 번째 여행지 ----------
@@ -499,7 +499,7 @@ public class StubData implements CommandLineRunner {
 
         dto12.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191227161822663");
         dto12.setNickname(member5.getNickname());
-        dto12.setTags(List.of(seaTag.toResponseDto(), parentTag.toResponseDto(), withHoneyTag.toResponseDto(), healingTag.toResponseDto()));
+        dto12.setTags(List.of(seaTag, parentTag, withHoneyTag, healingTag));
         destinationService.save(dto12);
 
         // ---------- 13 번째 여행지 ----------
@@ -517,7 +517,7 @@ public class StubData implements CommandLineRunner {
 
         dto13.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230901132543063");
         dto13.setNickname(member5.getNickname());
-        dto13.setTags(List.of(ChildrenTag.toResponseDto(), friendTag.toResponseDto(), experienceTag.toResponseDto(), rainTag.toResponseDto(), indoorTag.toResponseDto()));
+        dto13.setTags(List.of(ChildrenTag, friendTag, experienceTag, rainTag, indoorTag));
         destinationService.save(dto13);
 
         // ---------- 14 번째 여행지 ----------
@@ -535,7 +535,7 @@ public class StubData implements CommandLineRunner {
 
         dto14.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191231092729834");
         dto14.setNickname(member5.getNickname());
-        dto14.setTags(List.of(natureTag.toResponseDto(), hikingTag.toResponseDto(), aloneTag.toResponseDto(), friendTag.toResponseDto(), activityTag.toResponseDto()));
+        dto14.setTags(List.of(natureTag, hikingTag, aloneTag, friendTag, activityTag));
         destinationService.save(dto14);
 
         // ---------- 15 번째 여행지 ----------
@@ -553,7 +553,7 @@ public class StubData implements CommandLineRunner {
 
         dto15.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191230210019945");
         dto15.setNickname(member5.getNickname());
-        dto15.setTags(List.of(aloneTag.toResponseDto(), withChildTag.toResponseDto(), disabledTag.toResponseDto(), ChildrenTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), friendTag.toResponseDto(), activityTag.toResponseDto(), festivalTag.toResponseDto(), experienceTag.toResponseDto(), rainTag.toResponseDto(), indoorTag.toResponseDto()));
+        dto15.setTags(List.of(aloneTag, withChildTag, disabledTag, ChildrenTag, coupleTag, withHoneyTag, friendTag, activityTag, festivalTag, experienceTag, rainTag, indoorTag));
         destinationService.save(dto15);
 
         // ---------- 16 번째 여행지 ----------
@@ -571,7 +571,7 @@ public class StubData implements CommandLineRunner {
 
         dto16.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191231100856743");
         dto16.setNickname(member5.getNickname());
-        dto16.setTags(List.of(natureTag.toResponseDto(), hikingTag.toResponseDto(), walkingTag.toResponseDto(), coupleTag.toResponseDto(), friendTag.toResponseDto(), PetTag.toResponseDto()));
+        dto16.setTags(List.of(natureTag, hikingTag, walkingTag, coupleTag, friendTag, PetTag));
         destinationService.save(dto16);
 
         // ---------- 17 번째 여행지 ----------
@@ -589,7 +589,7 @@ public class StubData implements CommandLineRunner {
 
         dto17.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226093554532");
         dto17.setNickname(member5.getNickname());
-        dto17.setTags(List.of(walkingTag.toResponseDto(), aloneTag.toResponseDto(), withHoneyTag.toResponseDto(), coupleTag.toResponseDto(), PetTag.toResponseDto(), cultureStreetTag.toResponseDto(), historyTag.toResponseDto()));
+        dto17.setTags(List.of(walkingTag, aloneTag, withHoneyTag, coupleTag, PetTag, cultureStreetTag, historyTag));
         destinationService.save(dto17);
 
         // ---------- 18 번째 여행지 ----------
@@ -607,7 +607,7 @@ public class StubData implements CommandLineRunner {
 
         dto18.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226101451768");
         dto18.setNickname(member5.getNickname());
-        dto18.setTags(List.of(seaTag.toResponseDto(), aloneTag.toResponseDto(), withHoneyTag.toResponseDto(), coupleTag.toResponseDto(), PetTag.toResponseDto(), historyTag.toResponseDto()));
+        dto18.setTags(List.of(seaTag, aloneTag, withHoneyTag, coupleTag, PetTag, historyTag));
         destinationService.save(dto18);
 
         // ---------- 19 번째 여행지 ----------
@@ -625,7 +625,7 @@ public class StubData implements CommandLineRunner {
 
         dto19.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226183133502");
         dto19.setNickname(member5.getNickname());
-        dto19.setTags(List.of(withChildTag.toResponseDto(), ChildrenTag.toResponseDto(), friendTag.toResponseDto(), experienceTag.toResponseDto(), indoorTag.toResponseDto()));
+        dto19.setTags(List.of(withChildTag, ChildrenTag, friendTag, experienceTag, indoorTag));
         destinationService.save(dto19);
 
         // ---------- 20 번째 여행지 ----------
@@ -643,17 +643,18 @@ public class StubData implements CommandLineRunner {
 
         dto20.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226132135171");
         dto20.setNickname(member5.getNickname());
-        dto20.setTags(List.of(natureTag.toResponseDto(), aloneTag.toResponseDto(), parentTag.toResponseDto(), historyTag.toResponseDto(), coupleTag.toResponseDto()));
+        dto20.setTags(List.of(natureTag, aloneTag, parentTag, historyTag, coupleTag));
         destinationService.save(dto20);
 
 
     }
 
     private DestinationDto toDestinationDto(Destination destination) {
-        List<Tag> destinationTags = tagService.findAllByDestinationId(destination.getId());
-        List<TagResponseDto> tagDtos = destinationTags.stream()
-                .map(Tag::toResponseDto)
-                .collect(Collectors.toList());
+        List<TagResponseDto> destinationTags = tagService.findAllByDestinationId(destination.getId());
+
+//        List<TagResponseDto> tagDtos = destinationTags.stream()
+//                .map(Tag::toResponseDto)
+//                .collect(Collectors.toList());
 
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
@@ -662,7 +663,7 @@ public class StubData implements CommandLineRunner {
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
         dto.setLocation(new LocationDto(destination.getLocation(), destination.getLongitude(), destination.getLatitude()));
-        dto.setTags(tagDtos);
+        dto.setTags(destinationTags);
         return dto;
     }
 
@@ -673,74 +674,74 @@ public class StubData implements CommandLineRunner {
         Member member4 = memberService.findById(4L);
         Member member5 = memberService.findById(5L);
 
-        List<Tag> tags = tagService.findAllTags();
+        List<TagResponseDto> tags = tagService.findAllTags();
         // 태그 찾기
 
         // 자연
-        Tag seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
+        TagResponseDto seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "바다 태그"));
-        Tag natureTag = tags.stream().filter(tag -> "자연속휴식".equals(tag.getName())).findFirst()
+        TagResponseDto natureTag = tags.stream().filter(tag -> "자연속휴식".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "자연속휴식 태그"));
-        Tag hikingTag = tags.stream().filter(tag -> "등산".equals(tag.getName())).findFirst()
+        TagResponseDto hikingTag = tags.stream().filter(tag -> "등산".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "등산 태그"));
-        Tag walkingTag = tags.stream().filter(tag -> "둘레길".equals(tag.getName())).findFirst()
+        TagResponseDto walkingTag = tags.stream().filter(tag -> "둘레길".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "둘레길 태그"));
 
         // 동행
-        Tag aloneTag = tags.stream().filter(tag -> "나홀로 여행".equals(tag.getName())).findFirst()
+        TagResponseDto aloneTag = tags.stream().filter(tag -> "나홀로 여행".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "나홀로 여행 태그"));
-        Tag withChildTag = tags.stream().filter(tag -> "유아동반".equals(tag.getName())).findFirst()
+        TagResponseDto withChildTag = tags.stream().filter(tag -> "유아동반".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "유아동반 태그"));
-        Tag disabledTag = tags.stream().filter(tag -> "장애인".equals(tag.getName())).findFirst()
+        TagResponseDto disabledTag = tags.stream().filter(tag -> "장애인".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "장애인 태그"));
-        Tag ChildrenTag = tags.stream().filter(tag -> "어린이여행".equals(tag.getName())).findFirst()
+        TagResponseDto ChildrenTag = tags.stream().filter(tag -> "어린이여행".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "어린이여행 태그"));
-        Tag parentTag = tags.stream().filter(tag -> "부모님".equals(tag.getName())).findFirst()
+        TagResponseDto parentTag = tags.stream().filter(tag -> "부모님".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "부모님 태그"));
-        Tag coupleTag = tags.stream().filter(tag -> "연인".equals(tag.getName())).findFirst()
+        TagResponseDto coupleTag = tags.stream().filter(tag -> "연인".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "연인 태그"));
-        Tag withHoneyTag = tags.stream().filter(tag -> "배우자".equals(tag.getName())).findFirst()
+        TagResponseDto withHoneyTag = tags.stream().filter(tag -> "배우자".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "배우자 태그"));
-        Tag friendTag = tags.stream().filter(tag -> "친구".equals(tag.getName())).findFirst()
+        TagResponseDto friendTag = tags.stream().filter(tag -> "친구".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "친구 태그"));
-        Tag PetTag = tags.stream().filter(tag -> "애견동반".equals(tag.getName())).findFirst()
+        TagResponseDto PetTag = tags.stream().filter(tag -> "애견동반".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "애견동반 태그"));
 
 
         // 활동
-        Tag activityTag = tags.stream().filter(tag -> "액티비티".equals(tag.getName())).findFirst()
+        TagResponseDto activityTag = tags.stream().filter(tag -> "액티비티".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "액티비티 태그"));
-        Tag cultureStreetTag = tags.stream().filter(tag -> "문화거리".equals(tag.getName())).findFirst()
+        TagResponseDto cultureStreetTag = tags.stream().filter(tag -> "문화거리".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "문화거리 태그"));
-        Tag festivalTag = tags.stream().filter(tag -> "축제".equals(tag.getName())).findFirst()
+        TagResponseDto festivalTag = tags.stream().filter(tag -> "축제".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "축제 태그"));
-        Tag experienceTag = tags.stream().filter(tag -> "체험여행".equals(tag.getName())).findFirst()
+        TagResponseDto experienceTag = tags.stream().filter(tag -> "체험여행".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "체험여행 태그"));
-        Tag healingTag = tags.stream().filter(tag -> "힐링".equals(tag.getName())).findFirst()
+        TagResponseDto healingTag = tags.stream().filter(tag -> "힐링".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "힐링 태그"));
-        Tag historyTag = tags.stream().filter(tag -> "문화/유적지".equals(tag.getName())).findFirst()
+        TagResponseDto historyTag = tags.stream().filter(tag -> "문화/유적지".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "문화/유적지 태그"));
 
 
         // 음식
-        Tag foodTripTag = tags.stream().filter(tag -> "식도락".equals(tag.getName())).findFirst()
+        TagResponseDto foodTripTag = tags.stream().filter(tag -> "식도락".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "식도락 태그"));
-        Tag TraditionalTag = tags.stream().filter(tag -> "전통시장".equals(tag.getName())).findFirst()
+        TagResponseDto TraditionalTag = tags.stream().filter(tag -> "전통시장".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "전통시장 태그"));
-        Tag famousRestaurantTag = tags.stream().filter(tag -> "방송 맛집".equals(tag.getName())).findFirst()
+        TagResponseDto famousRestaurantTag = tags.stream().filter(tag -> "방송 맛집".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "방송 맛집 태그"));
-        Tag breadTag = tags.stream().filter(tag -> "빵지순례".equals(tag.getName())).findFirst()
+        TagResponseDto breadTag = tags.stream().filter(tag -> "빵지순례".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "빵지순례 태그"));
-        Tag cafeTag = tags.stream().filter(tag -> "카페투어".equals(tag.getName())).findFirst()
+        TagResponseDto cafeTag = tags.stream().filter(tag -> "카페투어".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "카페투어 태그"));
 
 
         // 날씨
-        Tag rainTag = tags.stream().filter(tag -> "우천시 운영".equals(tag.getName())).findFirst()
+        TagResponseDto rainTag = tags.stream().filter(tag -> "우천시 운영".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "우천시 운영 태그"));
-        Tag indoorTag = tags.stream().filter(tag -> "실내공간".equals(tag.getName())).findFirst()
+        TagResponseDto indoorTag = tags.stream().filter(tag -> "실내공간".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "실내공간 태그"));
-        Tag summerResortTag = tags.stream().filter(tag -> "피서지".equals(tag.getName())).findFirst()
+        TagResponseDto summerResortTag = tags.stream().filter(tag -> "피서지".equals(tag.getName())).findFirst()
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "피서지 태그"));
 
         List<Destination> destinations = destinationService.findAll();
@@ -761,7 +762,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191230190101989");
         course.setNickname(member1.getNickname());
         course.setCourseDestinations(courseDestinations1);
-        course.setTags(List.of(withChildTag.toResponseDto()));
+        course.setTags(List.of(withChildTag));
         courseService.save(course);
 
         // 2 번째 코스
@@ -779,7 +780,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20200729150013892");
         course.setNickname(member2.getNickname());
         course.setCourseDestinations(courseDestinations2);
-        course.setTags(List.of(seaTag.toResponseDto(), natureTag.toResponseDto(), walkingTag.toResponseDto(), aloneTag.toResponseDto(), parentTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), PetTag.toResponseDto(), friendTag.toResponseDto(), healingTag.toResponseDto()));
+        course.setTags(List.of(seaTag, natureTag, walkingTag, aloneTag, parentTag, coupleTag, withHoneyTag, PetTag, friendTag, healingTag));
         courseService.save(course);
 
 
@@ -796,7 +797,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20240528134839123");
         course.setNickname(member3.getNickname());
         course.setCourseDestinations(courseDestinations3);
-        course.setTags(List.of(aloneTag.toResponseDto(), withChildTag.toResponseDto(), friendTag.toResponseDto(), historyTag.toResponseDto(), rainTag.toResponseDto(), indoorTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, withChildTag, friendTag, historyTag, rainTag, indoorTag));
         courseService.save(course);
 
 
@@ -813,7 +814,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20200717114921294");
         course.setNickname(member4.getNickname());
         course.setCourseDestinations(courseDestinations4);
-        course.setTags(List.of(seaTag.toResponseDto(), walkingTag.toResponseDto(), parentTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto()));
+        course.setTags(List.of(seaTag, walkingTag, parentTag, coupleTag, withHoneyTag));
         courseService.save(course);
 
 
@@ -831,7 +832,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191227160751479");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations5);
-        course.setTags(List.of(aloneTag.toResponseDto(), withChildTag.toResponseDto(), parentTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), friendTag.toResponseDto(), healingTag.toResponseDto(), foodTripTag.toResponseDto(), TraditionalTag.toResponseDto(), famousRestaurantTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, withChildTag, parentTag, coupleTag, withHoneyTag, friendTag, healingTag, foodTripTag, TraditionalTag, famousRestaurantTag));
         courseService.save(course);
 
 
@@ -849,7 +850,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226110347271");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations6);
-        course.setTags(List.of(natureTag.toResponseDto(), withChildTag.toResponseDto(), parentTag.toResponseDto(), withHoneyTag.toResponseDto(), historyTag.toResponseDto(), cultureStreetTag.toResponseDto()));
+        course.setTags(List.of(natureTag, withChildTag, parentTag, withHoneyTag, historyTag, cultureStreetTag));
         courseService.save(course);
 
 
@@ -867,7 +868,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191231184354051");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations7);
-        course.setTags(List.of(aloneTag.toResponseDto(), friendTag.toResponseDto(), cultureStreetTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, friendTag, cultureStreetTag));
         courseService.save(course);
 
 
@@ -885,7 +886,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20240524131803859");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations8);
-        course.setTags(List.of(aloneTag.toResponseDto(), parentTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto() ,historyTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, parentTag, coupleTag, withHoneyTag ,historyTag));
         courseService.save(course);
 
 
@@ -903,7 +904,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230921171143286");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations9);
-        course.setTags(List.of(hikingTag.toResponseDto(), aloneTag.toResponseDto(), friendTag.toResponseDto()));
+        course.setTags(List.of(hikingTag, aloneTag, friendTag));
         courseService.save(course);
 
 
@@ -921,7 +922,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20240201225043211");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations10);
-        course.setTags(List.of(natureTag.toResponseDto(), walkingTag.toResponseDto(), aloneTag.toResponseDto(), friendTag.toResponseDto(), healingTag.toResponseDto()));
+        course.setTags(List.of(natureTag, walkingTag, aloneTag, friendTag, healingTag));
         courseService.save(course);
 
 
@@ -939,7 +940,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20240527143901347");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations11);
-        course.setTags(List.of(aloneTag.toResponseDto(), withChildTag.toResponseDto(), parentTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), PetTag.toResponseDto(), cultureStreetTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, withChildTag, parentTag, coupleTag, withHoneyTag, PetTag, cultureStreetTag));
         courseService.save(course);
 
 
@@ -957,7 +958,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230914182558311");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations12);
-        course.setTags(List.of(aloneTag.toResponseDto(), withChildTag.toResponseDto(), disabledTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), historyTag.toResponseDto(), rainTag.toResponseDto(), indoorTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, withChildTag, disabledTag, coupleTag, withHoneyTag, historyTag, rainTag, indoorTag));
         courseService.save(course);
 
 
@@ -975,7 +976,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20201216170753435");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations13);
-        course.setTags(List.of(aloneTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), friendTag.toResponseDto(), indoorTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, coupleTag, withHoneyTag, friendTag, indoorTag));
         courseService.save(course);
 
 
@@ -993,7 +994,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20200514115750295");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations14);
-        course.setTags(List.of(seaTag.toResponseDto(), aloneTag.toResponseDto(), healingTag.toResponseDto()));
+        course.setTags(List.of(seaTag, aloneTag, healingTag));
         courseService.save(course);
 
 
@@ -1011,7 +1012,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20240527173536003");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations15);
-        course.setTags(List.of(withChildTag.toResponseDto(), ChildrenTag.toResponseDto(), activityTag.toResponseDto(), experienceTag.toResponseDto(), rainTag.toResponseDto(), indoorTag.toResponseDto()));
+        course.setTags(List.of(withChildTag, ChildrenTag, activityTag, experienceTag, rainTag, indoorTag));
         courseService.save(course);
 
 
@@ -1029,7 +1030,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191229144834500");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations16);
-        course.setTags(List.of(withChildTag.toResponseDto(), disabledTag.toResponseDto(), ChildrenTag.toResponseDto(), activityTag.toResponseDto(), experienceTag.toResponseDto(), historyTag.toResponseDto()));
+        course.setTags(List.of(withChildTag, disabledTag, ChildrenTag, activityTag, experienceTag, historyTag));
         courseService.save(course);
 
 
@@ -1047,7 +1048,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191225164921130");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations17);
-        course.setTags(List.of(seaTag.toResponseDto(), aloneTag.toResponseDto(), disabledTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), healingTag.toResponseDto(), summerResortTag.toResponseDto()));
+        course.setTags(List.of(seaTag, aloneTag, disabledTag, coupleTag, withHoneyTag, healingTag, summerResortTag));
         courseService.save(course);
 
 
@@ -1065,7 +1066,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191225180243523");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations18);
-        course.setTags(List.of(seaTag.toResponseDto(), aloneTag.toResponseDto(), disabledTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), healingTag.toResponseDto()));
+        course.setTags(List.of(seaTag, aloneTag, disabledTag, coupleTag, withHoneyTag, healingTag));
         courseService.save(course);
 
 
@@ -1083,7 +1084,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191227194942971");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations19);
-        course.setTags(List.of(aloneTag.toResponseDto(), withChildTag.toResponseDto(), parentTag.toResponseDto(), coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), friendTag.toResponseDto(), PetTag.toResponseDto(), healingTag.toResponseDto()));
+        course.setTags(List.of(aloneTag, withChildTag, parentTag, coupleTag, withHoneyTag, friendTag, PetTag, healingTag));
         courseService.save(course);
 
 
@@ -1101,7 +1102,7 @@ public class StubData implements CommandLineRunner {
         course.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230525134753245");
         course.setNickname(member5.getNickname());
         course.setCourseDestinations(courseDestinations20);
-        course.setTags(List.of(coupleTag.toResponseDto(), withHoneyTag.toResponseDto(), activityTag.toResponseDto(), festivalTag.toResponseDto(), healingTag.toResponseDto()));
+        course.setTags(List.of(coupleTag, withHoneyTag, activityTag, festivalTag, healingTag));
         courseService.save(course);
     }
 

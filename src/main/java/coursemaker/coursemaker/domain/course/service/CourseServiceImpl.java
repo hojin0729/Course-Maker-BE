@@ -18,6 +18,7 @@ import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
@@ -109,15 +110,16 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public CourseMakerPagination<TravelCourse> findAll(Pageable pageable) {
         Page<TravelCourse> page = travelCourseRepository.findAllByDeletedAtIsNull(pageable);// db에서 페이지 단위로 가져옴
-        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page);// 페이지네이션 객체 변환
-
+        long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);// 페이지네이션 객체 변환
         return courseMakerPagination;
     }
 
     @Override
     public CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable) {
         Page<TravelCourse> page = travelCourseRepository.findAllByDeletedAtIsNullOrderByViewsDesc(pageable);// db에서 페이지 단위로 가져옴
-        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page);// 페이지네이션 객체 변환
+        long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);// 페이지네이션 객체 변환
         return courseMakerPagination;
     }
 
