@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.tag.controller;
 
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.tag.dto.TagUpdateDto;
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import coursemaker.coursemaker.util.LoginUser;
@@ -44,11 +45,7 @@ public class TagController {
     @GetMapping
     public ResponseEntity<List<TagResponseDto>> getTags() {
 
-        List<TagResponseDto> response = tagService.findAllTags()
-                .stream()
-                .map(Tag::toResponseDto)
-                .toList();
-
+        List<TagResponseDto> response = tagService.findAllTags();
         return ResponseEntity.ok().body(response);
     }
 
@@ -73,8 +70,7 @@ public class TagController {
     })
     @PostMapping
     public ResponseEntity<Void> addTag(@Valid @RequestBody TagPostDto request) {
-        TagResponseDto response = tagService.createTag(request.toEntity())
-                .toResponseDto();
+        TagResponseDto response = tagService.createTag(request);
 
         return ResponseEntity.created(URI.create("/v1/tags/" + response.getId())).build();
     }
@@ -107,12 +103,9 @@ public class TagController {
     })
     @PatchMapping("/{id}")
     public ResponseEntity<TagResponseDto> updateTag(@PathVariable(name = "id") Long id
-                                                    ,@Valid @RequestBody TagPostDto request) {
-        Tag tag = request.toEntity();
-        tag.setId(id);
+                                                    ,@Valid @RequestBody TagUpdateDto request) {
 
-        TagResponseDto response = tagService.updateTag(tag)
-                .toResponseDto();
+        TagResponseDto response = tagService.updateTag(request);
 
         return ResponseEntity.ok().body(response);
     }
