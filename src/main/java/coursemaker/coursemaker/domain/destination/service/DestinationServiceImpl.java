@@ -13,6 +13,7 @@ import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
@@ -117,8 +118,9 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public CourseMakerPagination<Destination> findAll(Pageable pageable) {
-        Page<Destination> destinations = destinationRepository.findAll(pageable);
-        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, destinations);
+        Page<Destination> page = destinationRepository.findAll(pageable);
+        long total = tagService.findAllDestinationByTagIds(null,pageable,OrderBy.NEWEST).getTotalContents();
+        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);
         return courseMakerPagination;
     }
 
