@@ -71,15 +71,13 @@ public class DestinationController {
         List<Destination> destinationList = destinations.getContents();
 
         for (Destination destination : destinationList) {
-            List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId())
-                    .stream()
-                    .map(Tag::toResponseDto)
-                    .toList();
+            List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
+
             destinationDtos.add(DestinationDto.toDto(destination, tags));
         }
 
         Page<DestinationDto> responsePage = new PageImpl<>(destinationDtos, pageable, totalPage);
-        CourseMakerPagination<DestinationDto> response = new CourseMakerPagination<>(pageable, responsePage);
+        CourseMakerPagination<DestinationDto> response = new CourseMakerPagination<>(pageable, responsePage, totalPage);
 
         return ResponseEntity.ok(response);
     }
@@ -106,10 +104,8 @@ public class DestinationController {
     @GetMapping("/{id}")
     public ResponseEntity<DestinationDto> getDestinationById(@PathVariable("id") Long id) {
         Destination destination = destinationService.findById(id);
-        List<TagResponseDto> tags = tagService.findAllByDestinationId(id)
-                .stream()
-                .map(Tag::toResponseDto)
-                .toList();
+        List<TagResponseDto> tags = tagService.findAllByDestinationId(id);
+
         DestinationDto destinationDto = DestinationDto.toDto(destination, tags);
         return ResponseEntity.ok(destinationDto);
     }
@@ -143,10 +139,7 @@ public class DestinationController {
     public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @LoginUser String nickname) {
         request.setNickname(nickname);
         Destination savedDestination = destinationService.save(request);
-        List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId())
-                .stream()
-                .map(Tag::toResponseDto)
-                .toList();
+        List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId());
         DestinationDto response = DestinationDto.toDto(savedDestination, tags);
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
@@ -265,10 +258,7 @@ public class DestinationController {
             throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         Destination updatedDestination = destinationService.update(id, request);
-        List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId())
-                .stream()
-                .map(Tag::toResponseDto)
-                .toList();
+        List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId());
         DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags);
         return ResponseEntity.ok(updatedDto);
     }
