@@ -30,24 +30,28 @@ import java.util.Collections;
 public class SecurityConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // 무상태성
-        http.setSharedObject(SessionManagementConfigurer.class,
-                new SessionManagementConfigurer<HttpSecurity>().sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        // csrf, http basic 등 비활성화
-        http.csrf(AbstractHttpConfigurer::disable)
+        /*URL 접근 권한 설정*/
+        http
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .anyRequest().permitAll()
+                );
+
+        http
+                .setSharedObject(SessionManagementConfigurer.class,
+                new SessionManagementConfigurer<HttpSecurity>()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+
+        /* csrf, http basic, 폼 로그인 비활성화 */
+        http
+                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
 
         //Cors
         http.cors(AbstractHttpConfigurer::disable);// disable 해야 cors 안터짐
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
@@ -77,4 +81,14 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
+    /*비밀번호 암호화*/
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+
+
 }
