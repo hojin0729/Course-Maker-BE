@@ -1,5 +1,7 @@
 package coursemaker.coursemaker;
 
+import coursemaker.coursemaker.domain.auth.dto.JoinRequestDto;
+import coursemaker.coursemaker.domain.auth.service.AuthService;
 import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.service.CourseService;
@@ -8,51 +10,50 @@ import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
-import coursemaker.coursemaker.domain.member.dto.SignUpRequest;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class StubData implements CommandLineRunner {
 
     private final TagService tagService;
     private final MemberService memberService;
     private final DestinationService destinationService;
     private final CourseService courseService;
+    private final AuthService authService;
 
-    @Autowired
-    public StubData(TagService tagService, MemberService memberService, DestinationService destinationService, CourseService courseService) {
-        this.tagService = tagService;
-        this.memberService = memberService;
-        this.destinationService = destinationService;
-        this.courseService = courseService;
-    }
+//    @Autowired
+//    public StubData(TagService tagService, MemberService memberService, DestinationService destinationService, CourseService courseService, AuthService authService) {
+//        this.tagService = tagService;
+//        this.memberService = memberService;
+//        this.destinationService = destinationService;
+//        this.courseService = courseService;
+////        this.authService = authService;
+//    }
 
     public void MemberStubData() throws Exception { // 1 ~ 5번 회원 생성
-        // 일반 회원 생성
-        SignUpRequest dto;
-        for (long i = 1; i <= 5; i++) {
-            dto = new SignUpRequest();
-            dto.setName("User");
-            dto.setEmail("User" + i + "@example.com");
-            dto.setNickname("nickname" + i);
-            dto.setPassword("password" + i);
-            dto.setPhoneNumber("010-0000-000" + i);
-//            dto.setProfileImgUrl("http://example.com/user" + i + ".jpg");
-//            dto.setProfileDescription("Profile description for User" + i);
-            memberService.signUp(dto);
+        
+        /*회원가입*/
+        JoinRequestDto request;
+        for(long i = 1; i <= 5; i++) {
+            request = new JoinRequestDto();
+            request.setName("User");
+            request.setEmail("User" + i + "@example.com");
+            request.setNickname("nickname" + i);
+            request.setPassword("password" + i);
+            request.setPhoneNumber("010-0000-000" + i);
+            authService.join(request);
         }
     }
 
@@ -1118,8 +1119,8 @@ public class StubData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         MemberStubData();
-        TagStubData();
-        DestinationStubData();
-        CourseStubData();
+//        TagStubData();
+//        DestinationStubData();
+//        CourseStubData();
     }
 }
