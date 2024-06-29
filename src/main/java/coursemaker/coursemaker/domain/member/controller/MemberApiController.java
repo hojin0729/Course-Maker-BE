@@ -29,37 +29,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/member")
 @RequiredArgsConstructor
 @Slf4j
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Member", description = "회원 API")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Member", description = "현재 회원 관련 API는 다시 작성중이라서 동작하지 않습니다ㅜ")
 public class MemberApiController {
     private final MemberService memberService;
     private final EmailService emailService;
 
 
-    @Operation(summary = "회원 생성", description = "기본 회원가입 후 유저를 생성한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원이 정상적으로 생성되었습니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 회원입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 회원입니다.\"}"
-                    )
-            ))
-    })
-    @PostMapping(value = "/signup")
-    public ResponseEntity<SignUpResponse> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
-        String nickname = memberService.signUp(signUpRequest).getNickname();
-        SignUpResponse signUpResponse = new SignUpResponse();
-        signUpResponse.setNickname(nickname);
-        return ResponseEntity.ok().body(signUpResponse);
-    }
+
 
     @Operation(summary = "회원 정보 수정", description = "로그인한 회원의 정보를 수정한다.")
     @ApiResponses(value = {
@@ -109,44 +85,7 @@ public class MemberApiController {
         return ResponseEntity.ok().body(deletedUser);
     }
 
-    @Operation(summary = "회원 로그인", description = "아이디와 비밀번호로 로그인한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다."),
-            @ApiResponse(responseCode = "401", description = "인증 실패: 비밀번호가 잘못되었습니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 401, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 잘못되었습니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "404", description = "인증 실패: 사용자를 찾을 수 없습니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"회원 정보가 없습니다.\"}"
-                    )
-            ))
-    })
-    @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        String id = loginRequest.getLoginEmail();
-        String password = loginRequest.getPassword();
-        LoginResponse loginResponse = memberService.login(id, password, response);
-        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, nickname : {}, token : {}", id, loginResponse.getNickname(), loginResponse.getAccessToken());
 
-        //TODO: 유저 정보 Cookie에 저장
-        return ResponseEntity.ok().body(loginResponse);
-    }
-
-    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
-    @ApiResponse(
-            responseCode = "200", description = "정상적으로 로그아웃되었습니다."
-    )
-    @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
-        LogoutResponse logoutResponse = memberService.logout(request);
-        return ResponseEntity.ok().body(logoutResponse);
-    }
 
 
     @Operation(summary = "마이페이지 정보 조회", description = "마이페이지에 필요한 정보를 조회한다.")
@@ -166,85 +105,4 @@ public class MemberApiController {
         return ResponseEntity.ok(myPageResponse);
     }
 
-    @Operation(summary = "닉네임 유효 확인", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "닉네임 유효성이 정상적으로 확인되었습니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 닉네임입니다.\"}"
-                    )
-            ))
-    })
-    @PostMapping(value = "/validate-nickname")
-    public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
-        ValidateNicknameResponse validateNicknameResponse = memberService.isValid(validateNicknameRequest);
-        return ResponseEntity.ok(validateNicknameResponse);
-    }
-
-    @Operation(summary = "이메일 유효 확인", description = "회원가입 및 회원정보 수정 시,  중복 또는 글자 수 등, 이메일 중복 여부를 검증한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 유효성이 정상적으로 확인되었습니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 이메일입니다.\"}"
-                    )
-            ))
-    })
-    @PostMapping(value = "/validate-email")
-    public ResponseEntity<ValidateEmailResponse> validateEmail(@Valid @RequestBody ValidateEmailRequest validateEmailRequest) {
-        ValidateEmailResponse validateEmailResponse = memberService.isEmailValid(validateEmailRequest);
-        return ResponseEntity.ok(validateEmailResponse);
-    }
-
-    @Operation(summary = "이메일 검증", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 정상적으로 발송되었습니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-                    )
-            ))
-    })
-    @PostMapping("/signup/send-validate")
-    public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
-        ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
-        return ResponseEntity.ok(validateEmailResponse);
-    }
-
-    @Operation(summary = "인증코드 검증", description = "이메일 인증코드의 유효성을 검증한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 일치합니다."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-                    )
-            ))
-    })
-    @PostMapping("/signup/verify-validate")
-    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
-        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
-        return ResponseEntity.ok(emailCodeVerifyResponse);
-    }
 }

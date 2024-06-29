@@ -2,11 +2,13 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.entity.Role;
 import coursemaker.coursemaker.domain.member.exception.*;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -34,43 +37,6 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
     }
 
-    public Member signUp(SignUpRequest signUpRequest) {
-        signUpRequest.validate(); // 검증 로직 추가
-
-        if (memberRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
-            throw new UserDuplicatedException("이미 존재하는 이메일 입니다. ", "Email: " + signUpRequest.getEmail());
-        }
-
-        if (memberRepository.findByNickname(signUpRequest.getNickname()).isPresent()) {
-            throw new UserDuplicatedException("이미 존재하는 닉네임 입니다. ", "닉네임: " + signUpRequest.getNickname());
-        }
-
-        String email = signUpRequest.getEmail();
-        Member.LoginType loginType = Member.LoginType.BASIC; //일반 이메일 로그인
-        String name = signUpRequest.getName();
-        String nickname = signUpRequest.getNickname();
-        String rawPassword = signUpRequest.getPassword();
-        String phoneNumber = signUpRequest.getPhoneNumber();
-        String encodedPassword = passwordEncoder.encode(rawPassword);
-//        String profileImg = signUpRequest.getProfileImgUrl();
-//        String profileDescription = signUpRequest.getProfileDescription();
-        String roles = "ROLE_USER"; // 기본값
-
-        Member builtUser = Member.addMemberBuilder()
-                .email(email)
-                .loginType(loginType)
-                .name(name)
-                .nickname(nickname)
-                .password(encodedPassword)
-                .phoneNumber(phoneNumber)
-//                .profileImgUrl(profileImg)
-//                .profileDescription(profileDescription)
-                .roles(roles)
-                .build();
-
-        Member newUser = memberRepository.save(builtUser);
-        return newUser;
-    }
 
     public Member updateUser(UpdateRequest updateRequest, String nickname) {
         updateRequest.validate(); // 검증 로직 추가

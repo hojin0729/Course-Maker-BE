@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,8 +41,9 @@ public class Member extends BaseEntity {
     @Column(name = "password", columnDefinition = "VARCHAR(255)")
     private String password; // 회원 비밀번호
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'ROLE_USER'")
-    private String roles; // 회원 등급
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role roles; // 회원 등급
 
     @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
     private String profileImgUrl;
@@ -69,6 +70,6 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.profileImgUrl = profileImgUrl;
         this.profileDescription = profileDescription;
-        this.roles = roles != null ? roles : "ROLE_USER";
+//        this.roles = roles != null ? roles : Role.USER.getRole();
     }
 }
