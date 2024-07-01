@@ -11,6 +11,13 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 @EnableJpaAuditing
@@ -55,5 +62,15 @@ public class CoursemakerApplication {
 //		connector.setRedirectPort(443);
 //		return connector;
 //	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+		List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+		messageConverters.add(new MappingJackson2HttpMessageConverter());
+		messageConverters.add(new MappingJackson2XmlHttpMessageConverter()); // XML 처리기 추가
+		restTemplate.setMessageConverters(messageConverters);
+		return restTemplate;
+	}
 
 }
