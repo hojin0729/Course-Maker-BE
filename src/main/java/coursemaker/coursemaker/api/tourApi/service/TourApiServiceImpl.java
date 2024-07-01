@@ -1,6 +1,5 @@
 package coursemaker.coursemaker.api.tourApi.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 import coursemaker.coursemaker.api.tourApi.repository.TourApiRepository;
@@ -11,10 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.yaml.snakeyaml.util.UriEncoder;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,7 +95,7 @@ public class TourApiServiceImpl implements TourApiService {
     @Override
     public List<TourApi> getAllTours() {
         return tourApiRepository.findAll();
-    };
+    }
 
 
 
