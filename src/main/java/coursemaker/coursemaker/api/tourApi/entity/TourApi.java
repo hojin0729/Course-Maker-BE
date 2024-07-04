@@ -13,464 +13,471 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "tour_api")
+@Table(name = "tourApi")
 public class TourApi {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(nullable = false)
+    @Column(name = "contentid")
     private long contentid;
 
-    @Column(name = "tel", length = 50)
+    @Column(name = "tel", columnDefinition = "TEXT")
     private String tel;
 
-    @Column(length = 100)
+    @Column(name = "addr1", columnDefinition = "TEXT")
     private String addr1;
 
-    @Column(length = 100)
+    @Column(name = "addr2", columnDefinition = "TEXT")
     private String addr2;
 
+    @Column(name = "sigungucode")
     private int sigungucode;
 
-    @Column(length = 300)
+    @Column(name = "firstimage", columnDefinition = "TEXT")
     private String firstimage;
 
-    @Column(length = 300)
+    @Column(name = "firstimage2", columnDefinition = "TEXT")
     private String firstimage2;
-    @Column(precision = 15, scale = 12)
+
+    @Column(name = "mapx", precision = 15, scale = 12)
     private BigDecimal mapx;
-    @Column(precision = 15, scale = 12)
+
+    @Column(name = "mapy", precision = 15, scale = 12)
     private BigDecimal mapy;
-    @Column(length = 50)
+
+    @Column(name = "zipcode", length = 20)
     private String zipcode;
 
-    @Column(length = 50)
+    @Column(name = "createdtime", length = 50)
     private String createdtime;
 
-    @Column(length = 50)
+    @Column(name = "modifiedtime", length = 50)
     private String modifiedtime;
 
-    @Column
+    @Column(name = "cat1", length = 10)
     private String cat1;
 
-    @Column
+    @Column(name = "cat2", length = 10)
     private String cat2;
 
-    @Column
+    @Column(name = "cat3", length = 10)
     private String cat3;
 
-    @Column
+    @Column(name = "contenttypeid")
     private int contenttypeid;
 
-    @Column
+    @Column(name = "disabled")
     private Long disabled;
 
-    @Column
+    @Column(name = "homepage", columnDefinition = "TEXT")
     private String homepage;
 
-    @Column
+    @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
 
     // 필드 추가: contentTypeId = 12 (관광지)
-    @Column
-    private Integer accomcount;
+    @Column(name = "accomcount")
+    private String accomcount;
 
-    @Column
+    @Column(name = "chkbabycarriage", length = 50)
     private String chkbabycarriage;
 
-    @Column
+    @Column(name = "chkcreditcard", length = 50)
     private String chkcreditcard;
 
-    @Column
+    @Column(name = "chkpet", length = 50)
     private String chkpet;
 
-    @Column
+    @Column(name = "expagerange", columnDefinition = "TEXT")
     private String expagerange;
 
-    @Column
+    @Column(name = "expguide", columnDefinition = "TEXT")
     private String expguide;
 
-    @Column
-    private String heritage1;
+    @Column(name = "heritage1")
+    private Integer heritage1;
 
-    @Column
-    private String heritage2;
+    @Column(name = "heritage2")
+    private Integer heritage2;
 
-    @Column
-    private String heritage3;
+    @Column(name = "heritage3")
+    private Integer heritage3;
 
-    @Column
+    @Column(name = "infocenter", columnDefinition = "TEXT")
     private String infocenter;
 
-    @Column
+    @Column(name = "opendate", columnDefinition = "TEXT")
     private String opendate;
 
-    @Column
+    @Column(name = "parking", columnDefinition = "TEXT")
     private String parking;
 
-    @Column
+    @Column(name = "restdate", columnDefinition = "TEXT")
     private String restdate;
 
-    @Column
+    @Column(name = "useseason", columnDefinition = "TEXT")
     private String useseason;
 
-    @Column
+    @Column(name = "usetime", columnDefinition = "TEXT")
     private String usetime;
 
     // 필드 추가: contentTypeId = 14 (문화시설)
-    @Column
-    private Integer accomcountculture;
+    @Column(name = "accomcountculture", columnDefinition = "TEXT")
+    private String accomcountculture;
 
-    @Column
+    @Column(name = "chkbabycarriageculture", length = 50)
     private String chkbabycarriageculture;
 
-    @Column
+    @Column(name = "chkcreditcardculture", length = 50)
     private String chkcreditcardculture;
 
-    @Column
+    @Column(name = "chkpetculture", length = 50)
     private String chkpetculture;
 
-    @Column
+    @Column(name = "discountinfo", columnDefinition = "TEXT")
     private String discountinfo;
 
-    @Column
+    @Column(name = "infocenterculture", columnDefinition = "TEXT")
     private String infocenterculture;
 
-    @Column
+    @Column(name = "parkingculture", columnDefinition = "TEXT")
     private String parkingculture;
 
-    @Column
+    @Column(name = "parkingfee", columnDefinition = "TEXT")
     private String parkingfee;
 
-    @Column
+    @Column(name = "restdateculture", columnDefinition = "TEXT")
     private String restdateculture;
 
-    @Column
+    @Column(name = "usefee", columnDefinition = "TEXT")
     private String usefee;
 
-    @Column
+    @Column(name = "usetimeculture", columnDefinition = "TEXT")
     private String usetimeculture;
 
-    @Column
+    @Column(name = "scale", columnDefinition = "TEXT")
     private String scale;
 
-    @Column
+    @Column(name = "spendtime", columnDefinition = "TEXT")
     private String spendtime;
 
     // 필드 추가: contentTypeId = 15 (행사/공연/축제)
-    @Column
+    @Column(name = "agelimit", columnDefinition = "TEXT")
     private String agelimit;
 
-    @Column
+    @Column(name = "bookingplace", columnDefinition = "TEXT")
     private String bookingplace;
 
-    @Column
+    @Column(name = "discountinfofestival", columnDefinition = "TEXT")
     private String discountinfofestival;
 
-    @Column
+    @Column(name = "eventenddate", length = 50)
     private String eventenddate;
 
-    @Column
+    @Column(name = "eventhomepage", columnDefinition = "TEXT")
     private String eventhomepage;
 
-    @Column
+    @Column(name = "eventplace", columnDefinition = "TEXT")
     private String eventplace;
 
-    @Column
+    @Column(name = "eventstartdate", length = 50)
     private String eventstartdate;
 
-    @Column
+    @Column(name = "festivalgrade", length = 50)
     private String festivalgrade;
 
-    @Column
+    @Column(name = "placeinfo", columnDefinition = "TEXT")
     private String placeinfo;
 
-    @Column
+    @Column(name = "playtime", columnDefinition = "TEXT")
     private String playtime;
 
-    @Column
+    @Column(name = "program", columnDefinition = "TEXT")
     private String program;
 
-    @Column
+    @Column(name = "spendtimefestival", columnDefinition = "TEXT")
     private String spendtimefestival;
 
-    @Column
+    @Column(name = "sponsor1", columnDefinition = "TEXT")
     private String sponsor1;
 
-    @Column
+    @Column(name = "sponsor1tel", columnDefinition = "TEXT")
     private String sponsor1tel;
 
-    @Column
+    @Column(name = "sponsor2", columnDefinition = "TEXT")
     private String sponsor2;
 
-    @Column
+    @Column(name = "sponsor2tel", columnDefinition = "TEXT")
     private String sponsor2tel;
 
-    @Column
+    @Column(name = "subevent", columnDefinition = "TEXT")
     private String subevent;
 
-    @Column
+    @Column(name = "usetimefestival", columnDefinition = "TEXT")
     private String usetimefestival;
 
     // 필드 추가: contentTypeId = 25 (여행코스)
-    @Column
+    @Column(name = "distance", columnDefinition = "TEXT")
     private String distance;
 
-    @Column
+    @Column(name = "infocentertourcourse", columnDefinition = "TEXT")
     private String infocentertourcourse;
 
-    @Column
+    @Column(name = "schedule", columnDefinition = "TEXT")
     private String schedule;
 
-    @Column
+    @Column(name = "taketime", columnDefinition = "TEXT")
     private String taketime;
 
-    @Column
+    @Column(name = "theme", columnDefinition = "TEXT")
     private String theme;
 
     // 필드 추가: contentTypeId = 28 (레포츠)
-    @Column
-    private Integer accomcountleports;
+    @Column(name = "accomcountleports", columnDefinition = "TEXT")
+    private String accomcountleports;
 
-    @Column
+    @Column(name = "chkbabycarriageleports", length = 50)
     private String chkbabycarriageleports;
 
-    @Column
+    @Column(name = "chkcreditcardleports", length = 50)
     private String chkcreditcardleports;
 
-    @Column
+    @Column(name = "chkpetleports", length = 50)
     private String chkpetleports;
 
-    @Column
+    @Column(name = "expagerangeleports", columnDefinition = "TEXT")
     private String expagerangeleports;
 
-    @Column
+    @Column(name = "infocenterleports", columnDefinition = "TEXT")
     private String infocenterleports;
 
-    @Column
+    @Column(name = "openperiod", columnDefinition = "TEXT")
     private String openperiod;
 
-    @Column
+    @Column(name = "parkingfeeleports", columnDefinition = "TEXT")
     private String parkingfeeleports;
 
-    @Column
+    @Column(name = "parkingleports", columnDefinition = "TEXT")
     private String parkingleports;
 
-    @Column
+    @Column(name = "reservation", columnDefinition = "TEXT")
     private String reservation;
 
-    @Column
+    @Column(name = "restdateleports", columnDefinition = "TEXT")
     private String restdateleports;
 
-    @Column
+    @Column(name = "scaleleports", columnDefinition = "TEXT")
     private String scaleleports;
 
-    @Column
+    @Column(name = "usefeeleports", columnDefinition = "TEXT")
     private String usefeeleports;
 
-    @Column
+    @Column(name = "usetimeleports", columnDefinition = "TEXT")
     private String usetimeleports;
 
     // 필드 추가: contentTypeId = 32 (숙박)
-    @Column
-    private Integer accomcountlodging;
+    @Column(name = "accomcountlodging", columnDefinition = "TEXT")
+    private String accomcountlodging;
 
-    @Column
+    @Column(name = "benikia", length = 50)
     private String benikia;
 
-    @Column
+    @Column(name = "checkintime", length = 50)
     private String checkintime;
 
-    @Column
+    @Column(name = "checkouttime", length = 50)
     private String checkouttime;
 
-    @Column
+    @Column(name = "chkcooking", length = 50)
     private String chkcooking;
 
-    @Column
+    @Column(name = "foodplace", columnDefinition = "TEXT")
     private String foodplace;
 
-    @Column
+    @Column(name = "goodstay", length = 50)
     private String goodstay;
 
-    @Column
+    @Column(name = "hanok", length = 50)
     private String hanok;
 
-    @Column
+    @Column(name = "infocenterlodging", columnDefinition = "TEXT")
     private String infocenterlodging;
 
-    @Column
+    @Column(name = "parkinglodging", columnDefinition = "TEXT")
     private String parkinglodging;
 
-    @Column
+    @Column(name = "pickup", length = 50)
     private String pickup;
 
-    @Column
-    private Integer roomcount;
+    @Column(name = "roomcount", columnDefinition = "TEXT")
+    private String roomcount;
 
-    @Column
+    @Column(name = "reservationlodging", columnDefinition = "TEXT")
     private String reservationlodging;
 
-    @Column
+    @Column(name = "reservationurl", columnDefinition = "TEXT")
     private String reservationurl;
 
-    @Column
+    @Column(name = "roomtype", columnDefinition = "TEXT")
     private String roomtype;
 
-    @Column
+    @Column(name = "scalelodging", columnDefinition = "TEXT")
     private String scalelodging;
 
-    @Column
+    @Column(name = "subfacility", columnDefinition = "TEXT")
     private String subfacility;
 
-    @Column
+    @Column(name = "barbecue", columnDefinition = "TEXT")
     private String barbecue;
 
-    @Column
+    @Column(name = "beauty", columnDefinition = "TEXT")
     private String beauty;
 
-    @Column
+    @Column(name = "beverage", columnDefinition = "TEXT")
     private String beverage;
 
-    @Column
+    @Column(name = "bicycle", columnDefinition = "TEXT")
     private String bicycle;
 
-    @Column
+    @Column(name = "campfire", length = 50)
     private String campfire;
 
-    @Column
+    @Column(name = "fitness", length = 50)
     private String fitness;
 
-    @Column
+    @Column(name = "karaoke", length = 50)
     private String karaoke;
 
-    @Column
+    @Column(name = "publicbath", length = 50)
     private String publicbath;
 
-    @Column
+    @Column(name = "publicpc", length = 50)
     private String publicpc;
 
-    @Column
+    @Column(name = "sauna", length = 50)
     private String sauna;
 
-    @Column
+    @Column(name = "seminar", length = 50)
     private String seminar;
 
-    @Column
+    @Column(name = "sports", length = 50)
     private String sports;
 
-    @Column
+    @Column(name = "refundregulation", columnDefinition = "TEXT")
     private String refundregulation;
 
     // 필드 추가: contentTypeId = 38 (쇼핑)
-    @Column
+    @Column(name = "chkbabycarriageshopping", length = 50)
     private String chkbabycarriageshopping;
 
-    @Column
+    @Column(name = "chkcreditcardshopping", length = 50)
     private String chkcreditcardshopping;
 
-    @Column
+    @Column(name = "chkpetshopping", length = 50)
     private String chkpetshopping;
 
-    @Column
+    @Column(name = "culturecenter", columnDefinition = "TEXT")
     private String culturecenter;
 
-    @Column
+    @Column(name = "fairday", length = 50)
     private String fairday;
 
-    @Column
+    @Column(name = "infocentershopping", columnDefinition = "TEXT")
     private String infocentershopping;
 
-    @Column
+    @Column(name = "opendateshopping", length = 50)
     private String opendateshopping;
 
-    @Column
+    @Column(name = "opentime", columnDefinition = "TEXT")
     private String opentime;
 
-    @Column
+    @Column(name = "parkingshopping", columnDefinition = "TEXT")
     private String parkingshopping;
 
-    @Column
+    @Column(name = "restdateshopping", length = 50)
     private String restdateshopping;
 
-    @Column
+    @Column(name = "restroom", columnDefinition = "TEXT")
     private String restroom;
 
-    @Column
+    @Column(name = "saleitem", columnDefinition = "TEXT")
     private String saleitem;
 
-    @Column
+    @Column(name = "saleitemcost", columnDefinition = "TEXT")
     private String saleitemcost;
 
-    @Column
+    @Column(name = "scaleshopping", columnDefinition = "TEXT")
     private String scaleshopping;
 
-    @Column
+    @Column(name = "shopguide", columnDefinition = "TEXT")
     private String shopguide;
 
     // 필드 추가: contentTypeId = 39 (음식점)
-    @Column
+    @Column(name = "chkcreditcardfood", length = 50)
     private String chkcreditcardfood;
 
-    @Column
+    @Column(name = "discountinfofood", columnDefinition = "TEXT")
     private String discountinfofood;
 
-    @Column
+    @Column(name = "firstmenu", columnDefinition = "TEXT")
     private String firstmenu;
 
-    @Column
+    @Column(name = "infocenterfood", columnDefinition = "TEXT")
     private String infocenterfood;
 
-    @Column
+    @Column(name = "kidsfacility", columnDefinition = "TEXT")
     private String kidsfacility;
 
-    @Column
+    @Column(name = "opendatefood", length = 50)
     private String opendatefood;
 
-    @Column
+    @Column(name = "opentimefood", columnDefinition = "TEXT")
     private String opentimefood;
 
-    @Column
+    @Column(name = "packing", columnDefinition = "TEXT")
     private String packing;
 
-    @Column
+    @Column(name = "parkingfood", columnDefinition = "TEXT")
     private String parkingfood;
 
-    @Column
+    @Column(name = "reservationfood", columnDefinition = "TEXT")
     private String reservationfood;
 
-    @Column
+    @Column(name = "restdatefood", length = 50)
     private String restdatefood;
 
-    @Column
+    @Column(name = "scalefood", columnDefinition = "TEXT")
     private String scalefood;
 
-    @Column
-    private Integer seat;
+    @Column(name = "seat", columnDefinition = "TEXT")
+    private String seat;
 
-    @Column
+    @Column(name = "smoking", length = 50)
     private String smoking;
 
-    @Column
+    @Column(name = "treatmenu", columnDefinition = "TEXT")
     private String treatmenu;
 
-    @Column
+    @Column(name = "lcnsno", columnDefinition = "TEXT")
     private String lcnsno;
+
+//    @OneToOne
+//    private Tag tag;
 
     @Builder
     public TourApi(String title, long contentid, String tel, String addr1, String addr2, int sigungucode,
                    String firstimage, String firstimage2, BigDecimal mapx, BigDecimal mapy, String zipcode,
                    String createdtime, String modifiedtime, String cat1, String cat2, String cat3,
                    int contenttypeid, Long disabled, String homepage, String overview,
-                   Integer accomcount, String chkbabycarriage, String chkcreditcard, String chkpet,
-                   String expagerange, String expguide, String heritage1, String heritage2,
-                   String heritage3, String infocenter, String opendate, String parking, String restdate,
-                   String useseason, String usetime, Integer accomcountculture, String chkbabycarriageculture,
+                   String accomcount, String chkbabycarriage, String chkcreditcard, String chkpet,
+                   String expagerange, String expguide, Integer heritage1, Integer heritage2,
+                   Integer heritage3, String infocenter, String opendate, String parking, String restdate,
+                   String useseason, String usetime, String accomcountculture, String chkbabycarriageculture,
                    String chkcreditcardculture, String chkpetculture, String discountinfo, String infocenterculture,
                    String parkingculture, String parkingfee, String restdateculture, String usefee,
                    String usetimeculture, String scale, String spendtime, String agelimit, String bookingplace,
@@ -478,13 +485,13 @@ public class TourApi {
                    String eventstartdate, String festivalgrade, String placeinfo, String playtime, String program,
                    String spendtimefestival, String sponsor1, String sponsor1tel, String sponsor2, String sponsor2tel,
                    String subevent, String usetimefestival, String distance, String infocentertourcourse, String schedule,
-                   String taketime, String theme, Integer accomcountleports, String chkbabycarriageleports,
+                   String taketime, String theme, String accomcountleports, String chkbabycarriageleports,
                    String chkcreditcardleports, String chkpetleports, String expagerangeleports, String infocenterleports,
                    String openperiod, String parkingfeeleports, String parkingleports, String reservation,
                    String restdateleports, String scaleleports, String usefeeleports, String usetimeleports,
-                   Integer accomcountlodging, String benikia, String checkintime, String checkouttime, String chkcooking,
+                   String accomcountlodging, String benikia, String checkintime, String checkouttime, String chkcooking,
                    String foodplace, String goodstay, String hanok, String infocenterlodging, String parkinglodging,
-                   String pickup, Integer roomcount, String reservationlodging, String reservationurl, String roomtype,
+                   String pickup, String roomcount, String reservationlodging, String reservationurl, String roomtype,
                    String scalelodging, String subfacility, String barbecue, String beauty, String beverage,
                    String bicycle, String campfire, String fitness, String karaoke, String publicbath, String publicpc,
                    String sauna, String seminar, String sports, String refundregulation, String chkbabycarriageshopping,
@@ -493,7 +500,7 @@ public class TourApi {
                    String restdateshopping, String restroom, String saleitem, String saleitemcost, String scaleshopping,
                    String shopguide, String chkcreditcardfood, String discountinfofood, String firstmenu, String infocenterfood,
                    String kidsfacility, String opendatefood, String opentimefood, String packing, String parkingfood,
-                   String reservationfood, String restdatefood, String scalefood, Integer seat, String smoking,
+                   String reservationfood, String restdatefood, String scalefood, String seat, String smoking,
                    String treatmenu, String lcnsno) {
         this.title = title;
         this.contentid = contentid;
@@ -643,4 +650,3 @@ public class TourApi {
         this.lcnsno = lcnsno;
     }
 }
-
