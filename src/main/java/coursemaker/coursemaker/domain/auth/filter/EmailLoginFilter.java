@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.domain.auth.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import coursemaker.coursemaker.domain.auth.dto.LoginRequestDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,15 +27,22 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         
         /*로그인 정보 가져옴*/
-        // TODO: JWT로 사용자 정보 가져오기
-        String username=obtainUsername(request);
-        String password=obtainPassword(request);
-        
-        /*검증용 객체에 담음*/
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, password, null);
-        
-        /*로그인 검증 진행*/
-        return authenticationManager.authenticate(authentication);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            LoginRequestDto dto = mapper.readValue(request.getInputStream(), LoginRequestDto.class);
+
+            /*검증용 객체에 담음*/
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(dto.getLoginEmail(),dto.getPassword());
+
+            /*로그인 검증 진행*/
+            return authenticationManager.authenticate(authentication);
+
+
+
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            throw new RuntimeException(e);
+        }
     }
     
     /*로그인 성공시*/
