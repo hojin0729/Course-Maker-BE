@@ -74,6 +74,9 @@ public class TourApiResponse {
         @Schema(description = "콘텐츠타입 ID", example = "14")
         private int contenttypeid;
 
+//        @Schema(description = "공공데이터 여행지 태그")
+//        private TagResponseDto tag;
+
         @Schema(description = "무장애 여행지", example = "1")
         private int disabled;
 
@@ -83,15 +86,15 @@ public class TourApiResponse {
         private String overview;
 
         // 필드 추가: contentTypeId = 12 (관광지)
-        private Integer accomcount;
+        private String accomcount;
         private String chkbabycarriage;
         private String chkcreditcard;
         private String chkpet;
         private String expagerange;
         private String expguide;
-        private String heritage1;
-        private String heritage2;
-        private String heritage3;
+        private int heritage1;
+        private int heritage2;
+        private int heritage3;
         private String infocenter;
         private String opendate;
         private String parking;
@@ -100,7 +103,7 @@ public class TourApiResponse {
         private String usetime;
 
         // 필드 추가: contentTypeId = 14 (문화시설)
-        private Integer accomcountculture;
+        private String accomcountculture;
         private String chkbabycarriageculture;
         private String chkcreditcardculture;
         private String chkpetculture;
@@ -142,7 +145,7 @@ public class TourApiResponse {
         private String theme;
 
         // 필드 추가: contentTypeId = 28 (레포츠)
-        private Integer accomcountleports;
+        private String accomcountleports;
         private String chkbabycarriageleports;
         private String chkcreditcardleports;
         private String chkpetleports;
@@ -158,7 +161,7 @@ public class TourApiResponse {
         private String usetimeleports;
 
         // 필드 추가: contentTypeId = 32 (숙박)
-        private Integer accomcountlodging;
+        private String accomcountlodging;
         private String benikia;
         private String checkintime;
         private String checkouttime;
@@ -169,7 +172,7 @@ public class TourApiResponse {
         private String infocenterlodging;
         private String parkinglodging;
         private String pickup;
-        private Integer roomcount;
+        private String roomcount;
         private String reservationlodging;
         private String reservationurl;
         private String roomtype;
@@ -219,7 +222,7 @@ public class TourApiResponse {
         private String reservationfood;
         private String restdatefood;
         private String scalefood;
-        private Integer seat;
+        private String seat;
         private String smoking;
         private String treatmenu;
         private String lcnsno;

@@ -8,12 +8,31 @@ import java.util.Optional;
 
 public interface TourApiService {
 
+    // TagResponseDto findTagByName(String name);
     TourApiResponse updateAndGetTour();
     Optional<TourApi> getTourById(Long id);
     List<TourApi> getAllTours();
-    // void updateDisabledTours();
-    void updateTourWithCommonData();
-    void updateTourWithIntroData();
+    void updateDisabledTours();
+    void updateTourWithCommonData1();
+    void updateTourWithCommonData2();
+    void updateTourWithCommonData3();
+    void updateTourWithCommonData4();
+    void updateTourWithCommonData5();
+    void updateTourWithCommonData6();
+    void updateTourWithCommonData7();
+    void updateTourWithCommonData8();
+    void updateTourWithCommonData9();
+    void updateTourWithCommonData10();
+    void updateTourWithIntroData1();
+    void updateTourWithIntroData2();
+    void updateTourWithIntroData3();
+    void updateTourWithIntroData4();
+    void updateTourWithIntroData5();
+    void updateTourWithIntroData6();
+    void updateTourWithIntroData7();
+    void updateTourWithIntroData8();
+    void updateTourWithIntroData9();
+    void updateTourWithIntroData10();
 
 
     // 호진님이 작업하셨었던 코드
