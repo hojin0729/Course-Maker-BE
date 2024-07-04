@@ -37,6 +37,11 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
     }
 
+    public Member findByEmail(String email){
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + email));
+    }
+
 
     public Member updateUser(UpdateRequest updateRequest, String nickname) {
         updateRequest.validate(); // 검증 로직 추가
