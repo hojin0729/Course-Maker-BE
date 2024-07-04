@@ -40,15 +40,89 @@ public class TourApiController {
 //        tourApiService.updateDisabledTours();
 //    }
 
-    @GetMapping("/updateCommonData")
-    public void updateCommonData() {
-        tourApiService.updateTourWithCommonData();
-    }
+//    @GetMapping("/updateCommonData1")
+//    public void updateCommonData1() {
+//        tourApiService.updateTourWithCommonData1();
+//    }
+//    @GetMapping("/updateCommonData2")
+//    public void updateCommonData2() {
+//        tourApiService.updateTourWithCommonData2();
+//    }
+//    @GetMapping("/updateCommonData3")
+//    public void updateCommonData3() {
+//        tourApiService.updateTourWithCommonData3();
+//    }
+//    @GetMapping("/updateCommonData4")
+//    public void updateCommonData4() {
+//        tourApiService.updateTourWithCommonData4();
+//    }
+//    @GetMapping("/updateCommonData5")
+//    public void updateCommonData5() {
+//        tourApiService.updateTourWithCommonData5();
+//    }
+//    @GetMapping("/updateCommonData6")
+//    public void updateCommonData6() {
+//        tourApiService.updateTourWithCommonData6();
+//    }
+//    @GetMapping("/updateCommonData7")
+//    public void updateCommonData7() {
+//        tourApiService.updateTourWithCommonData7();
+//    }
+//    @GetMapping("/updateCommonData8")
+//    public void updateCommonData8() {
+//        tourApiService.updateTourWithCommonData8();
+//    }
+//    @GetMapping("/updateCommonData9")
+//    public void updateCommonData9() {
+//        tourApiService.updateTourWithCommonData9();
+//    }
+//    @GetMapping("/updateCommonData10")
+//    public void updateCommonData10() {
+//        tourApiService.updateTourWithCommonData10();
+//    }
 
-    @GetMapping("/updateIntroData")
-    public void updateIntroData() {
-        tourApiService.updateTourWithIntroData();
-    }
+
+
+//    @GetMapping("/updateIntroData1")
+//    public void updateIntroData1() {
+//        tourApiService.updateTourWithIntroData1();
+//    }
+//    @GetMapping("/updateIntroData2")
+//    public void updateIntroData2() {
+//        tourApiService.updateTourWithIntroData2();
+//    }
+//    @GetMapping("/updateIntroData3")
+//    public void updateIntroData3() {
+//        tourApiService.updateTourWithIntroData3();
+//    }
+//    @GetMapping("/updateIntroData4")
+//    public void updateIntroData4() {
+//        tourApiService.updateTourWithIntroData4();
+//    }
+//    @GetMapping("/updateIntroData5")
+//    public void updateIntroData5() {
+//        tourApiService.updateTourWithIntroData5();
+//    }
+//    @GetMapping("/updateIntroData6")
+//    public void updateIntroData6() {
+//        tourApiService.updateTourWithIntroData6();
+//    }
+//    @GetMapping("/updateIntroData7")
+//    public void updateIntroData7() {
+//        tourApiService.updateTourWithIntroData7();
+//    }
+//    @GetMapping("/updateIntroData8")
+//    public void updateIntroData8() {
+//        tourApiService.updateTourWithIntroData8();
+//    }
+//    @GetMapping("/updateIntroData9")
+//    public void updateIntroData9() {
+//        tourApiService.updateTourWithIntroData9();
+//    }
+//    @GetMapping("/updateIntroData10")
+//    public void updateIntroData10() {
+//        tourApiService.updateTourWithIntroData10();
+//    }
 
     // 호진님이 작업하셨었던 코드
 //    @GetMapping

@@ -32,8 +32,8 @@ public class TourApiServiceImpl implements TourApiService {
     @Value("${tourapi.disableTourUrl}")
     private String disableTourUrl;
 
-
     private final RestTemplate restTemplate;
+    // private final WebClient webClient;
     private final TourApiRepository tourApiRepository;
 
     @Override
@@ -48,8 +48,12 @@ public class TourApiServiceImpl implements TourApiService {
                 .queryParam("serviceKey", serviceKey)
                 .build(true)
                 .toUri();
-
         TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
+//        TourApiResponse response = webClient.get()
+//                .uri(uri)
+//                .retrieve()
+//                .bodyToMono(TourApiResponse.class)
+//                .block();
 
         if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
             List<TourApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
@@ -58,8 +62,41 @@ public class TourApiServiceImpl implements TourApiService {
             tourList.forEach(this::saveOrUpdateTour);
         }
 
+        updateDisabledTours();
+        updateTourWithCommonData1();
+        updateTourWithCommonData2();
+        updateTourWithCommonData3();
+        updateTourWithCommonData4();
+        updateTourWithCommonData5();
+        updateTourWithCommonData6();
+        updateTourWithCommonData7();
+        updateTourWithCommonData8();
+        updateTourWithCommonData9();
+        updateTourWithCommonData10();
+        updateTourWithIntroData1();
+        updateTourWithIntroData2();
+        updateTourWithIntroData3();
+        updateTourWithIntroData4();
+        updateTourWithIntroData5();
+        updateTourWithIntroData6();
+        updateTourWithIntroData7();
+        updateTourWithIntroData8();
+        updateTourWithIntroData9();
+        updateTourWithIntroData10();
 
-        uri = UriComponentsBuilder.fromHttpUrl(disableTourUrl)
+        return response;
+    }
+
+    @Override
+    public List<TourApi> getAllTours() {
+        return tourApiRepository.findAll();
+    }
+
+
+
+    @Override
+    public void updateDisabledTours() {
+        URI uri = UriComponentsBuilder.fromHttpUrl(disableTourUrl)
                 .queryParam("numOfRows", 2300)
                 .queryParam("pageNo", 1)
                 .queryParam("MobileOS", "WIN")
@@ -69,8 +106,12 @@ public class TourApiServiceImpl implements TourApiService {
                 .queryParam("serviceKey", serviceKey)
                 .build(true)
                 .toUri();
-
-        response = restTemplate.getForObject(uri, TourApiResponse.class);
+        TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
+//        TourApiResponse response = webClient.get()
+//                .uri(uri)
+//                .retrieve()
+//                .bodyToMono(TourApiResponse.class)
+//                .block();
 
         if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
             List<Long> disabledContentIds = response.getResponse().getBody().getItems().getItem().stream()
@@ -87,49 +128,7 @@ public class TourApiServiceImpl implements TourApiService {
                 tourApiRepository.save(tour);
             });
         }
-
-
-        return response;
     }
-
-    @Override
-    public List<TourApi> getAllTours() {
-        return tourApiRepository.findAll();
-    }
-
-
-
-//    @Override
-//    public void updateDisabledTours() {
-//        URI uri = UriComponentsBuilder.fromHttpUrl(disableTourUrl)
-//                .queryParam("numOfRows", 2300)
-//                .queryParam("pageNo", 1)
-//                .queryParam("MobileOS", "WIN")
-//                .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
-//                .queryParam("_type", "json")
-//                .queryParam("areaCode", 6)
-//                .queryParam("serviceKey", serviceKey)
-//                .build(true)
-//                .toUri();
-//
-//        TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
-//
-//        if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-//            List<Long> disabledContentIds = response.getResponse().getBody().getItems().getItem().stream()
-//                    .map(TourApiResponse.Item::getContentid)
-//                    .toList();
-//
-//            List<TourApi> allTours = tourApiRepository.findAll();
-//            allTours.forEach(tour -> {
-//                if (disabledContentIds.contains(tour.getContentid())) {
-//                    tour.setDisabled(1L);
-//                } else {
-//                    tour.setDisabled(null);
-//                }
-//                tourApiRepository.save(tour);
-//            });
-//        }
-//    }
 
     @Override
     public Optional<TourApi> getTourById(Long id) {
@@ -137,12 +136,69 @@ public class TourApiServiceImpl implements TourApiService {
     }
 
     @Override
-    public void updateTourWithCommonData() {
+    public void updateTourWithCommonData1() {
+        updateTourWithCommonDataRange(1, tourApiRepository.findAll().size() / 10);
+    }
+
+    @Override
+    public void updateTourWithCommonData2() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange(totalSize / 10 + 1, (totalSize / 10) * 2);
+    }
+
+    @Override
+    public void updateTourWithCommonData3() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 2 + 1, (totalSize / 10) * 3);
+    }
+
+    @Override
+    public void updateTourWithCommonData4() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 3 + 1, (totalSize / 10) * 4);
+    }
+
+    @Override
+    public void updateTourWithCommonData5() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 4 + 1, (totalSize / 10) * 5);
+    }
+
+    @Override
+    public void updateTourWithCommonData6() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 5 + 1, (totalSize / 10) * 6);
+    }
+
+    @Override
+    public void updateTourWithCommonData7() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 6 + 1, (totalSize / 10) * 7);
+    }
+
+    @Override
+    public void updateTourWithCommonData8() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 7 + 1, (totalSize / 10) * 8);
+    }
+
+    @Override
+    public void updateTourWithCommonData9() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 8 + 1, (totalSize / 10) * 9);
+    }
+
+    @Override
+    public void updateTourWithCommonData10() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithCommonDataRange((totalSize / 10) * 9 + 1, totalSize);
+    }
+
+    private void updateTourWithCommonDataRange(long start, long end) {
         List<TourApi> tourList = tourApiRepository.findAll();
-        for (long i = 1; i <= tourList.size(); i++) {
+        for (long i = start; i <= end; i++) {
             Optional<TourApi> getTourApi = tourApiRepository.findById(i);
             long contentId = getTourApi.get().getContentid();
-
 
             URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
                     .queryParam("numOfRows", 2300)
@@ -156,8 +212,12 @@ public class TourApiServiceImpl implements TourApiService {
                     .queryParam("contentId", contentId)
                     .build(true)
                     .toUri();
-
             TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
+//            TourApiResponse response = webClient.get()
+//                    .uri(uri)
+//                    .retrieve()
+//                    .bodyToMono(TourApiResponse.class)
+//                    .block();
 
             if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
                 response.getResponse().getBody().getItems().getItem().forEach(item -> {
@@ -172,363 +232,249 @@ public class TourApiServiceImpl implements TourApiService {
         }
     }
 
-//    @Override
-//    public void updateTourWithCommonData() {
-//        List<TourApi> tourList = tourApiRepository.findAll();
-//        for (long i = 1; i <= tourList.size(); i++) {
-//            Optional<TourApi> getTourApi = tourApiRepository.findById(i);
-//            if (getTourApi.isPresent()) {
-//                long contentId = getTourApi.get().getContentid();
-//                int contentTypeId = getTourApi.get().getContenttypeid();
-//                // int pageNo = (int) Math.ceil(i / 100.0);
-//
-//                URI uri = UriComponentsBuilder.fromHttpUrl(detailIntroUrl)
-//                        .queryParam("numOfRows", 2300)
-//                        .queryParam("pageNo", 1)
-//                        .queryParam("MobileOS", "WIN")
-//                        .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
-//                        .queryParam("_type", "json")
-//                        .queryParam("serviceKey", serviceKey)
-//                        .queryParam("contentId", contentId)
-//                        .queryParam("contentTypeId", contentTypeId)
-//                        .build(true)
-//                        .toUri();
-//
-//                try {
-//                    // 응답을 문자열로 받아서 로그로 출력
-//                    String jsonResponse = restTemplate.getForObject(uri, String.class);
-//                    System.out.println("Response for contentId " + contentId + ": " + jsonResponse);
-//
-//                    // 문자열을 DTO로 변환
-//                    ObjectMapper objectMapper = new ObjectMapper();
-//                    TourApiResponse response = objectMapper.readValue(jsonResponse, TourApiResponse.class);
-//
-//                    if (response != null && response.getResponse() != null && response.getResponse().getBody() != null
-//                            && response.getResponse().getBody().getItems() != null
-//                            && response.getResponse().getBody().getItems().getItem() != null) {
-//
-//                        response.getResponse().getBody().getItems().getItem().forEach(item -> {
-//                            Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
-//                            tourApiOptional.ifPresent(tourApi -> {
-//                                // contentTypeId에 따라 다른 컬럼 업데이트
-//                                if (contentTypeId == 12) {
-//                                    tourApi.setAccomcount(item.getAccomcount());
-//                                    tourApi.setChkbabycarriage(item.getChkbabycarriage());
-//                                    tourApi.setChkcreditcard(item.getChkcreditcard());
-//                                    tourApi.setChkpet(item.getChkpet());
-//                                    tourApi.setExpagerange(item.getExpagerange());
-//                                    tourApi.setExpguide(item.getExpguide());
-//                                    tourApi.setHeritage1(item.getHeritage1());
-//                                    tourApi.setHeritage2(item.getHeritage2());
-//                                    tourApi.setHeritage3(item.getHeritage3());
-//                                    tourApi.setInfocenter(item.getInfocenter());
-//                                    tourApi.setOpendate(item.getOpendate());
-//                                    tourApi.setParking(item.getParking());
-//                                    tourApi.setRestdate(item.getRestdate());
-//                                    tourApi.setUseseason(item.getUseseason());
-//                                    tourApi.setUsetime(item.getUsetime());
-//                                } else if (contentTypeId == 14) {
-//                                    tourApi.setAccomcountculture(item.getAccomcountculture());
-//                                    tourApi.setChkbabycarriageculture(item.getChkbabycarriageculture());
-//                                    tourApi.setChkcreditcardculture(item.getChkcreditcardculture());
-//                                    tourApi.setChkpetculture(item.getChkpetculture());
-//                                    tourApi.setDiscountinfo(item.getDiscountinfo());
-//                                    tourApi.setInfocenterculture(item.getInfocenterculture());
-//                                    tourApi.setParkingculture(item.getParkingculture());
-//                                    tourApi.setParkingfee(item.getParkingfee());
-//                                    tourApi.setRestdateculture(item.getRestdateculture());
-//                                    tourApi.setUsefee(item.getUsefee());
-//                                    tourApi.setUsetimeculture(item.getUsetimeculture());
-//                                    tourApi.setScale(item.getScale());
-//                                    tourApi.setSpendtime(item.getSpendtime());
-//                                } else if (contentTypeId == 15) {
-//                                    tourApi.setAgelimit(item.getAgelimit());
-//                                    tourApi.setBookingplace(item.getBookingplace());
-//                                    tourApi.setDiscountinfofestival(item.getDiscountinfofestival());
-//                                    tourApi.setEventenddate(item.getEventenddate());
-//                                    tourApi.setEventhomepage(item.getEventhomepage());
-//                                    tourApi.setEventplace(item.getEventplace());
-//                                    tourApi.setEventstartdate(item.getEventstartdate());
-//                                    tourApi.setFestivalgrade(item.getFestivalgrade());
-//                                    tourApi.setPlaceinfo(item.getPlaceinfo());
-//                                    tourApi.setPlaytime(item.getPlaytime());
-//                                    tourApi.setProgram(item.getProgram());
-//                                    tourApi.setSpendtimefestival(item.getSpendtimefestival());
-//                                    tourApi.setSponsor1(item.getSponsor1());
-//                                    tourApi.setSponsor1tel(item.getSponsor1tel());
-//                                    tourApi.setSponsor2(item.getSponsor2());
-//                                    tourApi.setSponsor2tel(item.getSponsor2tel());
-//                                    tourApi.setSubevent(item.getSubevent());
-//                                    tourApi.setUsetimefestival(item.getUsetimefestival());
-//                                } else if (contentTypeId == 25) {
-//                                    tourApi.setDistance(item.getDistance());
-//                                    tourApi.setInfocentertourcourse(item.getInfocentertourcourse());
-//                                    tourApi.setSchedule(item.getSchedule());
-//                                    tourApi.setTaketime(item.getTaketime());
-//                                    tourApi.setTheme(item.getTheme());
-//                                } else if (contentTypeId == 28) {
-//                                    tourApi.setAccomcountleports(item.getAccomcountleports());
-//                                    tourApi.setChkbabycarriageleports(item.getChkbabycarriageleports());
-//                                    tourApi.setChkcreditcardleports(item.getChkcreditcardleports());
-//                                    tourApi.setChkpetleports(item.getChkpetleports());
-//                                    tourApi.setExpagerangeleports(item.getExpagerangeleports());
-//                                    tourApi.setInfocenterleports(item.getInfocenterleports());
-//                                    tourApi.setOpenperiod(item.getOpenperiod());
-//                                    tourApi.setParkingfeeleports(item.getParkingfeeleports());
-//                                    tourApi.setParkingleports(item.getParkingleports());
-//                                    tourApi.setReservation(item.getReservation());
-//                                    tourApi.setRestdateleports(item.getRestdateleports());
-//                                    tourApi.setScaleleports(item.getScaleleports());
-//                                    tourApi.setUsefeeleports(item.getUsefeeleports());
-//                                    tourApi.setUsetimeleports(item.getUsetimeleports());
-//                                } else if (contentTypeId == 32) {
-//                                    tourApi.setAccomcountlodging(item.getAccomcountlodging());
-//                                    tourApi.setBenikia(item.getBenikia());
-//                                    tourApi.setCheckintime(item.getCheckintime());
-//                                    tourApi.setCheckouttime(item.getCheckouttime());
-//                                    tourApi.setChkcooking(item.getChkcooking());
-//                                    tourApi.setFoodplace(item.getFoodplace());
-//                                    tourApi.setGoodstay(item.getGoodstay());
-//                                    tourApi.setHanok(item.getHanok());
-//                                    tourApi.setInfocenterlodging(item.getInfocenterlodging());
-//                                    tourApi.setParkinglodging(item.getParkinglodging());
-//                                    tourApi.setPickup(item.getPickup());
-//                                    tourApi.setRoomcount(item.getRoomcount());
-//                                    tourApi.setReservationlodging(item.getReservationlodging());
-//                                    tourApi.setReservationurl(item.getReservationurl());
-//                                    tourApi.setRoomtype(item.getRoomtype());
-//                                    tourApi.setScalelodging(item.getScalelodging());
-//                                    tourApi.setSubfacility(item.getSubfacility());
-//                                    tourApi.setBarbecue(item.getBarbecue());
-//                                    tourApi.setBeauty(item.getBeauty());
-//                                    tourApi.setBeverage(item.getBeverage());
-//                                    tourApi.setBicycle(item.getBicycle());
-//                                    tourApi.setCampfire(item.getCampfire());
-//                                    tourApi.setFitness(item.getFitness());
-//                                    tourApi.setKaraoke(item.getKaraoke());
-//                                    tourApi.setPublicbath(item.getPublicbath());
-//                                    tourApi.setPublicpc(item.getPublicpc());
-//                                    tourApi.setSauna(item.getSauna());
-//                                    tourApi.setSeminar(item.getSeminar());
-//                                    tourApi.setSports(item.getSports());
-//                                    tourApi.setRefundregulation(item.getRefundregulation());
-//                                } else if (contentTypeId == 38) {
-//                                    tourApi.setChkbabycarriageshopping(item.getChkbabycarriageshopping());
-//                                    tourApi.setChkcreditcardshopping(item.getChkcreditcardshopping());
-//                                    tourApi.setChkpetshopping(item.getChkpetshopping());
-//                                    tourApi.setCulturecenter(item.getCulturecenter());
-//                                    tourApi.setFairday(item.getFairday());
-//                                    tourApi.setInfocentershopping(item.getInfocentershopping());
-//                                    tourApi.setOpendateshopping(item.getOpendateshopping());
-//                                    tourApi.setOpentime(item.getOpentime());
-//                                    tourApi.setParkingshopping(item.getParkingshopping());
-//                                    tourApi.setRestdateshopping(item.getRestdateshopping());
-//                                    tourApi.setRestroom(item.getRestroom());
-//                                    tourApi.setSaleitem(item.getSaleitem());
-//                                    tourApi.setSaleitemcost(item.getSaleitemcost());
-//                                    tourApi.setScaleshopping(item.getScaleshopping());
-//                                    tourApi.setShopguide(item.getShopguide());
-//                                } else if (contentTypeId == 39) {
-//                                    tourApi.setChkcreditcardfood(item.getChkcreditcardfood());
-//                                    tourApi.setDiscountinfofood(item.getDiscountinfofood());
-//                                    tourApi.setFirstmenu(item.getFirstmenu());
-//                                    tourApi.setInfocenterfood(item.getInfocenterfood());
-//                                    tourApi.setKidsfacility(item.getKidsfacility());
-//                                    tourApi.setOpendatefood(item.getOpendatefood());
-//                                    tourApi.setOpentimefood(item.getOpentimefood());
-//                                    tourApi.setPacking(item.getPacking());
-//                                    tourApi.setParkingfood(item.getParkingfood());
-//                                    tourApi.setReservationfood(item.getReservationfood());
-//                                    tourApi.setRestdatefood(item.getRestdatefood());
-//                                    tourApi.setScalefood(item.getScalefood());
-//                                    tourApi.setSeat(item.getSeat());
-//                                    tourApi.setSmoking(item.getSmoking());
-//                                    tourApi.setTreatmenu(item.getTreatmenu());
-//                                    tourApi.setLcnsno(item.getLcnsno());
-//                                }
-//                                tourApiRepository.save(tourApi);
-//                            });
-//                        });
-//                    } else {
-//                        System.out.println("Response for contentId " + contentId + " is empty or malformed.");
-//                    }
-//                } catch (Exception e) {
-//                    System.err.println("Error processing contentId " + contentId + ": " + e.getMessage());
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
+    @Override
+    public void updateTourWithIntroData1() {
+        updateTourWithIntroDataRange(1, tourApiRepository.findAll().size() / 10);
+    }
 
     @Override
-    public void updateTourWithIntroData() {
+    public void updateTourWithIntroData2() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange(totalSize / 10 + 1, (totalSize / 10) * 2);
+    }
+
+    @Override
+    public void updateTourWithIntroData3() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 2 + 1, (totalSize / 10) * 3);
+    }
+
+    @Override
+    public void updateTourWithIntroData4() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 3 + 1, (totalSize / 10) * 4);
+    }
+
+    @Override
+    public void updateTourWithIntroData5() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 4 + 1, (totalSize / 10) * 5);
+    }
+
+    @Override
+    public void updateTourWithIntroData6() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 5 + 1, (totalSize / 10) * 6);
+    }
+
+    @Override
+    public void updateTourWithIntroData7() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 6 + 1, (totalSize / 10) * 7);
+    }
+
+    @Override
+    public void updateTourWithIntroData8() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 7 + 1, (totalSize / 10) * 8);
+    }
+
+    @Override
+    public void updateTourWithIntroData9() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 8 + 1, (totalSize / 10) * 9);
+    }
+
+    @Override
+    public void updateTourWithIntroData10() {
+        int totalSize = tourApiRepository.findAll().size();
+        updateTourWithIntroDataRange((totalSize / 10) * 9 + 1, totalSize);
+    }
+
+    private void updateTourWithIntroDataRange(long start, long end) {
         List<TourApi> tourList = tourApiRepository.findAll();
-        for (long i = 1; i <= tourList.size(); i++) {
+        for (long i = start; i <= end; i++) {
             Optional<TourApi> getTourApi = tourApiRepository.findById(i);
-            long contentId = getTourApi.get().getContentid();
-            int contentTypeId = getTourApi.get().getContenttypeid();
+            if (getTourApi.isPresent()) {
+                long contentId = getTourApi.get().getContentid();
+                int contentTypeId = getTourApi.get().getContenttypeid();
 
-            URI uri = UriComponentsBuilder.fromHttpUrl(detailIntroUrl)
-                    .queryParam("numOfRows", 2300)
-                    .queryParam("pageNo", 1)
-                    .queryParam("MobileOS", "WIN")
-                    .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
-                    .queryParam("_type", "json")
-                    .queryParam("serviceKey", serviceKey)
-                    .queryParam("contentId", contentId)
-                    .queryParam("contentTypeId", contentTypeId)
-                    .build(true)
-                    .toUri();
+                URI uri = UriComponentsBuilder.fromHttpUrl(detailIntroUrl)
+                        .queryParam("numOfRows", 2300)
+                        .queryParam("pageNo", 1)
+                        .queryParam("MobileOS", "WIN")
+                        .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
+                        .queryParam("_type", "json")
+                        .queryParam("serviceKey", serviceKey)
+                        .queryParam("contentId", contentId)
+                        .queryParam("contentTypeId", contentTypeId)
+                        .build(true)
+                        .toUri();
+                TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
+//                TourApiResponse response = webClient.get()
+//                        .uri(uri)
+//                        .retrieve()
+//                        .bodyToMono(TourApiResponse.class)
+//                        .block();
 
-            TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
-
-            if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                response.getResponse().getBody().getItems().getItem().forEach(item -> {
-                    Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
-                    tourApiOptional.ifPresent(tourApi -> {
-                        // contentTypeId에 따라 다른 컬럼 업데이트
-                        if (contentTypeId == 12) {
-                            tourApi.setAccomcount(item.getAccomcount());
-                            tourApi.setChkbabycarriage(item.getChkbabycarriage());
-                            tourApi.setChkcreditcard(item.getChkcreditcard());
-                            tourApi.setChkpet(item.getChkpet());
-                            tourApi.setExpagerange(item.getExpagerange());
-                            tourApi.setExpguide(item.getExpguide());
-                            tourApi.setHeritage1(item.getHeritage1());
-                            tourApi.setHeritage2(item.getHeritage2());
-                            tourApi.setHeritage3(item.getHeritage3());
-                            tourApi.setInfocenter(item.getInfocenter());
-                            tourApi.setOpendate(item.getOpendate());
-                            tourApi.setParking(item.getParking());
-                            tourApi.setRestdate(item.getRestdate());
-                            tourApi.setUseseason(item.getUseseason());
-                            tourApi.setUsetime(item.getUsetime());
-                        } else if (contentTypeId == 14) {
-                            tourApi.setAccomcountculture(item.getAccomcountculture());
-                            tourApi.setChkbabycarriageculture(item.getChkbabycarriageculture());
-                            tourApi.setChkcreditcardculture(item.getChkcreditcardculture());
-                            tourApi.setChkpetculture(item.getChkpetculture());
-                            tourApi.setDiscountinfo(item.getDiscountinfo());
-                            tourApi.setInfocenterculture(item.getInfocenterculture());
-                            tourApi.setParkingculture(item.getParkingculture());
-                            tourApi.setParkingfee(item.getParkingfee());
-                            tourApi.setRestdateculture(item.getRestdateculture());
-                            tourApi.setUsefee(item.getUsefee());
-                            tourApi.setUsetimeculture(item.getUsetimeculture());
-                            tourApi.setScale(item.getScale());
-                            tourApi.setSpendtime(item.getSpendtime());
-                        } else if (contentTypeId == 15) {
-                            tourApi.setAgelimit(item.getAgelimit());
-                            tourApi.setBookingplace(item.getBookingplace());
-                            tourApi.setDiscountinfofestival(item.getDiscountinfofestival());
-                            tourApi.setEventenddate(item.getEventenddate());
-                            tourApi.setEventhomepage(item.getEventhomepage());
-                            tourApi.setEventplace(item.getEventplace());
-                            tourApi.setEventstartdate(item.getEventstartdate());
-                            tourApi.setFestivalgrade(item.getFestivalgrade());
-                            tourApi.setPlaceinfo(item.getPlaceinfo());
-                            tourApi.setPlaytime(item.getPlaytime());
-                            tourApi.setProgram(item.getProgram());
-                            tourApi.setSpendtimefestival(item.getSpendtimefestival());
-                            tourApi.setSponsor1(item.getSponsor1());
-                            tourApi.setSponsor1tel(item.getSponsor1tel());
-                            tourApi.setSponsor2(item.getSponsor2());
-                            tourApi.setSponsor2tel(item.getSponsor2tel());
-                            tourApi.setSubevent(item.getSubevent());
-                            tourApi.setUsetimefestival(item.getUsetimefestival());
-                        } else if (contentTypeId == 25) {
-                            tourApi.setDistance(item.getDistance());
-                            tourApi.setInfocentertourcourse(item.getInfocentertourcourse());
-                            tourApi.setSchedule(item.getSchedule());
-                            tourApi.setTaketime(item.getTaketime());
-                            tourApi.setTheme(item.getTheme());
-                        } else if (contentTypeId == 28) {
-                            tourApi.setAccomcountleports(item.getAccomcountleports());
-                            tourApi.setChkbabycarriageleports(item.getChkbabycarriageleports());
-                            tourApi.setChkcreditcardleports(item.getChkcreditcardleports());
-                            tourApi.setChkpetleports(item.getChkpetleports());
-                            tourApi.setExpagerangeleports(item.getExpagerangeleports());
-                            tourApi.setInfocenterleports(item.getInfocenterleports());
-                            tourApi.setOpenperiod(item.getOpenperiod());
-                            tourApi.setParkingfeeleports(item.getParkingfeeleports());
-                            tourApi.setParkingleports(item.getParkingleports());
-                            tourApi.setReservation(item.getReservation());
-                            tourApi.setRestdateleports(item.getRestdateleports());
-                            tourApi.setScaleleports(item.getScaleleports());
-                            tourApi.setUsefeeleports(item.getUsefeeleports());
-                            tourApi.setUsetimeleports(item.getUsetimeleports());
-                        } else if (contentTypeId == 32) {
-                            tourApi.setAccomcountlodging(item.getAccomcountlodging());
-                            tourApi.setBenikia(item.getBenikia());
-                            tourApi.setCheckintime(item.getCheckintime());
-                            tourApi.setCheckouttime(item.getCheckouttime());
-                            tourApi.setChkcooking(item.getChkcooking());
-                            tourApi.setFoodplace(item.getFoodplace());
-                            tourApi.setGoodstay(item.getGoodstay());
-                            tourApi.setHanok(item.getHanok());
-                            tourApi.setInfocenterlodging(item.getInfocenterlodging());
-                            tourApi.setParkinglodging(item.getParkinglodging());
-                            tourApi.setPickup(item.getPickup());
-                            tourApi.setRoomcount(item.getRoomcount());
-                            tourApi.setReservationlodging(item.getReservationlodging());
-                            tourApi.setReservationurl(item.getReservationurl());
-                            tourApi.setRoomtype(item.getRoomtype());
-                            tourApi.setScalelodging(item.getScalelodging());
-                            tourApi.setSubfacility(item.getSubfacility());
-                            tourApi.setBarbecue(item.getBarbecue());
-                            tourApi.setBeauty(item.getBeauty());
-                            tourApi.setBeverage(item.getBeverage());
-                            tourApi.setBicycle(item.getBicycle());
-                            tourApi.setCampfire(item.getCampfire());
-                            tourApi.setFitness(item.getFitness());
-                            tourApi.setKaraoke(item.getKaraoke());
-                            tourApi.setPublicbath(item.getPublicbath());
-                            tourApi.setPublicpc(item.getPublicpc());
-                            tourApi.setSauna(item.getSauna());
-                            tourApi.setSeminar(item.getSeminar());
-                            tourApi.setSports(item.getSports());
-                            tourApi.setRefundregulation(item.getRefundregulation());
-                        } else if (contentTypeId == 38) {
-                            tourApi.setChkbabycarriageshopping(item.getChkbabycarriageshopping());
-                            tourApi.setChkcreditcardshopping(item.getChkcreditcardshopping());
-                            tourApi.setChkpetshopping(item.getChkpetshopping());
-                            tourApi.setCulturecenter(item.getCulturecenter());
-                            tourApi.setFairday(item.getFairday());
-                            tourApi.setInfocentershopping(item.getInfocentershopping());
-                            tourApi.setOpendateshopping(item.getOpendateshopping());
-                            tourApi.setOpentime(item.getOpentime());
-                            tourApi.setParkingshopping(item.getParkingshopping());
-                            tourApi.setRestdateshopping(item.getRestdateshopping());
-                            tourApi.setRestroom(item.getRestroom());
-                            tourApi.setSaleitem(item.getSaleitem());
-                            tourApi.setSaleitemcost(item.getSaleitemcost());
-                            tourApi.setScaleshopping(item.getScaleshopping());
-                            tourApi.setShopguide(item.getShopguide());
-                        } else if (contentTypeId == 39) {
-                            tourApi.setChkcreditcardfood(item.getChkcreditcardfood());
-                            tourApi.setDiscountinfofood(item.getDiscountinfofood());
-                            tourApi.setFirstmenu(item.getFirstmenu());
-                            tourApi.setInfocenterfood(item.getInfocenterfood());
-                            tourApi.setKidsfacility(item.getKidsfacility());
-                            tourApi.setOpendatefood(item.getOpendatefood());
-                            tourApi.setOpentimefood(item.getOpentimefood());
-                            tourApi.setPacking(item.getPacking());
-                            tourApi.setParkingfood(item.getParkingfood());
-                            tourApi.setReservationfood(item.getReservationfood());
-                            tourApi.setRestdatefood(item.getRestdatefood());
-                            tourApi.setScalefood(item.getScalefood());
-                            tourApi.setSeat(item.getSeat());
-                            tourApi.setSmoking(item.getSmoking());
-                            tourApi.setTreatmenu(item.getTreatmenu());
-                            tourApi.setLcnsno(item.getLcnsno());
-                        }
-                        tourApiRepository.save(tourApi);
+                if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                    response.getResponse().getBody().getItems().getItem().forEach(item -> {
+                        Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
+                        tourApiOptional.ifPresent(tourApi -> {
+                            updateTourApiFields(tourApi, item, contentTypeId);
+                            tourApiRepository.save(tourApi);
+                        });
                     });
-                });
+                }
             }
         }
+    }
 
-
+    private void updateTourApiFields(TourApi tourApi, TourApiResponse.Item item, int contentTypeId) {
+        switch (contentTypeId) {
+            case 12:
+                tourApi.setAccomcount(item.getAccomcount());
+                tourApi.setChkbabycarriage(item.getChkbabycarriage());
+                tourApi.setChkcreditcard(item.getChkcreditcard());
+                tourApi.setChkpet(item.getChkpet());
+                tourApi.setExpagerange(item.getExpagerange());
+                tourApi.setExpguide(item.getExpguide());
+                tourApi.setHeritage1(item.getHeritage1());
+                tourApi.setHeritage2(item.getHeritage2());
+                tourApi.setHeritage3(item.getHeritage3());
+                tourApi.setInfocenter(item.getInfocenter());
+                tourApi.setOpendate(item.getOpendate());
+                tourApi.setParking(item.getParking());
+                tourApi.setRestdate(item.getRestdate());
+                tourApi.setUseseason(item.getUseseason());
+                tourApi.setUsetime(item.getUsetime());
+                break;
+            case 14:
+                tourApi.setAccomcountculture(item.getAccomcountculture());
+                tourApi.setChkbabycarriageculture(item.getChkbabycarriageculture());
+                tourApi.setChkcreditcardculture(item.getChkcreditcardculture());
+                tourApi.setChkpetculture(item.getChkpetculture());
+                tourApi.setDiscountinfo(item.getDiscountinfo());
+                tourApi.setInfocenterculture(item.getInfocenterculture());
+                tourApi.setParkingculture(item.getParkingculture());
+                tourApi.setParkingfee(item.getParkingfee());
+                tourApi.setRestdateculture(item.getRestdateculture());
+                tourApi.setUsefee(item.getUsefee());
+                tourApi.setUsetimeculture(item.getUsetimeculture());
+                tourApi.setScale(item.getScale());
+                tourApi.setSpendtime(item.getSpendtime());
+                break;
+            case 15:
+                tourApi.setAgelimit(item.getAgelimit());
+                tourApi.setBookingplace(item.getBookingplace());
+                tourApi.setDiscountinfofestival(item.getDiscountinfofestival());
+                tourApi.setEventenddate(item.getEventenddate());
+                tourApi.setEventhomepage(item.getEventhomepage());
+                tourApi.setEventplace(item.getEventplace());
+                tourApi.setEventstartdate(item.getEventstartdate());
+                tourApi.setFestivalgrade(item.getFestivalgrade());
+                tourApi.setPlaceinfo(item.getPlaceinfo());
+                tourApi.setPlaytime(item.getPlaytime());
+                tourApi.setProgram(item.getProgram());
+                tourApi.setSpendtimefestival(item.getSpendtimefestival());
+                tourApi.setSponsor1(item.getSponsor1());
+                tourApi.setSponsor1tel(item.getSponsor1tel());
+                tourApi.setSponsor2(item.getSponsor2());
+                tourApi.setSponsor2tel(item.getSponsor2tel());
+                tourApi.setSubevent(item.getSubevent());
+                tourApi.setUsetimefestival(item.getUsetimefestival());
+                break;
+            case 25:
+                tourApi.setDistance(item.getDistance());
+                tourApi.setInfocentertourcourse(item.getInfocentertourcourse());
+                tourApi.setSchedule(item.getSchedule());
+                tourApi.setTaketime(item.getTaketime());
+                tourApi.setTheme(item.getTheme());
+                break;
+            case 28:
+                tourApi.setAccomcountleports(item.getAccomcountleports());
+                tourApi.setChkbabycarriageleports(item.getChkbabycarriageleports());
+                tourApi.setChkcreditcardleports(item.getChkcreditcardleports());
+                tourApi.setChkpetleports(item.getChkpetleports());
+                tourApi.setExpagerangeleports(item.getExpagerangeleports());
+                tourApi.setInfocenterleports(item.getInfocenterleports());
+                tourApi.setOpenperiod(item.getOpenperiod());
+                tourApi.setParkingfeeleports(item.getParkingfeeleports());
+                tourApi.setParkingleports(item.getParkingleports());
+                tourApi.setReservation(item.getReservation());
+                tourApi.setRestdateleports(item.getRestdateleports());
+                tourApi.setScaleleports(item.getScaleleports());
+                tourApi.setUsefeeleports(item.getUsefeeleports());
+                tourApi.setUsetimeleports(item.getUsetimeleports());
+                break;
+            case 32:
+                tourApi.setAccomcountlodging(item.getAccomcountlodging());
+                tourApi.setBenikia(item.getBenikia());
+                tourApi.setCheckintime(item.getCheckintime());
+                tourApi.setCheckouttime(item.getCheckouttime());
+                tourApi.setChkcooking(item.getChkcooking());
+                tourApi.setFoodplace(item.getFoodplace());
+                tourApi.setGoodstay(item.getGoodstay());
+                tourApi.setHanok(item.getHanok());
+                tourApi.setInfocenterlodging(item.getInfocenterlodging());
+                tourApi.setParkinglodging(item.getParkinglodging());
+                tourApi.setPickup(item.getPickup());
+                tourApi.setRoomcount(item.getRoomcount());
+                tourApi.setReservationlodging(item.getReservationlodging());
+                tourApi.setReservationurl(item.getReservationurl());
+                tourApi.setRoomtype(item.getRoomtype());
+                tourApi.setScalelodging(item.getScalelodging());
+                tourApi.setSubfacility(item.getSubfacility());
+                tourApi.setBarbecue(item.getBarbecue());
+                tourApi.setBeauty(item.getBeauty());
+                tourApi.setBeverage(item.getBeverage());
+                tourApi.setBicycle(item.getBicycle());
+                tourApi.setCampfire(item.getCampfire());
+                tourApi.setFitness(item.getFitness());
+                tourApi.setKaraoke(item.getKaraoke());
+                tourApi.setPublicbath(item.getPublicbath());
+                tourApi.setPublicpc(item.getPublicpc());
+                tourApi.setSauna(item.getSauna());
+                tourApi.setSeminar(item.getSeminar());
+                tourApi.setSports(item.getSports());
+                tourApi.setRefundregulation(item.getRefundregulation());
+                break;
+            case 38:
+                tourApi.setChkbabycarriageshopping(item.getChkbabycarriageshopping());
+                tourApi.setChkcreditcardshopping(item.getChkcreditcardshopping());
+                tourApi.setChkpetshopping(item.getChkpetshopping());
+                tourApi.setCulturecenter(item.getCulturecenter());
+                tourApi.setFairday(item.getFairday());
+                tourApi.setInfocentershopping(item.getInfocentershopping());
+                tourApi.setOpendateshopping(item.getOpendateshopping());
+                tourApi.setOpentime(item.getOpentime());
+                tourApi.setParkingshopping(item.getParkingshopping());
+                tourApi.setRestdateshopping(item.getRestdateshopping());
+                tourApi.setRestroom(item.getRestroom());
+                tourApi.setSaleitem(item.getSaleitem());
+                tourApi.setSaleitemcost(item.getSaleitemcost());
+                tourApi.setScaleshopping(item.getScaleshopping());
+                tourApi.setShopguide(item.getShopguide());
+                break;
+            case 39:
+                tourApi.setChkcreditcardfood(item.getChkcreditcardfood());
+                tourApi.setDiscountinfofood(item.getDiscountinfofood());
+                tourApi.setFirstmenu(item.getFirstmenu());
+                tourApi.setInfocenterfood(item.getInfocenterfood());
+                tourApi.setKidsfacility(item.getKidsfacility());
+                tourApi.setOpendatefood(item.getOpendatefood());
+                tourApi.setOpentimefood(item.getOpentimefood());
+                tourApi.setPacking(item.getPacking());
+                tourApi.setParkingfood(item.getParkingfood());
+                tourApi.setReservationfood(item.getReservationfood());
+                tourApi.setRestdatefood(item.getRestdatefood());
+                tourApi.setScalefood(item.getScalefood());
+                tourApi.setSeat(item.getSeat());
+                tourApi.setSmoking(item.getSmoking());
+                tourApi.setTreatmenu(item.getTreatmenu());
+                tourApi.setLcnsno(item.getLcnsno());
+                break;
+        }
     }
 
     private TourApi convertToEntity(TourApiResponse.Item item) {
@@ -718,4 +664,3 @@ public class TourApiServiceImpl implements TourApiService {
         }
     }
 }
-
