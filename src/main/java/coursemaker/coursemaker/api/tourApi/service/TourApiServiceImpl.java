@@ -195,7 +195,6 @@ public class TourApiServiceImpl implements TourApiService {
     }
 
     private void updateTourWithCommonDataRange(long start, long end) {
-        List<TourApi> tourList = tourApiRepository.findAll();
         for (long i = start; i <= end; i++) {
             Optional<TourApi> getTourApi = tourApiRepository.findById(i);
             long contentId = getTourApi.get().getContentid();
@@ -292,7 +291,6 @@ public class TourApiServiceImpl implements TourApiService {
     }
 
     private void updateTourWithIntroDataRange(long start, long end) {
-        List<TourApi> tourList = tourApiRepository.findAll();
         for (long i = start; i <= end; i++) {
             Optional<TourApi> getTourApi = tourApiRepository.findById(i);
             if (getTourApi.isPresent()) {
