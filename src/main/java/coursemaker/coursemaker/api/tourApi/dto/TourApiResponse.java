@@ -51,6 +51,8 @@ public class TourApiResponse {
         private String addr2;
         @Schema(description = "sigungucode", example = "16")
         private int sigungucode;
+        @Schema(description = "지역코드", example = "6")
+        private int areacode;
         @Schema(description = "대표이미지(원본)", example = "http://tong.visitkorea.or.kr/cms/resource/09/3020609_image2_1.jpg")
         private String firstimage;
         @Schema(description = "대표이미지(썸네일)", example = "http://tong.visitkorea.or.kr/cms/resource/09/3020609_image3_1.jpg")
@@ -73,6 +75,14 @@ public class TourApiResponse {
         private String cat3;
         @Schema(description = "콘텐츠타입 ID", example = "14")
         private int contenttypeid;
+        @Schema(description = "교과서속여행지 여부", example = "0")
+        private String booktour;
+
+        @Schema(description = "저작권 유형 Type1:제1유형(출처표시-권장), Type3:제3유형(제1유형 + 변경금지)", example = "Type3")
+        private String cpyrhtDivCd;
+
+        @Schema(description = "Map Level", example = "6")
+        private int mlevel;
 
 //        @Schema(description = "공공데이터 여행지 태그")
 //        private TagResponseDto tag;
@@ -80,6 +90,8 @@ public class TourApiResponse {
         @Schema(description = "무장애 여행지", example = "1")
         private int disabled;
 
+        @Schema(description = "telname")
+        private String telname;
         @Schema(description = "홈페이지")
         private String homepage;
         @Schema(description = "개요")
@@ -283,4 +295,3 @@ public class TourApiResponse {
 //        private String zipcode;
 //    }
 }
-
