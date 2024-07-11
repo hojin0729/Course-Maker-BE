@@ -4,9 +4,7 @@ import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 
 public interface WishService {
-    CourseWish addWish(CourseWish courseWish);
 
-    DestinationWish addDestinationWish(DestinationWish destinationWish);
 
     void decrementOrRemoveCourseWish(Long courseWish);
 
