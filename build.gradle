@@ -65,6 +65,9 @@ dependencies {
 	// aop
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+	//redis를 위한 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	//임시
 	implementation 'org.modelmapper:modelmapper:3.1.0'//객체 간의 필드 매핑을 자동으로 처리
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.2.2' //thymeleaf
