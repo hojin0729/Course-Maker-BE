@@ -1,13 +1,15 @@
 package coursemaker.coursemaker.config;
 
 
+import coursemaker.coursemaker.domain.auth.filter.EmailLoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -30,13 +33,14 @@ import java.util.Collections;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
         /*URL 접근 권한 설정*/
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .anyRequest().permitAll()
                 );
 
+        /*세션 무상태 설정*/
         http
                 .setSharedObject(SessionManagementConfigurer.class,
                 new SessionManagementConfigurer<HttpSecurity>()
@@ -75,11 +79,24 @@ public class SecurityConfig {
             }
         }));
 
+        /*로그인 필터 등록*/
+        http
+                .addFilterAt(
+                        new EmailLoginFilter(authenticationManager(authenticationConfiguration)),
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
 //        //oauth2
 //        http
 //                .oauth2Login(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    /*AuthenticationManager 등록*/
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
 

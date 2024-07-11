@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.List;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableAspectJAutoProxy// AOP enable
+@EnableAsync // 비동기 메서드 동작
 public class CoursemakerApplication {
 
 	public static void main(String[] args) {
@@ -72,5 +74,4 @@ public class CoursemakerApplication {
 		restTemplate.setMessageConverters(messageConverters);
 		return restTemplate;
 	}
-
 }

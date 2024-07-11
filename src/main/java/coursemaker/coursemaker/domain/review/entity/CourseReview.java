@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.review.entity;
 
 import coursemaker.coursemaker.BaseEntity;
+import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import lombok.Getter;
@@ -18,17 +19,23 @@ public class CourseReview extends BaseEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "description")
+    private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "memberId")
+    private Member member;
+
     @Column(name = "rating")
     private BigDecimal rating;
-
-    @Column(name = "text", columnDefinition = "TEXT")
-    private String text;
 
     @ManyToOne
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
 
-//    @ManyToOne
-//    @JoinColumn(name = "memberId")
-//    private Member member
+    @Column(name = "picture")
+    private String picture;
 }
