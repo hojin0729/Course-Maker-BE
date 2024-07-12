@@ -1,13 +1,18 @@
 package coursemaker.coursemaker.config;
 
 
+import coursemaker.coursemaker.domain.auth.filter.EmailLoginFilter;
+import coursemaker.coursemaker.domain.auth.filter.ExceptionHandlerFilter;
+import coursemaker.coursemaker.domain.auth.filter.JwtAuthenticationFilter;
+import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,6 +21,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -23,11 +29,14 @@ import java.util.Collections;
 
 //커스텀 순서 AF(authentication filter) -> AM(authentication manager)
 //         ->AP(authentication provider) -> US(userdetails service)
-@Configuration
-@RequiredArgsConstructor
-@EnableWebSecurity
 @Slf4j
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtProvider jwtProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,6 +46,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 );
 
+        /*세션 무상태 설정*/
         http
                 .setSharedObject(SessionManagementConfigurer.class,
                 new SessionManagementConfigurer<HttpSecurity>()
@@ -75,11 +85,36 @@ public class SecurityConfig {
             }
         }));
 
+        /*로그인 필터 등록*/
+        http
+                .addFilterAt(
+                        emailLoginFilter(),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(new ExceptionHandlerFilter(), EmailLoginFilter.class);
+        
+        /*JWT 검증 필터 등록*/
+        http
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), EmailLoginFilter.class);
+
 //        //oauth2
 //        http
 //                .oauth2Login(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    /*이메일 로그인 필터*/
+    private EmailLoginFilter emailLoginFilter() throws Exception {
+        EmailLoginFilter emailLoginFilter = new EmailLoginFilter(authenticationManager(authenticationConfiguration), jwtProvider);
+        emailLoginFilter.setFilterProcessesUrl("/v1/auth/login");
+        return emailLoginFilter;
+    }
+
+    /*AuthenticationManager 등록*/
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
 

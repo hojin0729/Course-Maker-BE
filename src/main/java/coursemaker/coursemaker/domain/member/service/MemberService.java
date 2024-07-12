@@ -37,6 +37,11 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
     }
 
+    public Member findByEmail(String email){
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + email));
+    }
+
 
     public Member updateUser(UpdateRequest updateRequest, String nickname) {
         updateRequest.validate(); // 검증 로직 추가
@@ -86,44 +91,6 @@ public class MemberService {
             log.error("Error occurred while deleting user with ID: {}", userId, e);
             throw new RuntimeException("회원 삭제 중 오류가 발생했습니다.");
         }
-    }
-
-    public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
-        LoginResponse loginResponse = new LoginResponse();
-
-//        Member loginUser = memberRepository.findByEmail(id)
-//                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + id));
-//        String encodedPassword = loginUser.getPassword();
-//        log.info("[SignInResult] Id : {}", id);
-//
-//        if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
-//            log.error("[SignInResult] 패스워드 불일치");
-//            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.", "Password: " + rawPassword);
-//        }
-//        log.info("[LogInResult] 패스워드 일치");
-//        log.info("[LogInResult] LogInResponse 객체 생성");
-//        String accessToken = jwtTokenProvider.createAccessToken(
-//                loginUser.getNickname()
-//        );
-//
-//        String refreshToken = jwtTokenProvider.createRefreshToken();
-//
-//        loginResponse = LoginResponse.builder()
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-//                .nickname(loginUser.getNickname())
-//                .build();
-//
-//
-//        log.info("[LogInResult] LogInResponse 객체에 값 주입");
-//        response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
-//
-//        /*db에 리프레시토큰이랑 엑세스토큰 저장*/
-//        refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
-//
-//        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
-        return loginResponse;
-
     }
 
     public LogoutResponse logout(HttpServletRequest request) {
@@ -215,10 +182,6 @@ public class MemberService {
                 .build();
 
         return validateEmailResponse;
-    }
-
-    public boolean checkExistByEmail(String email) {
-        return memberRepository.existsByEmail(email);
     }
 
 }
