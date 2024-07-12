@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
 
     public JoinResponseDto join(JoinRequestDto request){
         JoinResponseDto response = new JoinResponseDto();
@@ -57,26 +56,6 @@ public class AuthService {
 
         log.info("[Auth] 신규 회원가입(이메일). 닉네임: {}", member.getNickname());
 
-        return response;
-    }
-
-    // TODO: 로그인 로직 개발
-    // TODO: 시큐리티의 로그인/로그아웃 VS 직접 만드는 로그인/로그아웃
-    public LoginResponseDto login(LoginRequestDto request){
-        LoginResponseDto response = new LoginResponseDto();
-
-        /*회원 존재여부 검증*/
-        Member member = memberRepository.findByEmail(request.getLoginEmail())
-                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + request.getLoginEmail()));
-
-        /*비밀번호 일치 여부 검증*/
-        if(!passwordEncoder.matches(request.getPassword(), member.getPassword())){
-            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.", "Password: " + request.getPassword());
-        }
-
-        String access;
-
-        access = jwtProvider.createAccessToken(member.getNickname(), member.getRoles().name());
         return response;
     }
 
