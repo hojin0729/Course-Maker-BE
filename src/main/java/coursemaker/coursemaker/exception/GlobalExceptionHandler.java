@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.exception;
 
+import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
+import coursemaker.coursemaker.domain.auth.exception.UnAuthorizedException;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
@@ -19,8 +21,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnAuthorizedException e) {
         ErrorResponse response = new ErrorResponse();
 
         response.setErrorType("login required");
