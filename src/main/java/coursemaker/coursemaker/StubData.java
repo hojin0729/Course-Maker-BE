@@ -1119,8 +1119,8 @@ public class StubData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         MemberStubData();
-//        TagStubData();
-//        DestinationStubData();
-//        CourseStubData();
+        TagStubData();
+        DestinationStubData();
+        CourseStubData();
     }
 }

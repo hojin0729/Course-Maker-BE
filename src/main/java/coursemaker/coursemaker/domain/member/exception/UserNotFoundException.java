@@ -9,7 +9,7 @@ public class UserNotFoundException extends RootException {
     String message;
 
    public UserNotFoundException(String message, String logMessage) {
-       super(ErrorCode.NOT_FOUND_MEMBER, logMessage);
+       super(ErrorCode.NOT_FOUND_MEMBER, logMessage, message);
        this.message = message;
    }
 }
