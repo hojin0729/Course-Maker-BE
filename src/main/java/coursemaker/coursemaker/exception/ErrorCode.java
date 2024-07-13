@@ -29,11 +29,15 @@ public enum ErrorCode {
     /*Member 도메인 예외*/
     /* 회원가입, 로그인 시 */
     DUPLICATED_MEMBER(HttpStatus.CONFLICT, "Duplicated item", "이미 존재하는 아이디입니다.", "MEMBER-001"),
-    WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "Authentication failed", "비밀번호가 잘못되었습니다.", "MEMBER-002"),
-    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Invalid item", "회원 정보가 없습니다.", "MEMBER-003"),
-    ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "Illegal argument", "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004"),
-    UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-005"),
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Illegal argument", "토큰 형식이 잘못되었습니다.", "MEMBER-006");
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Invalid item", "회원 정보가 없습니다.", "MEMBER-002"),
+    ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "Illegal argument", "회원에 알맞은 인자값이 아닙니다.", "MEMBER-003"),
+    UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-004"),
+
+    /*Auth 도메인 예와*/
+    WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "Authentication failed", "비밀번호가 잘못되었습니다.", "AUTH-001"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "토큰이 만료됬습니다.", "AUTH-003");
+
 
 
 

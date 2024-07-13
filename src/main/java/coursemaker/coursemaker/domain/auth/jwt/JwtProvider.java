@@ -1,9 +1,7 @@
 package coursemaker.coursemaker.domain.auth.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
+import coursemaker.coursemaker.domain.auth.exception.InvalidTokenException;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +60,24 @@ public class JwtProvider {
                 .expiration(new Date(System.currentTimeMillis()+refreshTokenExpiration) )
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public TokenType getTokenType(String token) {
+        JwsHeader header = Jwts
+                .parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getHeader();
+
+        String keyId = header.getKeyId();
+        if(keyId.equals("access")) {
+            return TokenType.ACCESS_TOKEN;
+        } else if(keyId.equals("refresh")) {
+            return TokenType.REFRESH_TOKEN;
+        } else {
+            throw new InvalidTokenException("인증되지 않은 토큰 형태 입니다.", "인증되지 않은 토큰 형태: " + keyId);
+        }
     }
 
     public Boolean isExpired(String token){
