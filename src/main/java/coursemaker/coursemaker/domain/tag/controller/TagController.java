@@ -45,15 +45,7 @@ public class TagController {
     /*전체 태그 조회*/
     @Operation(summary = "전체 태그 조회")
     @GetMapping
-    public ResponseEntity<List<TagResponseDto>> getTags(@AuthenticationPrincipal Member member) {
-        if(member != null){
-            System.out.println("@@@@@@@@@@@@@@@@ member is not null");
-            System.out.println(member.getClass().getName());
-            System.out.println("member = " + member.getNickname());
-            System.out.println("member.getUsername() = " + member.getUsername());
-            System.out.println("member.getEmail() = " + member.getEmail());
-            System.out.println("member.getId() = " + member.getId());
-        }
+    public ResponseEntity<List<TagResponseDto>> getTags() {
         List<TagResponseDto> response = tagService.findAllTags();
         return ResponseEntity.ok().body(response);
     }

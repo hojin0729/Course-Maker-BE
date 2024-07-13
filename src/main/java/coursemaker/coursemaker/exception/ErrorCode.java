@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
+    UNKNOWN_ERROR(HttpStatus.BAD_REQUEST, "Unknown error", "예상치 못한 오류가 발생했습니다.", "UNKNOWN-001"),
+
     /*Tag 도메인 예외*/
     INVALID_TAG(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 태그가 없습니다.", "TAG-001"),
     DUPLICATED_TAG(HttpStatus.CONFLICT, "Duplicated item", "해당 태그가 이미 존재합니다.", "TAG-002"),
