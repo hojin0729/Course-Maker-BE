@@ -1,7 +1,10 @@
 package coursemaker.coursemaker.domain.auth.filter;
 
 import coursemaker.coursemaker.domain.auth.dto.CustomMemberDetails;
+import coursemaker.coursemaker.domain.auth.exception.ExpiredTokenException;
+import coursemaker.coursemaker.domain.auth.exception.InvalidTokenException;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
+import coursemaker.coursemaker.domain.auth.jwt.TokenType;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.entity.Role;
 import jakarta.servlet.FilterChain;
@@ -37,11 +40,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authorization.split(" ")[1];
 
+        /*access token 여부 검증*/
+        if(jwtProvider.getTokenType(token) != TokenType.ACCESS_TOKEN) {
+            log.error("[JWT] 토큰인증 실패: {}", jwtProvider.getTokenType(token));
+            throw new InvalidTokenException("인증되지 않은 토큰 형태 입니다.", "토큰 타입 인증 실패: " + jwtProvider.getTokenType(token));
+        }
         /*토큰 만료 여부 확인*/
         if(jwtProvider.isExpired(token)) {
-            log.info("[JWT] 토큰이 만료됬습니다.");
-            filterChain.doFilter(request, response);
-            return;
+            log.info("[JWT] access 토큰 만료: {}", jwtProvider.isExpired(token));
+            throw new ExpiredTokenException("토큰이 만료됬습니다.", "Access Token 만료됨.");
         }
 
         String nickname = jwtProvider.getNickname(token);

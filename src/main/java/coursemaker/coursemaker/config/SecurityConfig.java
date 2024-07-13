@@ -95,7 +95,8 @@ public class SecurityConfig {
         
         /*JWT 검증 필터 등록*/
         http
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), EmailLoginFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), EmailLoginFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
 
 //        //oauth2
 //        http
