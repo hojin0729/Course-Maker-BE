@@ -2,6 +2,9 @@ package coursemaker.coursemaker.config;
 
 
 import coursemaker.coursemaker.domain.auth.filter.EmailLoginFilter;
+import coursemaker.coursemaker.domain.auth.filter.ExceptionHandlerFilter;
+import coursemaker.coursemaker.domain.auth.filter.JwtAuthenticationFilter;
+import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +29,17 @@ import java.util.Collections;
 
 //커스텀 순서 AF(authentication filter) -> AM(authentication manager)
 //         ->AP(authentication provider) -> US(userdetails service)
-@Configuration
-@RequiredArgsConstructor
-@EnableWebSecurity
 @Slf4j
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtProvider jwtProvider;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         /*URL 접근 권한 설정*/
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
@@ -82,15 +88,28 @@ public class SecurityConfig {
         /*로그인 필터 등록*/
         http
                 .addFilterAt(
-                        new EmailLoginFilter(authenticationManager(authenticationConfiguration)),
+                        emailLoginFilter(),
                         UsernamePasswordAuthenticationFilter.class
-                );
+                )
+                .addFilterBefore(new ExceptionHandlerFilter(), EmailLoginFilter.class);
+        
+        /*JWT 검증 필터 등록*/
+        http
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), EmailLoginFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
 
 //        //oauth2
 //        http
 //                .oauth2Login(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    /*이메일 로그인 필터*/
+    private EmailLoginFilter emailLoginFilter() throws Exception {
+        EmailLoginFilter emailLoginFilter = new EmailLoginFilter(authenticationManager(authenticationConfiguration), jwtProvider);
+        emailLoginFilter.setFilterProcessesUrl("/v1/auth/login");
+        return emailLoginFilter;
     }
 
     /*AuthenticationManager 등록*/
