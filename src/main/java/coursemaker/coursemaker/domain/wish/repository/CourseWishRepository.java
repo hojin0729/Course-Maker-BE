@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CourseWishRepository extends JpaRepository<CourseWish, Long> {
+    CourseWish findByTravelCourseId(Long travelCourseId);
 }

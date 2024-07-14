@@ -14,7 +14,7 @@ public class DestinationWish {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "count")
+    @Column(name = "count") //찜된 횟수
     private Long count;
 
     @ManyToOne
