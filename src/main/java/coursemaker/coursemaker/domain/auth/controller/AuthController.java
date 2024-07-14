@@ -2,8 +2,9 @@ package coursemaker.coursemaker.domain.auth.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.JoinRequestDto;
 import coursemaker.coursemaker.domain.auth.dto.JoinResponseDto;
+import coursemaker.coursemaker.domain.auth.dto.LoginRequestDto;
+import coursemaker.coursemaker.domain.auth.dto.LoginResponseDto;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
-import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.service.EmailService;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.exception.ErrorResponse;
@@ -13,9 +14,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +34,7 @@ public class AuthController {
     private final EmailService emailService;
     private final AuthService authService;
 
-    @Operation(summary = "회원 생성", description = "회원가입을 진행합니다.")
+    @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원이 정상적으로 생성되었습니다."),
             @ApiResponse(responseCode = "400", description = "생성하려는 회원의 인자값이 올바르지 않을 때 반환합니다.", content = @Content(
@@ -54,41 +52,37 @@ public class AuthController {
                     )
             ))
     })
-    @PostMapping(value = "/join")
+    @PostMapping("/join")
     public ResponseEntity<JoinResponseDto> signUp(@Valid @RequestBody JoinRequestDto joinRequest) {
         JoinResponseDto joinResponse = authService.join(joinRequest);
         return ResponseEntity.ok().body(joinResponse);
     }
 
-//    @Operation(summary = "회원 로그인", description = "아이디와 비밀번호로 로그인한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다."),
-//            @ApiResponse(responseCode = "401", description = "인증 실패: 비밀번호가 잘못되었습니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 401, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 잘못되었습니다.\"}"
-//                    )
-//            )),
-//            @ApiResponse(responseCode = "404", description = "인증 실패: 사용자를 찾을 수 없습니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"회원 정보가 없습니다.\"}"
-//                    )
-//            ))
-//    })
-//    @PostMapping(value = "/login")
-//    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-//        String id = loginRequest.getLoginEmail();
-//        String password = loginRequest.getPassword();
-//        LoginResponse loginResponse = memberService.login(id, password, response);
-//        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, nickname : {}, token : {}", id, loginResponse.getNickname(), loginResponse.getAccessToken());
-//
-//        //TODO: 유저 정보 Cookie에 저장
-//        return ResponseEntity.ok().body(loginResponse);
-//    }
-//
+    /*스웨거용 더미 로그인 컨트롤러*/
+    @Operation(summary = "회원 로그인", description = "아이디와 비밀번호로 로그인한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다."),
+            @ApiResponse(responseCode = "401", description = "비밀번호가 잘못되었습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 일치하지 않습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "인증 실패: 사용자를 찾을 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 회원입니다.\"}"
+                    )
+            ))
+    })
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequest) {
+        return ResponseEntity.ok().body(null);
+    }
+
+
 //    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
 //    @ApiResponse(
 //            responseCode = "200", description = "정상적으로 로그아웃되었습니다."

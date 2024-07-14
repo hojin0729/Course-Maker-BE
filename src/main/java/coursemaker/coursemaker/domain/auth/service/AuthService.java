@@ -2,13 +2,19 @@ package coursemaker.coursemaker.domain.auth.service;
 
 import coursemaker.coursemaker.domain.auth.dto.JoinRequestDto;
 import coursemaker.coursemaker.domain.auth.dto.JoinResponseDto;
+import coursemaker.coursemaker.domain.auth.dto.LoginRequestDto;
+import coursemaker.coursemaker.domain.auth.dto.LoginResponseDto;
+import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
+import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.entity.Role;
 import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

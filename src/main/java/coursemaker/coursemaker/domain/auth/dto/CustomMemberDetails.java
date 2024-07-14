@@ -20,15 +20,10 @@ public class CustomMemberDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-        authorities.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return member.getRoles()
-                        .getRole();
-            }
-        });
+        authorities.add((GrantedAuthority) () -> member.getRoles()
+                .name());
 
-        return null;
+        return authorities;
     }
 
     @Override
@@ -38,7 +33,7 @@ public class CustomMemberDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return member.getNickname();
     }
 
     /*계정 만료 여부*/
