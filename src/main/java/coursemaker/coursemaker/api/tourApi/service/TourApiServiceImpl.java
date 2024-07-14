@@ -4,18 +4,25 @@ import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 import coursemaker.coursemaker.api.tourApi.repository.TourApiRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.yaml.snakeyaml.util.UriEncoder;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TourApiServiceImpl implements TourApiService {
@@ -34,46 +41,27 @@ public class TourApiServiceImpl implements TourApiService {
     @Value("${tourapi.disableTourUrl}")
     private String disableTourUrl;
 
-    private final RestTemplate restTemplate;
+    private final WebClient.Builder webClientBuilder;
     private final TourApiRepository tourApiRepository;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
     public TourApiResponse updateAndGetTour() {
-        // 1. 데이터 초기 업데이트
-        TourApiResponse response = initialUpdate();
+        CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
 
-        // 2. 비동기/병렬 데이터 업데이트
-        int totalSize = tourApiRepository.findAll().size();
-        CompletableFuture<Void> updateTasks = CompletableFuture.allOf(
-                CompletableFuture.runAsync(this::updateDisabledTours),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(1, (totalSize/10))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange((totalSize/10) + 1, ((totalSize/10) * 2))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 2) + 1, ((totalSize/10) * 3))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 3) + 1, ((totalSize/10) * 4))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 4) + 1, ((totalSize/10) * 5))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 5) + 1, ((totalSize/10) * 6))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 6) + 1, ((totalSize/10) * 7))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 7) + 1, ((totalSize/10) * 8))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 8) + 1, ((totalSize/10) * 9))),
-                CompletableFuture.runAsync(() -> updateTourWithCommonDataRange(((totalSize/10) * 9) + 1, totalSize)),
+        initialUpdateFuture
+                .thenComposeAsync(response -> CompletableFuture.runAsync(this::updateDisabledTours, executorService)
+                        .thenComposeAsync(aVoid -> {
+                            List<CompletableFuture<Void>> updateFutures = tourApiRepository.findAll().stream()
+                                    .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
+                                    .collect(Collectors.toList());
+                            return CompletableFuture.allOf(updateFutures.toArray(new CompletableFuture[0]))
+                                    .thenRunAsync(this::updateMissingData, executorService); // 추가적인 업데이트 수행
+                        }, executorService), executorService)
+                .join();
 
-                // 필요한 만큼 추가
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(1, (totalSize/10))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange((totalSize/10) + 1, ((totalSize/10) * 2))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 2) + 1, ((totalSize/10) * 3))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 3) + 1, ((totalSize/10) * 4))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 4) + 1, ((totalSize/10) * 5))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 5) + 1, ((totalSize/10) * 6))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 6) + 1, ((totalSize/10) * 7))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 7) + 1, ((totalSize/10) * 8))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 8) + 1, ((totalSize/10) * 9))),
-                CompletableFuture.runAsync(() -> updateTourWithIntroDataRange(((totalSize/10) * 9) + 1, totalSize))
-                // 필요한 만큼 추가
-        );
-
-        updateTasks.join(); // 모든 업데이트 작업이 완료될 때까지 대기
-
-        return response;
+        return initialUpdateFuture.join();
     }
 
     private TourApiResponse initialUpdate() {
@@ -87,27 +75,48 @@ public class TourApiServiceImpl implements TourApiService {
                 .queryParam("serviceKey", serviceKey)
                 .build(true)
                 .toUri();
-        TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
+        try {
+            TourApiResponse response = webClientBuilder.build().get()
+                    .uri(uri)
+                    .retrieve()
+                    .onStatus(status -> status.value() >= 400, clientResponse -> {
+                        log.error("Error response code: {}", clientResponse.statusCode().value());
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("Error body: {}", errorBody);
+                                    return Mono.error(new RuntimeException("Error response from API: " + clientResponse.statusCode().value() + " " + errorBody));
+                                });
+                    })
+                    .bodyToMono(TourApiResponse.class)
+                    .doOnNext(res -> log.debug("Received response: {}", res))
+                    .block();
 
-        if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-            List<TourApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
-                    .map(this::convertToEntity)
-                    .toList();
-            tourList.forEach(this::saveOrUpdateTour);
+            if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                List<TourApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
+                        .map(this::convertToEntity)
+                        .collect(Collectors.toList());
+                synchronized (this) {
+                    tourList.forEach(this::saveOrUpdateTour);
+                }
+            }
+            return response;
+        } catch (Exception e) {
+            log.error("Exception occurred while updating tours: ", e);
+            throw new RuntimeException("Failed to update tours", e);
         }
-        return response;
     }
 
-    @Async
-    public void updateTourWithCommonDataRange(long start, long end) {
-        for (long i = start; i <= end; i++) {
-            Optional<TourApi> getTourApi = tourApiRepository.findById(i);
-            if (getTourApi.isPresent()) {
-                long contentId = getTourApi.get().getContentid();
+    private void updateCommonData(long id) {
+        Optional<TourApi> getTourApi = tourApiRepository.findById(id);
+        if (getTourApi.isPresent()) {
+            long contentId = getTourApi.get().getContentid();
+            int pageNo = 1;
+            boolean moreData = true;
 
+            while (moreData) {
                 URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
-                        .queryParam("numOfRows", 2300)
-                        .queryParam("pageNo", 1)
+                        .queryParam("numOfRows", 100) // 한 페이지에 가져올 데이터 수
+                        .queryParam("pageNo", pageNo)
                         .queryParam("MobileOS", "WIN")
                         .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
                         .queryParam("_type", "json")
@@ -117,59 +126,101 @@ public class TourApiServiceImpl implements TourApiService {
                         .queryParam("contentId", contentId)
                         .build(true)
                         .toUri();
-                TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
 
-                if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                    response.getResponse().getBody().getItems().getItem().forEach(item -> {
-                        Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
-                        tourApiOptional.ifPresent(tourApi -> {
+                try {
+                    TourApiResponse response = webClientBuilder.build().get()
+                            .uri(uri)
+                            .retrieve()
+                            .onStatus(status -> status.value() >= 400, clientResponse -> {
+                                return clientResponse.bodyToMono(String.class)
+                                        .flatMap(errorBody -> Mono.error(new RuntimeException("Error response from API: " + clientResponse.statusCode().value() + " " + errorBody)));
+                            })
+                            .bodyToMono(TourApiResponse.class)
+                            .timeout(Duration.ofSeconds(10))
+                            .retryWhen(Retry.backoff(3, Duration.ofSeconds(10)))
+                            .block();
+
+                    if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                        List<TourApiResponse.Item> items = response.getResponse().getBody().getItems().getItem();
+                        items.forEach(item -> {
+                            Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
+                            tourApiOptional.ifPresent(tourApi -> {
+                                synchronized (this) {
+                                    tourApi.setHomepage(item.getHomepage());
+                                    tourApi.setOverview(item.getOverview());
+                                    tourApiRepository.save(tourApi);
+                                }
+                            });
+                        });
+
+                        if (items.size() < 100) {
+                            moreData = false; // 더 이상 데이터가 없으면 루프 종료
+                        } else {
+                            pageNo++; // 다음 페이지로 이동
+                        }
+                    } else {
+                        moreData = false; // 응답이 없거나 유효하지 않으면 루프 종료
+                    }
+                } catch (Exception e) {
+                    moreData = false; // 예외 발생 시 루프 종료
+                }
+            }
+        }
+    }
+
+    private void updateMissingData() {
+        List<TourApi> missingDataTours = tourApiRepository.findAll().stream()
+                .filter(tour -> tour.getOverview() == null)
+                .collect(Collectors.toList());
+
+        for (TourApi tour : missingDataTours) {
+            retryUpdateCommonData(tour.getContentid());
+        }
+    }
+
+    private void retryUpdateCommonData(long contentId) {
+        URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
+                .queryParam("numOfRows", 1)
+                .queryParam("pageNo", 1)
+                .queryParam("MobileOS", "WIN")
+                .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
+                .queryParam("_type", "json")
+                .queryParam("serviceKey", serviceKey)
+                .queryParam("defaultYN", "Y")
+                .queryParam("overviewYN", "Y")
+                .queryParam("contentId", contentId)
+                .build(true)
+                .toUri();
+
+        try {
+            TourApiResponse response = webClientBuilder.build().get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(TourApiResponse.class)
+                    .timeout(Duration.ofSeconds(10)) // 타임아웃 설정
+                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(10)))
+                    .block();
+
+            if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                response.getResponse().getBody().getItems().getItem().forEach(item -> {
+                    Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
+                    tourApiOptional.ifPresent(tourApi -> {
+                        synchronized (this) {
                             tourApi.setHomepage(item.getHomepage());
                             tourApi.setOverview(item.getOverview());
                             tourApiRepository.save(tourApi);
-                        });
+                        }
                     });
-                }
+                });
+            } else {
+                log.error("Invalid response for contentId: {}", contentId);
             }
+        } catch (Exception e) {
+            log.error("Exception occurred while retrying common data for contentId: {}", contentId, e);
         }
     }
 
-    @Async
-    public void updateTourWithIntroDataRange(long start, long end) {
-        for (long i = start; i <= end; i++) {
-            Optional<TourApi> getTourApi = tourApiRepository.findById(i);
-            if (getTourApi.isPresent()) {
-                long contentId = getTourApi.get().getContentid();
-                int contentTypeId = getTourApi.get().getContenttypeid();
-
-                URI uri = UriComponentsBuilder.fromHttpUrl(detailIntroUrl)
-                        .queryParam("numOfRows", 2300)
-                        .queryParam("pageNo", 1)
-                        .queryParam("MobileOS", "WIN")
-                        .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
-                        .queryParam("_type", "json")
-                        .queryParam("serviceKey", serviceKey)
-                        .queryParam("contentId", contentId)
-                        .queryParam("contentTypeId", contentTypeId)
-                        .build(true)
-                        .toUri();
-                TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
-
-                if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                    response.getResponse().getBody().getItems().getItem().forEach(item -> {
-                        Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
-                        tourApiOptional.ifPresent(tourApi -> {
-                            updateTourApiFields(tourApi, item, contentTypeId);
-                            tourApiRepository.save(tourApi);
-                        });
-                    });
-                }
-            }
-        }
-    }
-
-    @Override
-    @Async
-    public void updateDisabledTours() {
+    private void updateDisabledTours() {
         URI uri = UriComponentsBuilder.fromHttpUrl(disableTourUrl)
                 .queryParam("numOfRows", 2300)
                 .queryParam("pageNo", 1)
@@ -180,23 +231,28 @@ public class TourApiServiceImpl implements TourApiService {
                 .queryParam("serviceKey", serviceKey)
                 .build(true)
                 .toUri();
-        TourApiResponse response = restTemplate.getForObject(uri, TourApiResponse.class);
 
-        if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-            List<Long> disabledContentIds = response.getResponse().getBody().getItems().getItem().stream()
-                    .map(TourApiResponse.Item::getContentid)
-                    .toList();
+        webClientBuilder.build().get()
+                .uri(uri)
+                .retrieve()
+                .bodyToMono(TourApiResponse.class)
+                .subscribe(response -> {
+                    if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                        List<Long> disabledContentIds = response.getResponse().getBody().getItems().getItem().stream()
+                                .map(TourApiResponse.Item::getContentid)
+                                .collect(Collectors.toList());
 
-            List<TourApi> allTours = tourApiRepository.findAll();
-            allTours.forEach(tour -> {
-                if (disabledContentIds.contains(tour.getContentid())) {
-                    tour.setDisabled(1L);
-                } else {
-                    tour.setDisabled(null);
-                }
-                tourApiRepository.save(tour);
-            });
-        }
+                        List<TourApi> allTours = tourApiRepository.findAll();
+                        allTours.forEach(tour -> {
+                            if (disabledContentIds.contains(tour.getContentid())) {
+                                tour.setDisabled(1L);
+                            } else {
+                                tour.setDisabled(0L);
+                            }
+                            tourApiRepository.save(tour);
+                        });
+                    }
+                });
     }
 
     @Override
@@ -233,7 +289,7 @@ public class TourApiServiceImpl implements TourApiService {
                 .build();
     }
 
-    private void saveOrUpdateTour(TourApi tourApi) {
+    private synchronized void saveOrUpdateTour(TourApi tourApi) {
         Optional<TourApi> existingTour = tourApiRepository.findByContentid(tourApi.getContentid());
         if (existingTour.isPresent()) {
             TourApi existing = existingTour.get();
@@ -255,291 +311,9 @@ public class TourApiServiceImpl implements TourApiService {
             existing.setContenttypeid(tourApi.getContenttypeid());
             existing.setHomepage(tourApi.getHomepage());
             existing.setOverview(tourApi.getOverview());
-
-            // 업데이트된 필드들 추가
-            existing.setAccomcount(tourApi.getAccomcount());
-            existing.setChkbabycarriage(tourApi.getChkbabycarriage());
-            existing.setChkcreditcard(tourApi.getChkcreditcard());
-            existing.setChkpet(tourApi.getChkpet());
-            existing.setExpagerange(tourApi.getExpagerange());
-            existing.setExpguide(tourApi.getExpguide());
-            existing.setHeritage1(tourApi.getHeritage1());
-            existing.setHeritage2(tourApi.getHeritage2());
-            existing.setHeritage3(tourApi.getHeritage3());
-            existing.setInfocenter(tourApi.getInfocenter());
-            existing.setOpendate(tourApi.getOpendate());
-            existing.setParking(tourApi.getParking());
-            existing.setRestdate(tourApi.getRestdate());
-            existing.setUseseason(tourApi.getUseseason());
-            existing.setUsetime(tourApi.getUsetime());
-
-            existing.setAccomcountculture(tourApi.getAccomcountculture());
-            existing.setChkbabycarriageculture(tourApi.getChkbabycarriageculture());
-            existing.setChkcreditcardculture(tourApi.getChkcreditcardculture());
-            existing.setChkpetculture(tourApi.getChkpetculture());
-            existing.setDiscountinfo(tourApi.getDiscountinfo());
-            existing.setInfocenterculture(tourApi.getInfocenterculture());
-            existing.setParkingculture(tourApi.getParkingculture());
-            existing.setParkingfee(tourApi.getParkingfee());
-            existing.setRestdateculture(tourApi.getRestdateculture());
-            existing.setUsefee(tourApi.getUsefee());
-            existing.setUsetimeculture(tourApi.getUsetimeculture());
-            existing.setScale(tourApi.getScale());
-            existing.setSpendtime(tourApi.getSpendtime());
-
-            existing.setAgelimit(tourApi.getAgelimit());
-            existing.setBookingplace(tourApi.getBookingplace());
-            existing.setDiscountinfofestival(tourApi.getDiscountinfofestival());
-            existing.setEventenddate(tourApi.getEventenddate());
-            existing.setEventhomepage(tourApi.getEventhomepage());
-            existing.setEventplace(tourApi.getEventplace());
-            existing.setEventstartdate(tourApi.getEventstartdate());
-            existing.setFestivalgrade(tourApi.getFestivalgrade());
-            existing.setPlaceinfo(tourApi.getPlaceinfo());
-            existing.setPlaytime(tourApi.getPlaytime());
-            existing.setProgram(tourApi.getProgram());
-            existing.setSpendtimefestival(tourApi.getSpendtimefestival());
-            existing.setSponsor1(tourApi.getSponsor1());
-            existing.setSponsor1tel(tourApi.getSponsor1tel());
-            existing.setSponsor2(tourApi.getSponsor2());
-            existing.setSponsor2tel(tourApi.getSponsor2tel());
-            existing.setSubevent(tourApi.getSubevent());
-            existing.setUsetimefestival(tourApi.getUsetimefestival());
-
-            existing.setDistance(tourApi.getDistance());
-            existing.setInfocentertourcourse(tourApi.getInfocentertourcourse());
-            existing.setSchedule(tourApi.getSchedule());
-            existing.setTaketime(tourApi.getTaketime());
-            existing.setTheme(tourApi.getTheme());
-
-            existing.setAccomcountleports(tourApi.getAccomcountleports());
-            existing.setChkbabycarriageleports(tourApi.getChkbabycarriageleports());
-            existing.setChkcreditcardleports(tourApi.getChkcreditcardleports());
-            existing.setChkpetleports(tourApi.getChkpetleports());
-            existing.setExpagerangeleports(tourApi.getExpagerangeleports());
-            existing.setInfocenterleports(tourApi.getInfocenterleports());
-            existing.setOpenperiod(tourApi.getOpenperiod());
-            existing.setParkingfeeleports(tourApi.getParkingfeeleports());
-            existing.setParkingleports(tourApi.getParkingleports());
-            existing.setReservation(tourApi.getReservation());
-            existing.setRestdateleports(tourApi.getRestdateleports());
-            existing.setScaleleports(tourApi.getScaleleports());
-            existing.setUsefeeleports(tourApi.getUsefeeleports());
-            existing.setUsetimeleports(tourApi.getUsetimeleports());
-
-            existing.setAccomcountlodging(tourApi.getAccomcountlodging());
-            existing.setBenikia(tourApi.getBenikia());
-            existing.setCheckintime(tourApi.getCheckintime());
-            existing.setCheckouttime(tourApi.getCheckouttime());
-            existing.setChkcooking(tourApi.getChkcooking());
-            existing.setFoodplace(tourApi.getFoodplace());
-            existing.setGoodstay(tourApi.getGoodstay());
-            existing.setHanok(tourApi.getHanok());
-            existing.setInfocenterlodging(tourApi.getInfocenterlodging());
-            existing.setParkinglodging(tourApi.getParkinglodging());
-            existing.setPickup(tourApi.getPickup());
-            existing.setRoomcount(tourApi.getRoomcount());
-            existing.setReservationlodging(tourApi.getReservationlodging());
-            existing.setReservationurl(tourApi.getReservationurl());
-            existing.setRoomtype(tourApi.getRoomtype());
-            existing.setScalelodging(tourApi.getScalelodging());
-            existing.setSubfacility(tourApi.getSubfacility());
-            existing.setBarbecue(tourApi.getBarbecue());
-            existing.setBeauty(tourApi.getBeauty());
-            existing.setBeverage(tourApi.getBeverage());
-            existing.setBicycle(tourApi.getBicycle());
-            existing.setCampfire(tourApi.getCampfire());
-            existing.setFitness(tourApi.getFitness());
-            existing.setKaraoke(tourApi.getKaraoke());
-            existing.setPublicbath(tourApi.getPublicbath());
-            existing.setPublicpc(tourApi.getPublicpc());
-            existing.setSauna(tourApi.getSauna());
-            existing.setSeminar(tourApi.getSeminar());
-            existing.setSports(tourApi.getSports());
-            existing.setRefundregulation(tourApi.getRefundregulation());
-
-            existing.setChkbabycarriageshopping(tourApi.getChkbabycarriageshopping());
-            existing.setChkcreditcardshopping(tourApi.getChkcreditcardshopping());
-            existing.setChkpetshopping(tourApi.getChkpetshopping());
-            existing.setCulturecenter(tourApi.getCulturecenter());
-            existing.setFairday(tourApi.getFairday());
-            existing.setInfocentershopping(tourApi.getInfocentershopping());
-            existing.setOpendateshopping(tourApi.getOpendateshopping());
-            existing.setOpentime(tourApi.getOpentime());
-            existing.setParkingshopping(tourApi.getParkingshopping());
-            existing.setRestdateshopping(tourApi.getRestdateshopping());
-            existing.setRestroom(tourApi.getRestroom());
-            existing.setSaleitem(tourApi.getSaleitem());
-            existing.setSaleitemcost(tourApi.getSaleitemcost());
-            existing.setScaleshopping(tourApi.getScaleshopping());
-            existing.setShopguide(tourApi.getShopguide());
-
-            existing.setChkcreditcardfood(tourApi.getChkcreditcardfood());
-            existing.setDiscountinfofood(tourApi.getDiscountinfofood());
-            existing.setFirstmenu(tourApi.getFirstmenu());
-            existing.setInfocenterfood(tourApi.getInfocenterfood());
-            existing.setKidsfacility(tourApi.getKidsfacility());
-            existing.setOpendatefood(tourApi.getOpendatefood());
-            existing.setOpentimefood(tourApi.getOpentimefood());
-            existing.setPacking(tourApi.getPacking());
-            existing.setParkingfood(tourApi.getParkingfood());
-            existing.setReservationfood(tourApi.getReservationfood());
-            existing.setRestdatefood(tourApi.getRestdatefood());
-            existing.setScalefood(tourApi.getScalefood());
-            existing.setSeat(tourApi.getSeat());
-            existing.setSmoking(tourApi.getSmoking());
-            existing.setTreatmenu(tourApi.getTreatmenu());
-            existing.setLcnsno(tourApi.getLcnsno());
             tourApiRepository.save(existing);
         } else {
             tourApiRepository.save(tourApi);
-        }
-    }
-
-    private void updateTourApiFields(TourApi tourApi, TourApiResponse.Item item, int contentTypeId) {
-        switch (contentTypeId) {
-            case 12:
-                tourApi.setAccomcount(item.getAccomcount());
-                tourApi.setChkbabycarriage(item.getChkbabycarriage());
-                tourApi.setChkcreditcard(item.getChkcreditcard());
-                tourApi.setChkpet(item.getChkpet());
-                tourApi.setExpagerange(item.getExpagerange());
-                tourApi.setExpguide(item.getExpguide());
-                tourApi.setHeritage1(item.getHeritage1());
-                tourApi.setHeritage2(item.getHeritage2());
-                tourApi.setHeritage3(item.getHeritage3());
-                tourApi.setInfocenter(item.getInfocenter());
-                tourApi.setOpendate(item.getOpendate());
-                tourApi.setParking(item.getParking());
-                tourApi.setRestdate(item.getRestdate());
-                tourApi.setUseseason(item.getUseseason());
-                tourApi.setUsetime(item.getUsetime());
-                break;
-            case 14:
-                tourApi.setAccomcountculture(item.getAccomcountculture());
-                tourApi.setChkbabycarriageculture(item.getChkbabycarriageculture());
-                tourApi.setChkcreditcardculture(item.getChkcreditcardculture());
-                tourApi.setChkpetculture(item.getChkpetculture());
-                tourApi.setDiscountinfo(item.getDiscountinfo());
-                tourApi.setInfocenterculture(item.getInfocenterculture());
-                tourApi.setParkingculture(item.getParkingculture());
-                tourApi.setParkingfee(item.getParkingfee());
-                tourApi.setRestdateculture(item.getRestdateculture());
-                tourApi.setUsefee(item.getUsefee());
-                tourApi.setUsetimeculture(item.getUsetimeculture());
-                tourApi.setScale(item.getScale());
-                tourApi.setSpendtime(item.getSpendtime());
-                break;
-            case 15:
-                tourApi.setAgelimit(item.getAgelimit());
-                tourApi.setBookingplace(item.getBookingplace());
-                tourApi.setDiscountinfofestival(item.getDiscountinfofestival());
-                tourApi.setEventenddate(item.getEventenddate());
-                tourApi.setEventhomepage(item.getEventhomepage());
-                tourApi.setEventplace(item.getEventplace());
-                tourApi.setEventstartdate(item.getEventstartdate());
-                tourApi.setFestivalgrade(item.getFestivalgrade());
-                tourApi.setPlaceinfo(item.getPlaceinfo());
-                tourApi.setPlaytime(item.getPlaytime());
-                tourApi.setProgram(item.getProgram());
-                tourApi.setSpendtimefestival(item.getSpendtimefestival());
-                tourApi.setSponsor1(item.getSponsor1());
-                tourApi.setSponsor1tel(item.getSponsor1tel());
-                tourApi.setSponsor2(item.getSponsor2());
-                tourApi.setSponsor2tel(item.getSponsor2tel());
-                tourApi.setSubevent(item.getSubevent());
-                tourApi.setUsetimefestival(item.getUsetimefestival());
-                break;
-            case 25:
-                tourApi.setDistance(item.getDistance());
-                tourApi.setInfocentertourcourse(item.getInfocentertourcourse());
-                tourApi.setSchedule(item.getSchedule());
-                tourApi.setTaketime(item.getTaketime());
-                tourApi.setTheme(item.getTheme());
-                break;
-            case 28:
-                tourApi.setAccomcountleports(item.getAccomcountleports());
-                tourApi.setChkbabycarriageleports(item.getChkbabycarriageleports());
-                tourApi.setChkcreditcardleports(item.getChkcreditcardleports());
-                tourApi.setChkpetleports(item.getChkpetleports());
-                tourApi.setExpagerangeleports(item.getExpagerangeleports());
-                tourApi.setInfocenterleports(item.getInfocenterleports());
-                tourApi.setOpenperiod(item.getOpenperiod());
-                tourApi.setParkingfeeleports(item.getParkingfeeleports());
-                tourApi.setParkingleports(item.getParkingleports());
-                tourApi.setReservation(item.getReservation());
-                tourApi.setRestdateleports(item.getRestdateleports());
-                tourApi.setScaleleports(item.getScaleleports());
-                tourApi.setUsefeeleports(item.getUsefeeleports());
-                tourApi.setUsetimeleports(item.getUsetimeleports());
-                break;
-            case 32:
-                tourApi.setAccomcountlodging(item.getAccomcountlodging());
-                tourApi.setBenikia(item.getBenikia());
-                tourApi.setCheckintime(item.getCheckintime());
-                tourApi.setCheckouttime(item.getCheckouttime());
-                tourApi.setChkcooking(item.getChkcooking());
-                tourApi.setFoodplace(item.getFoodplace());
-                tourApi.setGoodstay(item.getGoodstay());
-                tourApi.setHanok(item.getHanok());
-                tourApi.setInfocenterlodging(item.getInfocenterlodging());
-                tourApi.setParkinglodging(item.getParkinglodging());
-                tourApi.setPickup(item.getPickup());
-                tourApi.setRoomcount(item.getRoomcount());
-                tourApi.setReservationlodging(item.getReservationlodging());
-                tourApi.setReservationurl(item.getReservationurl());
-                tourApi.setRoomtype(item.getRoomtype());
-                tourApi.setScalelodging(item.getScalelodging());
-                tourApi.setSubfacility(item.getSubfacility());
-                tourApi.setBarbecue(item.getBarbecue());
-                tourApi.setBeauty(item.getBeauty());
-                tourApi.setBeverage(item.getBeverage());
-                tourApi.setBicycle(item.getBicycle());
-                tourApi.setCampfire(item.getCampfire());
-                tourApi.setFitness(item.getFitness());
-                tourApi.setKaraoke(item.getKaraoke());
-                tourApi.setPublicbath(item.getPublicbath());
-                tourApi.setPublicpc(item.getPublicpc());
-                tourApi.setSauna(item.getSauna());
-                tourApi.setSeminar(item.getSeminar());
-                tourApi.setSports(item.getSports());
-                tourApi.setRefundregulation(item.getRefundregulation());
-                break;
-            case 38:
-                tourApi.setChkbabycarriageshopping(item.getChkbabycarriageshopping());
-                tourApi.setChkcreditcardshopping(item.getChkcreditcardshopping());
-                tourApi.setChkpetshopping(item.getChkpetshopping());
-                tourApi.setCulturecenter(item.getCulturecenter());
-                tourApi.setFairday(item.getFairday());
-                tourApi.setInfocentershopping(item.getInfocentershopping());
-                tourApi.setOpendateshopping(item.getOpendateshopping());
-                tourApi.setOpentime(item.getOpentime());
-                tourApi.setParkingshopping(item.getParkingshopping());
-                tourApi.setRestdateshopping(item.getRestdateshopping());
-                tourApi.setRestroom(item.getRestroom());
-                tourApi.setSaleitem(item.getSaleitem());
-                tourApi.setSaleitemcost(item.getSaleitemcost());
-                tourApi.setScaleshopping(item.getScaleshopping());
-                tourApi.setShopguide(item.getShopguide());
-                break;
-            case 39:
-                tourApi.setChkcreditcardfood(item.getChkcreditcardfood());
-                tourApi.setDiscountinfofood(item.getDiscountinfofood());
-                tourApi.setFirstmenu(item.getFirstmenu());
-                tourApi.setInfocenterfood(item.getInfocenterfood());
-                tourApi.setKidsfacility(item.getKidsfacility());
-                tourApi.setOpendatefood(item.getOpendatefood());
-                tourApi.setOpentimefood(item.getOpentimefood());
-                tourApi.setPacking(item.getPacking());
-                tourApi.setParkingfood(item.getParkingfood());
-                tourApi.setReservationfood(item.getReservationfood());
-                tourApi.setRestdatefood(item.getRestdatefood());
-                tourApi.setScalefood(item.getScalefood());
-                tourApi.setSeat(item.getSeat());
-                tourApi.setSmoking(item.getSmoking());
-                tourApi.setTreatmenu(item.getTreatmenu());
-                tourApi.setLcnsno(item.getLcnsno());
-                break;
         }
     }
 }
