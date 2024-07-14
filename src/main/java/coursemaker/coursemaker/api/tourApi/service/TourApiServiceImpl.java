@@ -3,6 +3,8 @@ package coursemaker.coursemaker.api.tourApi.service;
 import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 import coursemaker.coursemaker.api.tourApi.repository.TourApiRepository;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,8 @@ import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -43,22 +47,41 @@ public class TourApiServiceImpl implements TourApiService {
 
     private final WebClient.Builder webClientBuilder;
     private final TourApiRepository tourApiRepository;
+    private final DestinationRepository destinationRepository;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
     public TourApiResponse updateAndGetTour() {
+//        CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
+//
+//        // Initial update -> updateDisabledTours -> updateCommonData 순서로 실행
+//        initialUpdateFuture
+//                .thenComposeAsync(response -> CompletableFuture.runAsync(this::updateDisabledTours, executorService)
+//                        .thenComposeAsync(aVoid -> {
+//                            List<CompletableFuture<Void>> updateFutures = tourApiRepository.findAll().stream()
+//                                    .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
+//                                    .collect(Collectors.toList());
+//                            return CompletableFuture.allOf(updateFutures.toArray(new CompletableFuture[0]));
+//                        }, executorService), executorService)
+//                .thenRunAsync(this::convertAndSaveToDestination, executorService)
+//                .join();
+//
+//        return initialUpdateFuture.join();
+
         CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
 
+        // Initial update -> updateDisabledTours -> updateCommonData 순서로 실행
         initialUpdateFuture
                 .thenComposeAsync(response -> CompletableFuture.runAsync(this::updateDisabledTours, executorService)
                         .thenComposeAsync(aVoid -> {
-                            List<CompletableFuture<Void>> updateFutures = tourApiRepository.findAll().stream()
-                                    .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
-                                    .collect(Collectors.toList());
-                            return CompletableFuture.allOf(updateFutures.toArray(new CompletableFuture[0]))
-                                    .thenRunAsync(this::updateMissingData, executorService); // 추가적인 업데이트 수행
+                            // List<CompletableFuture<Void>> updateFutures = tourApiRepository.findAll().stream()
+                            //         .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
+                            //         .collect(Collectors.toList());
+                            // return CompletableFuture.allOf(updateFutures.toArray(new CompletableFuture[0]));
+                            return CompletableFuture.completedFuture(null);
                         }, executorService), executorService)
+                .thenRunAsync(this::convertAndSaveToDestination, executorService)
                 .join();
 
         return initialUpdateFuture.join();
@@ -106,120 +129,6 @@ public class TourApiServiceImpl implements TourApiService {
         }
     }
 
-    private void updateCommonData(long id) {
-        Optional<TourApi> getTourApi = tourApiRepository.findById(id);
-        if (getTourApi.isPresent()) {
-            long contentId = getTourApi.get().getContentid();
-            int pageNo = 1;
-            boolean moreData = true;
-
-            while (moreData) {
-                URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
-                        .queryParam("numOfRows", 100) // 한 페이지에 가져올 데이터 수
-                        .queryParam("pageNo", pageNo)
-                        .queryParam("MobileOS", "WIN")
-                        .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
-                        .queryParam("_type", "json")
-                        .queryParam("serviceKey", serviceKey)
-                        .queryParam("defaultYN", "Y")
-                        .queryParam("overviewYN", "Y")
-                        .queryParam("contentId", contentId)
-                        .build(true)
-                        .toUri();
-
-                try {
-                    TourApiResponse response = webClientBuilder.build().get()
-                            .uri(uri)
-                            .retrieve()
-                            .onStatus(status -> status.value() >= 400, clientResponse -> {
-                                return clientResponse.bodyToMono(String.class)
-                                        .flatMap(errorBody -> Mono.error(new RuntimeException("Error response from API: " + clientResponse.statusCode().value() + " " + errorBody)));
-                            })
-                            .bodyToMono(TourApiResponse.class)
-                            .timeout(Duration.ofSeconds(10))
-                            .retryWhen(Retry.backoff(3, Duration.ofSeconds(10)))
-                            .block();
-
-                    if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                        List<TourApiResponse.Item> items = response.getResponse().getBody().getItems().getItem();
-                        items.forEach(item -> {
-                            Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
-                            tourApiOptional.ifPresent(tourApi -> {
-                                synchronized (this) {
-                                    tourApi.setHomepage(item.getHomepage());
-                                    tourApi.setOverview(item.getOverview());
-                                    tourApiRepository.save(tourApi);
-                                }
-                            });
-                        });
-
-                        if (items.size() < 100) {
-                            moreData = false; // 더 이상 데이터가 없으면 루프 종료
-                        } else {
-                            pageNo++; // 다음 페이지로 이동
-                        }
-                    } else {
-                        moreData = false; // 응답이 없거나 유효하지 않으면 루프 종료
-                    }
-                } catch (Exception e) {
-                    moreData = false; // 예외 발생 시 루프 종료
-                }
-            }
-        }
-    }
-
-    private void updateMissingData() {
-        List<TourApi> missingDataTours = tourApiRepository.findAll().stream()
-                .filter(tour -> tour.getOverview() == null)
-                .collect(Collectors.toList());
-
-        for (TourApi tour : missingDataTours) {
-            retryUpdateCommonData(tour.getContentid());
-        }
-    }
-
-    private void retryUpdateCommonData(long contentId) {
-        URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
-                .queryParam("numOfRows", 1)
-                .queryParam("pageNo", 1)
-                .queryParam("MobileOS", "WIN")
-                .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
-                .queryParam("_type", "json")
-                .queryParam("serviceKey", serviceKey)
-                .queryParam("defaultYN", "Y")
-                .queryParam("overviewYN", "Y")
-                .queryParam("contentId", contentId)
-                .build(true)
-                .toUri();
-
-        try {
-            TourApiResponse response = webClientBuilder.build().get()
-                    .uri(uri)
-                    .retrieve()
-                    .bodyToMono(TourApiResponse.class)
-                    .timeout(Duration.ofSeconds(10)) // 타임아웃 설정
-                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(10)))
-                    .block();
-
-            if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                response.getResponse().getBody().getItems().getItem().forEach(item -> {
-                    Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
-                    tourApiOptional.ifPresent(tourApi -> {
-                        synchronized (this) {
-                            tourApi.setHomepage(item.getHomepage());
-                            tourApi.setOverview(item.getOverview());
-                            tourApiRepository.save(tourApi);
-                        }
-                    });
-                });
-            } else {
-                log.error("Invalid response for contentId: {}", contentId);
-            }
-        } catch (Exception e) {
-            log.error("Exception occurred while retrying common data for contentId: {}", contentId, e);
-        }
-    }
-
     private void updateDisabledTours() {
         URI uri = UriComponentsBuilder.fromHttpUrl(disableTourUrl)
                 .queryParam("numOfRows", 2300)
@@ -255,6 +164,120 @@ public class TourApiServiceImpl implements TourApiService {
                 });
     }
 
+//    private void updateCommonData(long id) {
+//        Optional<TourApi> getTourApi = tourApiRepository.findById(id);
+//        if (getTourApi.isPresent()) {
+//            long contentId = getTourApi.get().getContentid();
+//            int pageNo = 1;
+//            boolean moreData = true;
+//
+//            while (moreData) {
+//                URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
+//                        .queryParam("numOfRows", 100) // 한 페이지에 가져올 데이터 수
+//                        .queryParam("pageNo", pageNo)
+//                        .queryParam("MobileOS", "WIN")
+//                        .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
+//                        .queryParam("_type", "json")
+//                        .queryParam("serviceKey", serviceKey)
+//                        .queryParam("defaultYN", "Y")
+//                        .queryParam("overviewYN", "Y")
+//                        .queryParam("contentId", contentId)
+//                        .build(true)
+//                        .toUri();
+//
+//                try {
+//                    TourApiResponse response = webClientBuilder.build().get()
+//                            .uri(uri)
+//                            .retrieve()
+//                            .onStatus(status -> status.value() >= 400, clientResponse -> {
+//                                return clientResponse.bodyToMono(String.class)
+//                                        .flatMap(errorBody -> Mono.error(new RuntimeException("Error response from API: " + clientResponse.statusCode().value() + " " + errorBody)));
+//                            })
+//                            .bodyToMono(TourApiResponse.class)
+//                            .timeout(Duration.ofSeconds(10))
+//                            .retryWhen(Retry.backoff(3, Duration.ofSeconds(10)))
+//                            .block();
+//
+//                    if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+//                        List<TourApiResponse.Item> items = response.getResponse().getBody().getItems().getItem();
+//                        items.forEach(item -> {
+//                            Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
+//                            tourApiOptional.ifPresent(tourApi -> {
+//                                synchronized (this) {
+//                                    tourApi.setHomepage(item.getHomepage());
+//                                    tourApi.setOverview(item.getOverview());
+//                                    tourApiRepository.save(tourApi);
+//                                }
+//                            });
+//                        });
+//
+//                        if (items.size() < 100) {
+//                            moreData = false; // 더 이상 데이터가 없으면 루프 종료
+//                        } else {
+//                            pageNo++; // 다음 페이지로 이동
+//                        }
+//                    } else {
+//                        moreData = false; // 응답이 없거나 유효하지 않으면 루프 종료
+//                    }
+//                } catch (Exception e) {
+//                    moreData = false; // 예외 발생 시 루프 종료
+//                }
+//            }
+//        }
+//    }
+
+//    private void updateMissingData() {
+//        List<TourApi> missingDataTours = tourApiRepository.findAll().stream()
+//                .filter(tour -> tour.getOverview() == null)
+//                .collect(Collectors.toList());
+//
+//        for (TourApi tour : missingDataTours) {
+//            retryUpdateCommonData(tour.getContentid());
+//        }
+//    }
+
+//    private void retryUpdateCommonData(long contentId) {
+//        URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
+//                .queryParam("numOfRows", 1)
+//                .queryParam("pageNo", 1)
+//                .queryParam("MobileOS", "WIN")
+//                .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
+//                .queryParam("_type", "json")
+//                .queryParam("serviceKey", serviceKey)
+//                .queryParam("defaultYN", "Y")
+//                .queryParam("overviewYN", "Y")
+//                .queryParam("contentId", contentId)
+//                .build(true)
+//                .toUri();
+//
+//        try {
+//            TourApiResponse response = webClientBuilder.build().get()
+//                    .uri(uri)
+//                    .retrieve()
+//                    .bodyToMono(TourApiResponse.class)
+//                    .timeout(Duration.ofSeconds(10)) // 타임아웃 설정
+//                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(10)))
+//                    .block();
+//
+//            if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+//                response.getResponse().getBody().getItems().getItem().forEach(item -> {
+//                    Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
+//                    tourApiOptional.ifPresent(tourApi -> {
+//                        synchronized (this) {
+//                            tourApi.setHomepage(item.getHomepage());
+//                            tourApi.setOverview(item.getOverview());
+//                            tourApiRepository.save(tourApi);
+//                        }
+//                    });
+//                });
+//            } else {
+//                log.error("Invalid response for contentId: {}", contentId);
+//            }
+//        } catch (Exception e) {
+//            log.error("Exception occurred while retrying common data for contentId: {}", contentId, e);
+//        }
+//    }
+
     @Override
     public List<TourApi> getAllTours() {
         return tourApiRepository.findAll();
@@ -263,6 +286,29 @@ public class TourApiServiceImpl implements TourApiService {
     @Override
     public Optional<TourApi> getTourById(Long id) {
         return tourApiRepository.findById(id);
+    }
+
+    private void convertAndSaveToDestination() {
+        List<TourApi> tourApis = tourApiRepository.findAll();
+        tourApis.forEach(tourApi -> {
+            Destination destination = new Destination();
+            destination.setName(tourApi.getTitle());
+            destination.setPictureLink(tourApi.getFirstimage());
+            destination.setViews(0);
+            destination.setContent(tourApi.getOverview());
+            destination.setLocation(tourApi.getAddr1());
+            destination.setLongitude(tourApi.getMapx());
+            destination.setLatitude(tourApi.getMapy());
+
+            // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+            LocalDateTime createdAt = LocalDateTime.parse(tourApi.getCreatedtime(), formatter);
+            LocalDateTime updatedAt = LocalDateTime.parse(tourApi.getModifiedtime(), formatter);
+            destination.setCreatedAt(createdAt);
+            destination.setUpdatedAt(updatedAt);
+
+            destinationRepository.save(destination);
+        });
     }
 
     private TourApi convertToEntity(TourApiResponse.Item item) {
