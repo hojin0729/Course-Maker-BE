@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface CourseWishRepository extends JpaRepository<CourseWish, Long> {
-    CourseWish findByTravelCourseId(Long travelCourseId);
     List<CourseWish> findByMember_Nickname(String nickname);
 
     Optional<CourseWish> findByTravelCourseIdAndMemberId(Long courseId, Long memberId);
