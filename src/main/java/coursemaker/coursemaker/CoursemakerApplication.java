@@ -106,14 +106,4 @@ public class CoursemakerApplication {
 	public WebClient webClient(WebClient.Builder builder) {
 		return builder.build();
 	}
-
-//	@Bean
-//	public RestTemplate restTemplate() {
-//		RestTemplate restTemplate = new RestTemplate();
-//		List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-//		messageConverters.add(new MappingJackson2HttpMessageConverter());
-//		messageConverters.add(new MappingJackson2XmlHttpMessageConverter()); // XML 처리기 추가
-//		restTemplate.setMessageConverters(messageConverters);
-//		return restTemplate;
-//	}
 }
