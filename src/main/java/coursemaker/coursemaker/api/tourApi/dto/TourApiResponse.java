@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -25,7 +26,7 @@ public class TourApiResponse {
 
     @Data
     public static class Body {
-        private Items items;
+        private Items items = new Items(); // 변경된 부분: items 필드를 기본 초기화
         private int numOfRows;
         private int pageNo;
         private int totalCount;
@@ -33,7 +34,7 @@ public class TourApiResponse {
 
     @Data
     public static class Items {
-        private List<Item> item;
+        private List<Item> item = new ArrayList<>(); // 변경된 부분: item 필드를 기본 초기화
     }
 
     @Data
@@ -97,147 +98,147 @@ public class TourApiResponse {
         @Schema(description = "개요")
         private String overview;
 
-        // 필드 추가: contentTypeId = 12 (관광지)
-        private String accomcount;
-        private String chkbabycarriage;
-        private String chkcreditcard;
-        private String chkpet;
-        private String expagerange;
-        private String expguide;
-        private int heritage1;
-        private int heritage2;
-        private int heritage3;
-        private String infocenter;
-        private String opendate;
-        private String parking;
-        private String restdate;
-        private String useseason;
-        private String usetime;
-
-        // 필드 추가: contentTypeId = 14 (문화시설)
-        private String accomcountculture;
-        private String chkbabycarriageculture;
-        private String chkcreditcardculture;
-        private String chkpetculture;
-        private String discountinfo;
-        private String infocenterculture;
-        private String parkingculture;
-        private String parkingfee;
-        private String restdateculture;
-        private String usefee;
-        private String usetimeculture;
-        private String scale;
-        private String spendtime;
-
-        // 필드 추가: contentTypeId = 15 (행사/공연/축제)
-        private String agelimit;
-        private String bookingplace;
-        private String discountinfofestival;
-        private String eventenddate;
-        private String eventhomepage;
-        private String eventplace;
-        private String eventstartdate;
-        private String festivalgrade;
-        private String placeinfo;
-        private String playtime;
-        private String program;
-        private String spendtimefestival;
-        private String sponsor1;
-        private String sponsor1tel;
-        private String sponsor2;
-        private String sponsor2tel;
-        private String subevent;
-        private String usetimefestival;
-
-        // 필드 추가: contentTypeId = 25 (여행코스)
-        private String distance;
-        private String infocentertourcourse;
-        private String schedule;
-        private String taketime;
-        private String theme;
-
-        // 필드 추가: contentTypeId = 28 (레포츠)
-        private String accomcountleports;
-        private String chkbabycarriageleports;
-        private String chkcreditcardleports;
-        private String chkpetleports;
-        private String expagerangeleports;
-        private String infocenterleports;
-        private String openperiod;
-        private String parkingfeeleports;
-        private String parkingleports;
-        private String reservation;
-        private String restdateleports;
-        private String scaleleports;
-        private String usefeeleports;
-        private String usetimeleports;
-
-        // 필드 추가: contentTypeId = 32 (숙박)
-        private String accomcountlodging;
-        private String benikia;
-        private String checkintime;
-        private String checkouttime;
-        private String chkcooking;
-        private String foodplace;
-        private String goodstay;
-        private String hanok;
-        private String infocenterlodging;
-        private String parkinglodging;
-        private String pickup;
-        private String roomcount;
-        private String reservationlodging;
-        private String reservationurl;
-        private String roomtype;
-        private String scalelodging;
-        private String subfacility;
-        private String barbecue;
-        private String beauty;
-        private String beverage;
-        private String bicycle;
-        private String campfire;
-        private String fitness;
-        private String karaoke;
-        private String publicbath;
-        private String publicpc;
-        private String sauna;
-        private String seminar;
-        private String sports;
-        private String refundregulation;
-
-        // 필드 추가: contentTypeId = 38 (쇼핑)
-        private String chkbabycarriageshopping;
-        private String chkcreditcardshopping;
-        private String chkpetshopping;
-        private String culturecenter;
-        private String fairday;
-        private String infocentershopping;
-        private String opendateshopping;
-        private String opentime;
-        private String parkingshopping;
-        private String restdateshopping;
-        private String restroom;
-        private String saleitem;
-        private String saleitemcost;
-        private String scaleshopping;
-        private String shopguide;
-
-        // 필드 추가: contentTypeId = 39 (음식점)
-        private String chkcreditcardfood;
-        private String discountinfofood;
-        private String firstmenu;
-        private String infocenterfood;
-        private String kidsfacility;
-        private String opendatefood;
-        private String opentimefood;
-        private String packing;
-        private String parkingfood;
-        private String reservationfood;
-        private String restdatefood;
-        private String scalefood;
-        private String seat;
-        private String smoking;
-        private String treatmenu;
-        private String lcnsno;
+//        // 필드 추가: contentTypeId = 12 (관광지)
+//        private String accomcount;
+//        private String chkbabycarriage;
+//        private String chkcreditcard;
+//        private String chkpet;
+//        private String expagerange;
+//        private String expguide;
+//        private int heritage1;
+//        private int heritage2;
+//        private int heritage3;
+//        private String infocenter;
+//        private String opendate;
+//        private String parking;
+//        private String restdate;
+//        private String useseason;
+//        private String usetime;
+//
+//        // 필드 추가: contentTypeId = 14 (문화시설)
+//        private String accomcountculture;
+//        private String chkbabycarriageculture;
+//        private String chkcreditcardculture;
+//        private String chkpetculture;
+//        private String discountinfo;
+//        private String infocenterculture;
+//        private String parkingculture;
+//        private String parkingfee;
+//        private String restdateculture;
+//        private String usefee;
+//        private String usetimeculture;
+//        private String scale;
+//        private String spendtime;
+//
+//        // 필드 추가: contentTypeId = 15 (행사/공연/축제)
+//        private String agelimit;
+//        private String bookingplace;
+//        private String discountinfofestival;
+//        private String eventenddate;
+//        private String eventhomepage;
+//        private String eventplace;
+//        private String eventstartdate;
+//        private String festivalgrade;
+//        private String placeinfo;
+//        private String playtime;
+//        private String program;
+//        private String spendtimefestival;
+//        private String sponsor1;
+//        private String sponsor1tel;
+//        private String sponsor2;
+//        private String sponsor2tel;
+//        private String subevent;
+//        private String usetimefestival;
+//
+//        // 필드 추가: contentTypeId = 25 (여행코스)
+//        private String distance;
+//        private String infocentertourcourse;
+//        private String schedule;
+//        private String taketime;
+//        private String theme;
+//
+//        // 필드 추가: contentTypeId = 28 (레포츠)
+//        private String accomcountleports;
+//        private String chkbabycarriageleports;
+//        private String chkcreditcardleports;
+//        private String chkpetleports;
+//        private String expagerangeleports;
+//        private String infocenterleports;
+//        private String openperiod;
+//        private String parkingfeeleports;
+//        private String parkingleports;
+//        private String reservation;
+//        private String restdateleports;
+//        private String scaleleports;
+//        private String usefeeleports;
+//        private String usetimeleports;
+//
+//        // 필드 추가: contentTypeId = 32 (숙박)
+//        private String accomcountlodging;
+//        private String benikia;
+//        private String checkintime;
+//        private String checkouttime;
+//        private String chkcooking;
+//        private String foodplace;
+//        private String goodstay;
+//        private String hanok;
+//        private String infocenterlodging;
+//        private String parkinglodging;
+//        private String pickup;
+//        private String roomcount;
+//        private String reservationlodging;
+//        private String reservationurl;
+//        private String roomtype;
+//        private String scalelodging;
+//        private String subfacility;
+//        private String barbecue;
+//        private String beauty;
+//        private String beverage;
+//        private String bicycle;
+//        private String campfire;
+//        private String fitness;
+//        private String karaoke;
+//        private String publicbath;
+//        private String publicpc;
+//        private String sauna;
+//        private String seminar;
+//        private String sports;
+//        private String refundregulation;
+//
+//        // 필드 추가: contentTypeId = 38 (쇼핑)
+//        private String chkbabycarriageshopping;
+//        private String chkcreditcardshopping;
+//        private String chkpetshopping;
+//        private String culturecenter;
+//        private String fairday;
+//        private String infocentershopping;
+//        private String opendateshopping;
+//        private String opentime;
+//        private String parkingshopping;
+//        private String restdateshopping;
+//        private String restroom;
+//        private String saleitem;
+//        private String saleitemcost;
+//        private String scaleshopping;
+//        private String shopguide;
+//
+//        // 필드 추가: contentTypeId = 39 (음식점)
+//        private String chkcreditcardfood;
+//        private String discountinfofood;
+//        private String firstmenu;
+//        private String infocenterfood;
+//        private String kidsfacility;
+//        private String opendatefood;
+//        private String opentimefood;
+//        private String packing;
+//        private String parkingfood;
+//        private String reservationfood;
+//        private String restdatefood;
+//        private String scalefood;
+//        private String seat;
+//        private String smoking;
+//        private String treatmenu;
+//        private String lcnsno;
     }
 
     // 호진님이 작업하셨었던 코드

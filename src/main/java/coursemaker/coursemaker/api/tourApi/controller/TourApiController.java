@@ -15,6 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/v1/tours")
 @RequiredArgsConstructor
+@io.swagger.v3.oas.annotations.tags.Tag(name = "TourApi", description = "백엔드에서만 내부적으로 사용하는 API 입니다.")
 public class TourApiController {
 
     private final TourApiService tourApiService;

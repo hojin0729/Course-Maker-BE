@@ -5,14 +5,13 @@ import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface TourApiService {
 
-    // TagResponseDto findTagByName(String name);
     TourApiResponse updateAndGetTour();
     Optional<TourApi> getTourById(Long id);
     List<TourApi> getAllTours();
-    void updateDisabledTours();
 //    void updateTourWithCommonData1();
 //    void updateTourWithCommonData2();
 //    void updateTourWithCommonData3();
