@@ -8,9 +8,9 @@ public interface CourseWishService {
 
     List<CourseWish> getAllCourseWishes();
 
-    CourseWish getCourseWishById(Long id);
+    List<CourseWish> getCourseWishesByNickname(String nickname);
 
-    CourseWish addCourseWish(Long courseId);
-    /* 찜하기 취소 */
-    void cancelCourseWish(Long courseId);
+    CourseWish addCourseWish(Long courseId, Long memberId);
+
+    void cancelCourseWish(Long courseId, Long memberId);
 }

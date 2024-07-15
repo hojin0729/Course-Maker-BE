@@ -4,7 +4,13 @@ import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface CourseWishRepository extends JpaRepository<CourseWish, Long> {
     CourseWish findByTravelCourseId(Long travelCourseId);
+    List<CourseWish> findByMember_Nickname(String nickname);
+
+    Optional<CourseWish> findByTravelCourseIdAndMemberId(Long courseId, Long memberId);
 }

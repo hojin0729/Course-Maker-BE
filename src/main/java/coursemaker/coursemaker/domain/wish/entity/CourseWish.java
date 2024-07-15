@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.wish.entity;
 
+import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import lombok.Getter;
@@ -14,15 +15,12 @@ public class CourseWish {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "count") // 찜된 횟수
-    private Long count;
-
     @ManyToOne
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
 
-//    @OneToOne
-//    @JoinColumn("memberId")
-//    private Member member
+    @ManyToOne
+    @JoinColumn(name = "memberId")
+    private Member member;
 
 }

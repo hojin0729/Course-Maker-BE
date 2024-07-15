@@ -5,6 +5,7 @@ import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,29 +22,35 @@ public class CourseWishController {
     private CourseWish courseWish;
 
     /*코스찜 등록*/
-    @Operation(summary = "코스 찜하기")
     @PostMapping
-    public ResponseEntity<Void> addCourseWish(@Valid @RequestBody ) {
-        List<CourseWish> response = courseWishService.findAllWishes();
-        return ResponseEntity.created();
+    public ResponseEntity<CourseWish> addCourseWish(@RequestParam Long courseId, @RequestParam Long memberId) {
+        CourseWish courseWish = courseWishService.addCourseWish(courseId, memberId);
+        return ResponseEntity.ok(courseWish);
     }
 
-    @PostMapping
-    public ResponseEntity<Void> addTag(@Valid @RequestBody TagPostDto request) {
-        TagResponseDto response = tagService.createTag(request);
 
-        return ResponseEntity.created(URI.create("/v1/tags/" + response.getId())).build();
+
+    /*코스찜 취소*/
+    @DeleteMapping
+    public ResponseEntity<Void> cancelCourseWish(@RequestParam Long courseId, @RequestParam Long memberId) {
+        courseWishService.cancelCourseWish(courseId, memberId);
+        return ResponseEntity.noContent().build();
     }
 
-    /*코스찜 등록삭제*/
-
+    /*코스찜 닉네임으로 조회*/
+    @Operation(summary = "닉네임으로 코스찜 목록 조회")
+    @GetMapping
+    public ResponseEntity<List<CourseWish>> getCourseWishesByNickname(@RequestParam String nickname) {
+        List<CourseWish> courseWishes = courseWishService.getCourseWishesByNickname(nickname);
+        return ResponseEntity.ok(courseWishes);
+    }
 
     /*코스찜 전체조회*/
-    @Operation(summary = "전체 찜한 코스 조회")
+    @Operation(summary = "코스찜 목록 전체조회")
     @GetMapping
     public ResponseEntity<List<CourseWish>> getAllCourseWishes() {
-        List<CourseWish> response = courseWishService.findAllWishes();
-        return ResponseEntity.ok().body(response);
+        List<CourseWish> courseWishes = courseWishService.getAllCourseWishes();
+        return ResponseEntity.ok(courseWishes);
     }
 
 }
