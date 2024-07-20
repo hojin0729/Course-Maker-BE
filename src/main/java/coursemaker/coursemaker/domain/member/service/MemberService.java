@@ -93,40 +93,6 @@ public class MemberService {
         }
     }
 
-    public LogoutResponse logout(HttpServletRequest request) {
-//        // 쿠키 만료 시작
-//        Cookie cookieForExpire = new Cookie("Authorization", null);
-//        cookieForExpire.setPath("/");
-//        cookieForExpire.setMaxAge(0);
-//        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
-        //쿠키 만료 끝
-
-//        //리프레시 토큰 삭제 시작
-//        Cookie currentCookie = Arrays.stream(request.getCookies())
-//                .filter(cookie -> "Authorization".equals(cookie.getName()))
-//                .findFirst().orElseThrow();
-//        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
-
-//        String token = request.getHeader("Authorization");
-//
-//        //TODO:예외처리
-//        if (token == null) {
-//            throw new UnauthorizedException("인증받지 않은 회원입니다. ", "");
-//        }
-//        if (token.startsWith("Bearer ")) {
-//            token = token.substring(7);
-//        }
-////        refreshTokenService.setBlackList(token);//TODO 토큰 블랙리스트 등록
-//        //리프레시 토큰 삭제 끝
-//        refreshTokenService.removeTokenInfo(token);
-//
-//        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
-//        log.info("[logIn] 정상적으로 로그아웃되었습니다.");
-
-        return null;
-    }
-
-
     public MyPageResponse showMyPage(String nickname) {
         Member currentUser = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
