@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.api.tourApi.service;
 
+import coursemaker.coursemaker.api.busanApi.dto.BusanApiResponse;
+import coursemaker.coursemaker.api.busanApi.service.BusanApiService;
 import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 import coursemaker.coursemaker.api.tourApi.repository.TourApiRepository;
@@ -46,12 +48,15 @@ public class TourApiServiceImpl implements TourApiService {
     private final WebClient.Builder webClientBuilder;
     private final TourApiRepository tourApiRepository;
     private final DestinationRepository destinationRepository;
+    private final BusanApiService busanApiService;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
     public TourApiResponse updateAndGetTour() {
         CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
+
+        CompletableFuture<BusanApiResponse> busanApiUpdateFuture = CompletableFuture.supplyAsync(busanApiService::initialUpdate, executorService);
 
         initialUpdateFuture
                 .thenComposeAsync(response -> updateDisabledTours()
@@ -64,6 +69,10 @@ public class TourApiServiceImpl implements TourApiService {
                         }, executorService), executorService)
                 .thenRunAsync(this::updateMissingData, executorService)
                 .thenRunAsync(this::convertAndSaveToDestination, executorService)
+                .join();
+
+        busanApiUpdateFuture
+                .thenRunAsync(busanApiService::convertAndSaveToDestination, executorService)
                 .join();
 
         return initialUpdateFuture.join();
