@@ -22,7 +22,7 @@ public class Destination extends BaseEntity {
     @JoinColumn(name = "memberId")
     private Member member;
 
-    @Column(name = "name", length = 50)
+    @Column(name = "name", length = 60)
     private String name;
 
     @Column(name = "pictureLink", length = 300)
