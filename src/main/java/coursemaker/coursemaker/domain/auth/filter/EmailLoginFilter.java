@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -32,7 +31,7 @@ import java.util.Iterator;
 public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /*로그인 필터*/
     @Override
@@ -72,7 +71,7 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         /*토큰 발급*/
         String accessToken = jwtProvider.createAccessToken(member.getUsername(), role);
-        String refreshToken = jwtProvider.createRefreshToken(member.getUsername());
+        String refreshToken = jwtProvider.createRefreshToken(member.getUsername(), role);
         log.info("[JWT] JWT 발급 완료");
 
         /*토큰을 반환 객체에 담아서 반환*/
