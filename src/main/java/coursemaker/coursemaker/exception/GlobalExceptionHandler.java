@@ -1,6 +1,8 @@
 package coursemaker.coursemaker.exception;
 
+import coursemaker.coursemaker.domain.auth.exception.ExpiredTokenException;
 import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
+import coursemaker.coursemaker.domain.auth.exception.InvalidTokenException;
 import coursemaker.coursemaker.domain.auth.exception.UnAuthorizedException;
 import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
@@ -11,6 +13,8 @@ import coursemaker.coursemaker.domain.member.exception.*;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,8 +22,34 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /*인증 관련 예외처리*/
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredTokenException(ExpiredTokenException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler({InvalidTokenException.class, SignatureException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 
     @ExceptionHandler(UnAuthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnAuthorizedException e) {
@@ -69,6 +99,7 @@ public class GlobalExceptionHandler {
         response.setErrorType("unknown error");
         response.setMessage("예상치 못한 오류가 발생했습니다: "+e.getMessage());
         response.setStatus(400);
+        log.error(e.getClass().getName());
 
         return ResponseEntity
                 .status(response.getStatus())

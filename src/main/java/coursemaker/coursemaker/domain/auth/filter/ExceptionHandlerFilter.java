@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.exception.RootException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,10 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (RootException e) {
             returnErrorResponse(request, response, e);
+        } catch (SignatureException e) {
+            RootException exception = new RootException(ErrorCode.INVALID_TOKEN, "토큰이 변조됬습니다."+e.getMessage(), "토큰이 변조됬습니다.", e);
+
+            returnErrorResponse(request, response, exception);
         } catch (Exception e) {
             log.error("[FILTER] 예상치 못한 오류 발생: {}", e.getMessage());
             RootException rootException = new RootException(ErrorCode.UNKNOWN_ERROR, "예상치 못한 오류 발생: "+ e.getMessage(), "예상치 못한 쌈@뽕한 오류 발생! 백엔드에게 이 메시지를 전해주세여: "+ e.getMessage(), e);

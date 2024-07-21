@@ -1,9 +1,6 @@
 package coursemaker.coursemaker.domain.auth.service;
 
-import coursemaker.coursemaker.domain.auth.dto.JoinRequestDto;
-import coursemaker.coursemaker.domain.auth.dto.JoinResponseDto;
-import coursemaker.coursemaker.domain.auth.dto.LoginRequestDto;
-import coursemaker.coursemaker.domain.auth.dto.LoginResponseDto;
+import coursemaker.coursemaker.domain.auth.dto.*;
 import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.member.entity.Member;
@@ -25,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public JoinResponseDto join(JoinRequestDto request){
         JoinResponseDto response = new JoinResponseDto();
@@ -55,6 +53,14 @@ public class AuthService {
         response.setNickname(member.getNickname());
 
         log.info("[Auth] 신규 회원가입(이메일). 닉네임: {}", member.getNickname());
+
+        return response;
+    }
+
+    public ReIssueResponseDto reissueToken(ReIssueRequestDto request){
+        ReIssueResponseDto response = new ReIssueResponseDto();
+
+        response.setAccessToken(jwtProvider.reIssue(request.getRefreshToken()) );
 
         return response;
     }

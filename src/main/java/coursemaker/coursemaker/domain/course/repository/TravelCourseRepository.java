@@ -14,4 +14,7 @@ public interface TravelCourseRepository extends JpaRepository<TravelCourse, Long
     Page<TravelCourse> findAllByDeletedAtIsNull(Pageable pageable);
     Page<TravelCourse> findAllByDeletedAtIsNullOrderByViewsDesc(Pageable pageable);
     Optional<TravelCourse> findByIdAndDeletedAtIsNull(Long id);
+    // 제목에 특정 문자열이 포함된 코스를 검색하는 메서드
+    Page<TravelCourse> findByTitleContainingAndDeletedAtIsNull(String title, Pageable pageable);
+
 }
