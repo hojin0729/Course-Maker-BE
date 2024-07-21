@@ -33,14 +33,17 @@ public enum ErrorCode {
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Invalid item", "회원 정보가 없습니다.", "MEMBER-003"),
     ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "Illegal argument", "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-005"),
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Illegal argument", "토큰 형식이 잘못되었습니다.", "MEMBER-006");
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Illegal argument", "토큰 형식이 잘못되었습니다.", "MEMBER-006"),
 
+    /*Review 도메인 예외*/
+    INVALID_REVIEW(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 리뷰가 없습니다.", "REVIEW-001"),
+    DUPLICATED_REVIEW(HttpStatus.CONFLICT, "Duplicated item", "해당 리뷰가 이미 존재합니다.", "REVIEW-002"),
+    ILLEGAL_REVIEW_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "리뷰에 알맞은 인자값이 아닙니다.", "REVIEW-003");
 
-
-    private String description;
-    private HttpStatus status;
-    private String code;
-    private String errorType;
+    private final String description;
+    private final HttpStatus status;
+    private final String code;
+    private final String errorType;
 
     ErrorCode(HttpStatus status, String errorType, String description, String code) {
         this.status = status;
