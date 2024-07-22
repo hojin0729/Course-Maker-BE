@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.api.tourApi.service;
 
+import coursemaker.coursemaker.api.busanApi.dto.BusanApiResponse;
 import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 
