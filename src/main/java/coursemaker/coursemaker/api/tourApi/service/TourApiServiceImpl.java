@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.api.tourApi.service;
 
+import coursemaker.coursemaker.api.busanApi.dto.BusanApiResponse;
+import coursemaker.coursemaker.api.busanApi.service.BusanApiService;
 import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 import coursemaker.coursemaker.api.tourApi.repository.TourApiRepository;
@@ -46,12 +48,15 @@ public class TourApiServiceImpl implements TourApiService {
     private final WebClient.Builder webClientBuilder;
     private final TourApiRepository tourApiRepository;
     private final DestinationRepository destinationRepository;
+    private final BusanApiService busanApiService;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
     public TourApiResponse updateAndGetTour() {
         CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
+
+        CompletableFuture<BusanApiResponse> busanApiUpdateFuture = CompletableFuture.supplyAsync(busanApiService::initialUpdate, executorService);
 
         initialUpdateFuture
                 .thenComposeAsync(response -> updateDisabledTours()
@@ -64,6 +69,10 @@ public class TourApiServiceImpl implements TourApiService {
                         }, executorService), executorService)
                 .thenRunAsync(this::updateMissingData, executorService)
                 .thenRunAsync(this::convertAndSaveToDestination, executorService)
+                .join();
+
+        busanApiUpdateFuture
+                .thenRunAsync(busanApiService::convertAndSaveToDestination, executorService)
                 .join();
 
         return initialUpdateFuture.join();
@@ -98,6 +107,8 @@ public class TourApiServiceImpl implements TourApiService {
 
             if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
                 List<TourApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
+                        .filter(item -> !isExcludedCat1(item.getCat1())) // cat1 필터링
+                        .filter(item -> !isExcludedCat3(item.getCat3())) // cat3 필터링
                         .map(this::convertToEntity)
                         .collect(Collectors.toList());
                 synchronized (this) {
@@ -109,6 +120,22 @@ public class TourApiServiceImpl implements TourApiService {
             log.error("Exception occurred while updating tours: ", e);
             throw new RuntimeException("Failed to update tours", e);
         }
+    }
+
+    private boolean isExcludedCat1(String cat1) {
+        List<String> excludedCat1List = List.of(
+                "C01", "B02", "A04"
+        );
+        return excludedCat1List.contains(cat1);
+    }
+
+    private boolean isExcludedCat3(String cat3) {
+        List<String> excludedCat3List = List.of(
+                "A02080200", "A02080300", "A02080400", "A02080500", "A02080600",
+                "A02080800", "A02080900", "A02081000", "A02081100", "A02060900",
+                "A02061000", "A02061200", "A02061300", "A02061400"
+        );
+        return excludedCat3List.contains(cat3);
     }
 
     private CompletableFuture<Void> updateDisabledTours() {
