@@ -72,7 +72,7 @@ public class TourApiServiceImpl implements TourApiService {
                 .join();
 
         busanApiUpdateFuture
-                .thenRunAsync(busanApiService::convertAndSaveToDestination, executorService)
+                .thenRunAsync(busanApiService::busanConvertAndSaveToDestination, executorService)
                 .join();
 
         return initialUpdateFuture.join();
@@ -124,7 +124,7 @@ public class TourApiServiceImpl implements TourApiService {
 
     private boolean isExcludedCat1(String cat1) {
         List<String> excludedCat1List = List.of(
-                "C01", "B02", "A04"
+                "C01", "B02", "A04", "A05"
         );
         return excludedCat1List.contains(cat1);
     }
@@ -355,25 +355,32 @@ public class TourApiServiceImpl implements TourApiService {
 
     private void convertAndSaveToDestination() {
         List<TourApi> tourApis = tourApiRepository.findAll();
-        tourApis.forEach(tourApi -> {
-            Destination destination = new Destination();
-            destination.setName(tourApi.getTitle());
-            destination.setPictureLink(tourApi.getFirstimage());
-            destination.setViews(0);
-            destination.setContent(tourApi.getOverview());
-            destination.setLocation(tourApi.getAddr1());
-            destination.setLongitude(tourApi.getMapx());
-            destination.setLatitude(tourApi.getMapy());
+        for (TourApi tourApi : tourApis) {
+            // Destination 테이블에 이미 해당 TourApi의 contentid가 있는지 확인
+            Optional<Destination> existingDestination = destinationRepository.findByContentId(tourApi.getContentid());
+            if (existingDestination.isEmpty()) {
+                // Destination 테이블에 해당 항목이 없으면 새로 저장
+                Destination destination = new Destination();
+                destination.setName(tourApi.getTitle());
+                destination.setPictureLink(tourApi.getFirstimage());
+                destination.setViews(0);
+                destination.setContent(tourApi.getOverview());
+                destination.setLocation(tourApi.getAddr1());
+                destination.setLongitude(tourApi.getMapx());
+                destination.setLatitude(tourApi.getMapy());
+                destination.setDisabled(tourApi.getDisabled());
+                destination.setContentId(tourApi.getContentid());
 
-            // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-            LocalDateTime createdAt = LocalDateTime.parse(tourApi.getCreatedtime(), formatter);
-            LocalDateTime updatedAt = LocalDateTime.parse(tourApi.getModifiedtime(), formatter);
-            destination.setCreatedAt(createdAt);
-            destination.setUpdatedAt(updatedAt);
+                // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+                LocalDateTime createdAt = LocalDateTime.parse(tourApi.getCreatedtime(), formatter);
+                LocalDateTime updatedAt = LocalDateTime.parse(tourApi.getModifiedtime(), formatter);
+                destination.setCreatedAt(createdAt);
+                destination.setUpdatedAt(updatedAt);
 
-            destinationRepository.save(destination);
-        });
+                destinationRepository.save(destination);
+            }
+        }
     }
 
     private TourApi convertToEntity(TourApiResponse.Item item) {
@@ -397,6 +404,7 @@ public class TourApiServiceImpl implements TourApiService {
                 .contenttypeid(item.getContenttypeid())
                 .homepage(item.getHomepage())
                 .overview(item.getOverview())
+                .disabled(item.getDisabled())
                 .build();
     }
 
@@ -422,6 +430,7 @@ public class TourApiServiceImpl implements TourApiService {
             existing.setContenttypeid(tourApi.getContenttypeid());
             existing.setHomepage(tourApi.getHomepage());
             existing.setOverview(tourApi.getOverview());
+            existing.setDisabled(tourApi.getDisabled());
             tourApiRepository.save(existing);
         } else {
             tourApiRepository.save(tourApi);
