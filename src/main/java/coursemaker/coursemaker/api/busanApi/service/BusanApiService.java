@@ -12,5 +12,5 @@ public interface BusanApiService {
     Optional<BusanApi> getTourById(Long id);
     List<BusanApi> getAllTours();
     BusanApiResponse initialUpdate();
-    void convertAndSaveToDestination();
+    void busanConvertAndSaveToDestination();
 }

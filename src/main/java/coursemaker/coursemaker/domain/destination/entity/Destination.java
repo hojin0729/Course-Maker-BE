@@ -22,7 +22,7 @@ public class Destination extends BaseEntity {
     @JoinColumn(name = "memberId")
     private Member member;
 
-    @Column(name = "name", length = 60)
+    @Column(name = "name", length = 30)
     private String name;
 
     @Column(name = "pictureLink", length = 300)
@@ -42,4 +42,15 @@ public class Destination extends BaseEntity {
 
     @Column(name = "latitude", precision = 15, scale = 12)
     private BigDecimal latitude;
+
+    @Column(name = "disabled")
+    private Long disabled;
+
+    // tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
+    @Column(name = "contentId")
+    private Long contentId;
+
+    // busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
+    @Column(name = "seq")
+    private int seq;
 }

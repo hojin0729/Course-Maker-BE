@@ -48,7 +48,7 @@ public class BusanApiServiceImpl implements BusanApiService {
         CompletableFuture<BusanApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
 
         initialUpdateFuture
-                .thenRunAsync(this::convertAndSaveToDestination, executorService)
+                .thenRunAsync(this::busanConvertAndSaveToDestination, executorService)
                 .join();
 
         return initialUpdateFuture.join();
@@ -111,24 +111,30 @@ public class BusanApiServiceImpl implements BusanApiService {
     }
 
     @Override
-    public void convertAndSaveToDestination() {
+    public void busanConvertAndSaveToDestination() {
         List<BusanApi> busanApis = busanApiRepository.findAll();
-        busanApis.forEach(busanApi -> {
-            Destination destination = new Destination();
-            destination.setName(busanApi.getGuganNm());
-            destination.setViews(0);
-            destination.setContent(busanApi.getGmCourse());
-            destination.setLocation(busanApi.getStartAddr());
+        for (BusanApi busanApi : busanApis) {
+            // Destination 테이블에 이미 해당 BusanApi의 seq가 있는지 확인
+            Optional<Destination> existingDestination = destinationRepository.findBySeq(busanApi.getSeq());
+            if (existingDestination.isEmpty()) {
+                // Destination 테이블에 해당 항목이 없으면 새로 저장
+                Destination destination = new Destination();
+                destination.setName(busanApi.getGuganNm());
+                destination.setViews(0);
+                destination.setContent(busanApi.getGmCourse());
+                destination.setLocation(busanApi.getStartAddr());
+                destination.setSeq(busanApi.getSeq());
 
-            // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
-//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-//            LocalDateTime createdAt = LocalDateTime.parse(busanApi.getCreatedtime(), formatter);
-//            LocalDateTime updatedAt = LocalDateTime.parse(busanApi.getModifiedtime(), formatter);
-//            destination.setCreatedAt(createdAt);
-//            destination.setUpdatedAt(updatedAt);
+                // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
+//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+//                LocalDateTime createdAt = LocalDateTime.parse(busanApi.getCreatedtime(), formatter);
+//                LocalDateTime updatedAt = LocalDateTime.parse(busanApi.getModifiedtime(), formatter);
+//                destination.setCreatedAt(createdAt);
+//                destination.setUpdatedAt(updatedAt);
 
-            destinationRepository.save(destination);
-        });
+                destinationRepository.save(destination);
+            }
+        }
     }
 
     private BusanApi convertToEntity(BusanApiResponse.Item item) {
