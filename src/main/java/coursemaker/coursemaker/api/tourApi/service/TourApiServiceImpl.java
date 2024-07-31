@@ -356,6 +356,11 @@ public class TourApiServiceImpl implements TourApiService {
     private void convertAndSaveToDestination() {
         List<TourApi> tourApis = tourApiRepository.findAll();
         for (TourApi tourApi : tourApis) {
+            // title의 길이가 30자 초과인 경우 저장하지 않음
+            if (tourApi.getTitle().length() > 30) {
+                continue;
+            }
+
             // Destination 테이블에 이미 해당 TourApi의 contentid가 있는지 확인
             Optional<Destination> existingDestination = destinationRepository.findByContentId(tourApi.getContentid());
             if (existingDestination.isEmpty()) {
