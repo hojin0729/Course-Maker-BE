@@ -31,7 +31,7 @@ public class RequestCourseDto {
 
     @Schema(description = "평점", example = "4.5")
     @NotNull(message = "평점을 입력하세요.")
-    private BigDecimal rating;
+    private Double rating;
 
     public CourseReview toEntity(Member member) {
         CourseReview courseReview = new CourseReview();

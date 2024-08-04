@@ -25,7 +25,7 @@ public class ResponseCourseDto {
     private String picture;
 
     @Schema(description = "평점", example = "4.5")
-    private BigDecimal rating;
+    private Double rating;
 
     public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview) {
         ResponseCourseDto dto = new ResponseCourseDto();

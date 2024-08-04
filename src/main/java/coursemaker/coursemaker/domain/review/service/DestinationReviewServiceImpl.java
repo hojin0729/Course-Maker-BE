@@ -14,6 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.OptionalDouble;
+
 @Service
 public class DestinationReviewServiceImpl implements DestinationReviewService {
     private final DestinationReviewRepository destinationReviewRepository;
@@ -33,8 +37,13 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         Destination destination = destinationService.findById(destinationId);
         DestinationReview destinationReview = requestDestinationDto.toEntity(member);
         destinationReview.setDestination(destination);
+
+        // 디버깅: 저장 전 리뷰 평점 출력
+        System.out.println("Debug: Saving Review with Rating = " + destinationReview.getRating());
+
         return destinationReviewRepository.save(destinationReview);
     }
+
 
     @Override
     public DestinationReview update(Long destinationId, @Valid RequestDestinationDto requestDestinationDto, String nickname) {
@@ -68,5 +77,25 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         Page<DestinationReview> page = destinationReviewRepository.findAll(pageable);
         // CourseMakerPagination<DestinationReview> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total)
         return null;
+    }
+
+    @Override
+    public Double getAverageRating(Long destinationId) {
+        List<DestinationReview> reviews = destinationReviewRepository.findByDestinationId(destinationId);
+
+        System.out.println("Debug: Number of reviews found = " + reviews.size());
+
+        for (DestinationReview review : reviews) {
+            System.out.println("Debug: Review ID = " + review.getId() + ", Rating = " + review.getRating());
+        }
+
+        double averageRating = reviews.stream().mapToDouble(DestinationReview::getRating).average().orElse(0.0);
+
+        DecimalFormat df = new DecimalFormat("#.#");
+        double formattedAverageRating = Double.parseDouble(df.format(averageRating));
+
+        System.out.println("Debug: Calculated formatted averageRating = " + formattedAverageRating);
+
+        return formattedAverageRating;
     }
 }

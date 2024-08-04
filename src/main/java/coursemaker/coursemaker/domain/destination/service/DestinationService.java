@@ -44,4 +44,5 @@ public interface DestinationService {
     // 위치 정보 메서드
     Destination getLocation(Long destinationId, LocationDto locationDto);
 
+    Double getAverageRating(Long destinationId);
 }
