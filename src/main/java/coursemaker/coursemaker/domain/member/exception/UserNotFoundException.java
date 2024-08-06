@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class UserNotFoundException extends RootException {
-    String message;
+    private final String message;
 
    public UserNotFoundException(String message, String logMessage) {
        super(ErrorCode.NOT_FOUND_MEMBER, logMessage, message);

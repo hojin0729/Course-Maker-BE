@@ -36,17 +36,17 @@ public enum ErrorCode {
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-004"),
 
     /*Auth 도메인 예와*/
-    WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "Authentication failed", "비밀번호가 잘못되었습니다.", "AUTH-001"),
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
-    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "토큰이 만료됬습니다.", "AUTH-003");
+    WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "Authentication failed", "비밀번호가 잘못되었습니다.", "AUTH-001"),
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
+    EXPIRED_TOKEN(HttpStatus.BAD_REQUEST, "Expired token", "토큰이 만료됬습니다.", "AUTH-003");
 
 
 
 
-    private String description;
-    private HttpStatus status;
-    private String code;
-    private String errorType;
+    private final String description;
+    private final HttpStatus status;
+    private final String code;
+    private final String errorType;
 
     ErrorCode(HttpStatus status, String errorType, String description, String code) {
         this.status = status;
