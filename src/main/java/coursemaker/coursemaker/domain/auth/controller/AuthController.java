@@ -1,7 +1,9 @@
 package coursemaker.coursemaker.domain.auth.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.*;
+import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
+import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtProvider jwtProvider;
 
     @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     @ApiResponses(value = {
@@ -106,6 +110,17 @@ public class AuthController {
     )
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PostMapping("/withdrawal")
+    public ResponseEntity<Void> withdrawal(@AuthenticationPrincipal Member member,
+                                           @RequestBody WithdrawalRequestDto withdrawalRequestDto) {
+
+        System.out.println("member = " + member);
+        jwtProvider.expireRefreshToken(withdrawalRequestDto.getRefreshToken());
+        authService.withdrawal(member.getNickname());
         return ResponseEntity.ok().build();
     }
 //

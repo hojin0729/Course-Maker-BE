@@ -7,8 +7,9 @@ import lombok.Getter;
 @Getter
 public class UnAuthorizedException extends RootException {
 
-    String message;
+    private final String message;
     public UnAuthorizedException(String message, String logMessage) {
         super(ErrorCode.UNAUTHORIZED_MEMBER, logMessage, message);
+        this.message = message;
     }
 }
