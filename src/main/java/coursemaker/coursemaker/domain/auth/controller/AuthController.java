@@ -113,12 +113,13 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인된 회원을 탈퇴합니다. 프론트에서도 회원 탈퇴 후 로그아웃을 위해 리프레시 토큰 및 엑세스 토큰을 삭제해 주세여.")
+    @ApiResponse(
+            responseCode = "200", description = "정상적으로 로그아웃되었습니다."
+    )
     @PostMapping("/withdrawal")
     public ResponseEntity<Void> withdrawal(@AuthenticationPrincipal Member member,
                                            @RequestBody WithdrawalRequestDto withdrawalRequestDto) {
-
-        System.out.println("member = " + member);
         jwtProvider.expireRefreshToken(withdrawalRequestDto.getRefreshToken());
         authService.withdrawal(member.getNickname());
         return ResponseEntity.ok().build();

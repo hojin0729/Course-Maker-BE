@@ -69,14 +69,12 @@ public class AuthService {
     public void withdrawal(String nickname) {
 
         if(nickname == null) {
-            throw new IllegalArgumentException("닉네임은 null 값이 들어갈 수 없습니다. 로그인 혹은 인자값을 확읺주시요.");
+            throw new IllegalArgumentException("닉네임은 null 값이 들어갈 수 없습니다. 로그인 혹은 인자값을 확인해주시요.");
         }
 
         Member member = memberRepository.findByNickname(nickname).orElseThrow(() ->
                 new UserNotFoundException("존재하지 않는 회원입니다.", "Nickname: " + nickname)
         );
-
-        System.out.println("xxxxxx member = " + member);
 
         memberRepository.delete(member);
 
