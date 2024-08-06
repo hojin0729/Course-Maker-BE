@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class InvalidPasswordException extends RootException {
-    String message;
+    private final String message;
     public InvalidPasswordException(String message, String logMessage) {
         super(ErrorCode.WRONG_PASSWORD, logMessage, message);
 

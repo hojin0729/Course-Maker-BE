@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -52,6 +53,13 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
             log.error("[AUTH] 로그인 인증 오류: {}", e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             throw new RuntimeException(e);
+        } catch (InternalAuthenticationServiceException e) {
+            log.error("[AUTH] 로그인 인증 오류: {}", e.getMessage());
+            if(e.getCause() instanceof UserNotFoundException) {
+                throw new UserNotFoundException("존재하지 않는 회원입니다.", "Login Fail: " + e.getMessage());
+            } else{
+                throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.", "Login Fail: " + e.getMessage());
+            }
         }
     }
     
