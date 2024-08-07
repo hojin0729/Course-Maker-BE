@@ -53,4 +53,7 @@ public class Destination extends BaseEntity {
     // busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
     @Column(name = "seq")
     private int seq;
+
+    @Column(name = "apiData")
+    private int apiData;
 }

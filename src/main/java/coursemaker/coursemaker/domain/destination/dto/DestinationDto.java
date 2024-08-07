@@ -51,6 +51,9 @@ public class DestinationDto {
     @Schema(description = "무장애 여행지 여부")
     private Long disabled;
 
+    @Schema(description = "공공데이터 여부")
+    private int apiData;
+
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
     public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos) {

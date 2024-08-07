@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 public class BusanApiResponse {
 
-    @JsonProperty("getgmgcourseinfo")
-    private GetGmgCourseInfo getgmgcourseinfo;
+    @JsonProperty("response")
+    private Response response;
 
     @Data
-    public static class GetGmgCourseInfo {
+    public static class Response {
         @JsonProperty("header")
         private Header header;
 
