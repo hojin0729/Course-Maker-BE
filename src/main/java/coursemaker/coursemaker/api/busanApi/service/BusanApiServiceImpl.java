@@ -83,8 +83,8 @@ public class BusanApiServiceImpl implements BusanApiService {
             ObjectMapper objectMapper = new ObjectMapper();
             BusanApiResponse response = objectMapper.readValue(responseBody, BusanApiResponse.class);
 
-            if (response != null && response.getGetgmgcourseinfo() != null && response.getGetgmgcourseinfo().getBody() != null && response.getGetgmgcourseinfo().getBody().getItems().getItem() != null) {
-                List<BusanApi> tourList = response.getGetgmgcourseinfo().getBody().getItems().getItem().stream()
+            if (response != null && response.getResponse() != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems().getItem() != null) {
+                List<BusanApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
                         .map(this::convertToEntity)
                         .collect(Collectors.toList());
                 synchronized (this) {
@@ -124,6 +124,7 @@ public class BusanApiServiceImpl implements BusanApiService {
                 destination.setContent(busanApi.getGmCourse());
                 destination.setLocation(busanApi.getStartAddr());
                 destination.setSeq(busanApi.getSeq());
+                destination.setApiData(1);
 
                 // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
 //                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");

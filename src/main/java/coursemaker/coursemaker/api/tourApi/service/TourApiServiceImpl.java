@@ -356,6 +356,11 @@ public class TourApiServiceImpl implements TourApiService {
     private void convertAndSaveToDestination() {
         List<TourApi> tourApis = tourApiRepository.findAll();
         for (TourApi tourApi : tourApis) {
+            // title의 길이가 30자 초과인 경우 저장하지 않음
+            if (tourApi.getTitle().length() > 30) {
+                continue;
+            }
+
             // Destination 테이블에 이미 해당 TourApi의 contentid가 있는지 확인
             Optional<Destination> existingDestination = destinationRepository.findByContentId(tourApi.getContentid());
             if (existingDestination.isEmpty()) {
@@ -370,6 +375,7 @@ public class TourApiServiceImpl implements TourApiService {
                 destination.setLatitude(tourApi.getMapy());
                 destination.setDisabled(tourApi.getDisabled());
                 destination.setContentId(tourApi.getContentid());
+                destination.setApiData(1);
 
                 // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
