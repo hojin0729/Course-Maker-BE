@@ -375,6 +375,7 @@ public class TourApiServiceImpl implements TourApiService {
                 destination.setLatitude(tourApi.getMapy());
                 destination.setDisabled(tourApi.getDisabled());
                 destination.setContentId(tourApi.getContentid());
+                destination.setApiData(1);
 
                 // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");

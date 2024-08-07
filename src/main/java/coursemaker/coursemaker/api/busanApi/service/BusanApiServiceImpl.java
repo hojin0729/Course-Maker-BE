@@ -124,6 +124,7 @@ public class BusanApiServiceImpl implements BusanApiService {
                 destination.setContent(busanApi.getGmCourse());
                 destination.setLocation(busanApi.getStartAddr());
                 destination.setSeq(busanApi.getSeq());
+                destination.setApiData(1);
 
                 // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
 //                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
