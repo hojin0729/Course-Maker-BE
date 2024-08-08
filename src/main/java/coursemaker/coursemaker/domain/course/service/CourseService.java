@@ -12,6 +12,7 @@ public interface CourseService {
     CourseMakerPagination<TravelCourse> findAll(Pageable pageable);
     CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable);
     TravelCourse findById(Long id);
+    CourseMakerPagination<TravelCourse> findByTitleContaining(String title, Pageable pageable);
     TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname);
     void delete(Long id, String nickname);
     TravelCourse incrementViews(Long id);

@@ -1,11 +1,9 @@
 package coursemaker.coursemaker.domain.auth.controller;
 
-import coursemaker.coursemaker.domain.auth.dto.JoinRequestDto;
-import coursemaker.coursemaker.domain.auth.dto.JoinResponseDto;
+import coursemaker.coursemaker.domain.auth.dto.*;
+import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
-import coursemaker.coursemaker.domain.member.dto.*;
-import coursemaker.coursemaker.domain.member.service.EmailService;
-import coursemaker.coursemaker.domain.member.service.MemberService;
+import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,17 +11,12 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -32,11 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Auth", description = "로그인, 로그아웃, 회원가입등의 인증 관련 API")
 public class AuthController {
 
-    private final MemberService memberService;
-    private final EmailService emailService;
     private final AuthService authService;
+    private final JwtProvider jwtProvider;
 
-    @Operation(summary = "회원 생성", description = "회원가입을 진행합니다.")
+    @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원이 정상적으로 생성되었습니다."),
             @ApiResponse(responseCode = "400", description = "생성하려는 회원의 인자값이 올바르지 않을 때 반환합니다.", content = @Content(
@@ -54,50 +46,84 @@ public class AuthController {
                     )
             ))
     })
-    @PostMapping(value = "/join")
+    @PostMapping("/join")
     public ResponseEntity<JoinResponseDto> signUp(@Valid @RequestBody JoinRequestDto joinRequest) {
         JoinResponseDto joinResponse = authService.join(joinRequest);
         return ResponseEntity.ok().body(joinResponse);
     }
 
-//    @Operation(summary = "회원 로그인", description = "아이디와 비밀번호로 로그인한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다."),
-//            @ApiResponse(responseCode = "401", description = "인증 실패: 비밀번호가 잘못되었습니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 401, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 잘못되었습니다.\"}"
-//                    )
-//            )),
-//            @ApiResponse(responseCode = "404", description = "인증 실패: 사용자를 찾을 수 없습니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"회원 정보가 없습니다.\"}"
-//                    )
-//            ))
-//    })
-//    @PostMapping(value = "/login")
-//    public ResponseEntity<LoginResponse> loginBasic(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-//        String id = loginRequest.getLoginEmail();
-//        String password = loginRequest.getPassword();
-//        LoginResponse loginResponse = memberService.login(id, password, response);
-//        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, nickname : {}, token : {}", id, loginResponse.getNickname(), loginResponse.getAccessToken());
-//
-//        //TODO: 유저 정보 Cookie에 저장
-//        return ResponseEntity.ok().body(loginResponse);
-//    }
-//
-//    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃한다: 쿠키 만료, 리프레시 토큰 삭제.")
-//    @ApiResponse(
-//            responseCode = "200", description = "정상적으로 로그아웃되었습니다."
-//    )
-//    @PostMapping("/logout")
-//    public ResponseEntity<LogoutResponse> logoutBasic(HttpServletRequest request, HttpServletResponse response) {
-//        LogoutResponse logoutResponse = memberService.logout(request);
-//        return ResponseEntity.ok().body(logoutResponse);
-//    }
+    /*스웨거용 더미 로그인 컨트롤러*/
+    @Operation(summary = "회원 로그인", description = "이메일과 비밀번호로 로그인 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다."),
+            @ApiResponse(responseCode = "400", description = "비밀번호가 잘못되었습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 일치하지 않습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "인증 실패: 사용자를 찾을 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 회원입니다.\"}"
+                    )
+            ))
+    })
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequest) {
+        return ResponseEntity.ok().body(null);
+    }
+
+
+    @Operation(summary = "access token 재발행", description = "refresh token을 이용해 access token을 재발행 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 토큰이 재발행 됨."),
+            @ApiResponse(responseCode = "401", description = "토큰이 유효하지 않음.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"Invalid token\", \"message\": \"인증되지 않은 토큰입니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "400", description = "리프레시 토큰의 유효기간이 만료됨.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Expired token\", \"message\": \"토큰이 만료됬습니다.\"}"
+                    )
+            ))
+    })
+    @PostMapping("/reissue")
+    public ResponseEntity<ReIssueResponseDto> reissue(@RequestBody ReIssueRequestDto     reissueRequest) {
+
+        ReIssueResponseDto dto = authService.reissueToken(reissueRequest);
+
+        return ResponseEntity.ok().body(dto);
+    }
+
+
+    @Operation(summary = "회원 로그아웃", description = "현재 유저를 로그아웃 합니다. 프론트에서도 리프레시 토큰 및 엑세스 토큰을 삭제해 주세여.")
+    @ApiResponse(
+            responseCode = "200", description = "정상적으로 로그아웃되었습니다."
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인된 회원을 탈퇴합니다. 프론트에서도 회원 탈퇴 후 로그아웃을 위해 리프레시 토큰 및 엑세스 토큰을 삭제해 주세여.")
+    @ApiResponse(
+            responseCode = "200", description = "정상적으로 로그아웃되었습니다."
+    )
+    @PostMapping("/withdrawal")
+    public ResponseEntity<Void> withdrawal(@AuthenticationPrincipal Member member,
+                                           @RequestBody WithdrawalRequestDto withdrawalRequestDto) {
+        jwtProvider.expireRefreshToken(withdrawalRequestDto.getRefreshToken());
+        authService.withdrawal(member.getNickname());
+        return ResponseEntity.ok().build();
+    }
 //
 //
 //    @Operation(summary = "닉네임 유효 확인", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")

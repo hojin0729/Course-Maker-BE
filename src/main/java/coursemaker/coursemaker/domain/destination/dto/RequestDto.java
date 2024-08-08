@@ -45,6 +45,10 @@ public class RequestDto {
     @Schema(description = "평균 평점", example = "4.5", hidden = true)
     private Double averageRating; // 평균 평점
 
+    @Schema(description = "무장애 여행지 여부")
+    private Long disabled;
+
+
     // RequestDto를 Destination 엔티티로 변환하는 메서드
     public Destination toEntity(Member member) {
         Destination destination = new Destination();
@@ -55,7 +59,11 @@ public class RequestDto {
         destination.setLocation(this.location.getAddress());
         destination.setLongitude(this.location.getLongitude());
         destination.setLatitude(this.location.getLatitude());
+
         destination.setAverageRating(this.averageRating);
+
+        destination.setDisabled(this.disabled);
+
         return destination;
     }
 }

@@ -45,8 +45,16 @@ public class DestinationDto {
     @NotBlank(message = "내용은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String content; // 텍스트 에디터
 
+
     @Schema(description = "평균 평점", example = "4.5")
     private Double averageRating; // 평균 평점
+
+    @Schema(description = "무장애 여행지 여부")
+    private Long disabled;
+
+    @Schema(description = "공공데이터 여부", defaultValue = "0")
+    private int apiData;
+
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
     public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, Double averageRating) {
@@ -57,6 +65,7 @@ public class DestinationDto {
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
         dto.setTags(tagDtos);
+        dto.setDisabled(destination.getDisabled());
         LocationDto location = new LocationDto(
                 destination.getLocation(),
                 destination.getLongitude(),
@@ -67,4 +76,4 @@ public class DestinationDto {
         System.out.println("ㅇebug: DestinationDto averageRating = " + dto.getAverageRating()); // 디버깅 메시지 추가
         return dto;
     }
-}
+

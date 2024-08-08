@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
+    UNKNOWN_ERROR(HttpStatus.BAD_REQUEST, "Unknown error", "예상치 못한 오류가 발생했습니다.", "UNKNOWN-001"),
+
     /*Tag 도메인 예외*/
     INVALID_TAG(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 태그가 없습니다.", "TAG-001"),
     DUPLICATED_TAG(HttpStatus.CONFLICT, "Duplicated item", "해당 태그가 이미 존재합니다.", "TAG-002"),
@@ -34,11 +36,22 @@ public enum ErrorCode {
     ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "Illegal argument", "회원에 알맞은 인자값이 아닙니다.", "MEMBER-004"),
     UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-005"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Illegal argument", "토큰 형식이 잘못되었습니다.", "MEMBER-006"),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Invalid item", "회원 정보가 없습니다.", "MEMBER-002"),
+    ILLEGAL_MEMBER_ARGUMENT(HttpStatus.CONFLICT, "Illegal argument", "회원에 알맞은 인자값이 아닙니다.", "MEMBER-003"),
+    UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "Authorization failed", "인증된 회원이 아닙니다.", "MEMBER-004"),
+
+    /*Auth 도메인 예와*/
+    WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "Authentication failed", "비밀번호가 잘못되었습니다.", "AUTH-001"),
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Access 토큰이 만료됬습니다.", "AUTH-003"),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004");
+
 
     /*Review 도메인 예외*/
     INVALID_REVIEW(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 리뷰가 없습니다.", "REVIEW-001"),
     DUPLICATED_REVIEW(HttpStatus.CONFLICT, "Duplicated item", "해당 리뷰가 이미 존재합니다.", "REVIEW-002"),
     ILLEGAL_REVIEW_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "리뷰에 알맞은 인자값이 아닙니다.", "REVIEW-003");
+
 
     private final String description;
     private final HttpStatus status;

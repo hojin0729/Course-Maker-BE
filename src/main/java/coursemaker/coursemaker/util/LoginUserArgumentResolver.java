@@ -1,8 +1,6 @@
 package coursemaker.coursemaker.util;
 
-import coursemaker.coursemaker.domain.member.exception.UnauthorizedException;
 import jakarta.annotation.Nullable;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

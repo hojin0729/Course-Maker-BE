@@ -93,78 +93,6 @@ public class MemberService {
         }
     }
 
-    public LoginResponse login(String id, String rawPassword, HttpServletResponse response) {
-        LoginResponse loginResponse = new LoginResponse();
-
-//        Member loginUser = memberRepository.findByEmail(id)
-//                .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + id));
-//        String encodedPassword = loginUser.getPassword();
-//        log.info("[SignInResult] Id : {}", id);
-//
-//        if(!passwordEncoder.matches(rawPassword, encodedPassword)) {
-//            log.error("[SignInResult] 패스워드 불일치");
-//            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.", "Password: " + rawPassword);
-//        }
-//        log.info("[LogInResult] 패스워드 일치");
-//        log.info("[LogInResult] LogInResponse 객체 생성");
-//        String accessToken = jwtTokenProvider.createAccessToken(
-//                loginUser.getNickname()
-//        );
-//
-//        String refreshToken = jwtTokenProvider.createRefreshToken();
-//
-//        loginResponse = LoginResponse.builder()
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-//                .nickname(loginUser.getNickname())
-//                .build();
-//
-//
-//        log.info("[LogInResult] LogInResponse 객체에 값 주입");
-//        response.addHeader("Authorization", "Bearer " + loginResponse.getAccessToken());
-//
-//        /*db에 리프레시토큰이랑 엑세스토큰 저장*/
-//        refreshTokenService.saveTokenInfo(loginUser.getId(), refreshToken, accessToken, 60 * 60 * 24 * 7);
-//
-//        log.info("[logIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, loginResponse.getAccessToken());
-        return loginResponse;
-
-    }
-
-    public LogoutResponse logout(HttpServletRequest request) {
-//        // 쿠키 만료 시작
-//        Cookie cookieForExpire = new Cookie("Authorization", null);
-//        cookieForExpire.setPath("/");
-//        cookieForExpire.setMaxAge(0);
-//        response.addCookie(cookieForExpire); // 생성 즉시 만료되는 쿠키로 덮어씌움
-        //쿠키 만료 끝
-
-//        //리프레시 토큰 삭제 시작
-//        Cookie currentCookie = Arrays.stream(request.getCookies())
-//                .filter(cookie -> "Authorization".equals(cookie.getName()))
-//                .findFirst().orElseThrow();
-//        String token = URLDecoder.decode(currentCookie.getValue(), StandardCharsets.UTF_8);
-
-//        String token = request.getHeader("Authorization");
-//
-//        //TODO:예외처리
-//        if (token == null) {
-//            throw new UnauthorizedException("인증받지 않은 회원입니다. ", "");
-//        }
-//        if (token.startsWith("Bearer ")) {
-//            token = token.substring(7);
-//        }
-////        refreshTokenService.setBlackList(token);//TODO 토큰 블랙리스트 등록
-//        //리프레시 토큰 삭제 끝
-//        refreshTokenService.removeTokenInfo(token);
-//
-//        LogoutResponse logoutResponse = LogoutResponse.builder().success(true).build();
-//        log.info("[logIn] 정상적으로 로그아웃되었습니다.");
-
-        return null;
-    }
-
-
     public MyPageResponse showMyPage(String nickname) {
         Member currentUser = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
@@ -220,10 +148,6 @@ public class MemberService {
                 .build();
 
         return validateEmailResponse;
-    }
-
-    public boolean checkExistByEmail(String email) {
-        return memberRepository.existsByEmail(email);
     }
 
 }

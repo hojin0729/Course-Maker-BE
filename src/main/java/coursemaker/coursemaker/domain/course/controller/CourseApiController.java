@@ -193,6 +193,48 @@ public class CourseApiController {
         return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
     }
 
+    // GET - Search by title
+    @Operation(summary = "제목으로 여행 코스 검색", description = "제목에 특정 문자열이 포함된 여행 코스를 검색합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청 형식입니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "title", description = "검색할 코스의 제목"),
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지부터 시작합니다.)")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> searchCoursesByTitle(@RequestParam String title,
+                                                                                            @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                            @RequestParam(defaultValue = "1", name = "page") Integer page) {
+        Pageable pageable = PageRequest.of(page - 1, record);
+
+        CourseMakerPagination<TravelCourse> travelCoursePage = courseService.findByTitleContaining(title, pageable);
+
+        List<TravelCourseResponse> contents = new ArrayList<>();
+        for (TravelCourse travelCourse : travelCoursePage.getContents()) {
+            List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
+                    .stream()
+                    .map(courseDestinationService::toResponse)
+                    .toList();
+
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags));
+        }
+
+        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, travelCoursePage.getTotalContents());
+
+        return ResponseEntity.ok(response);
+    }
+
     // PUT
     /*********스웨거 어노테이션**********/
     @Operation(summary = "코스 수정", description = "유저가 등록한 코스를 수정합니다.")
