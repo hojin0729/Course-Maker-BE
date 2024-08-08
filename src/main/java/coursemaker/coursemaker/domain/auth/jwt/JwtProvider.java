@@ -1,7 +1,7 @@
 package coursemaker.coursemaker.domain.auth.jwt;
 
 import coursemaker.coursemaker.domain.auth.entity.RefreshToken;
-import coursemaker.coursemaker.domain.auth.exception.ExpiredTokenException;
+import coursemaker.coursemaker.domain.auth.exception.ExpiredRefreshTokenException;
 import coursemaker.coursemaker.domain.auth.exception.InvalidTokenException;
 import coursemaker.coursemaker.domain.auth.repository.RefreshTokenRepository;
 import io.jsonwebtoken.*;
@@ -132,7 +132,7 @@ public class JwtProvider {
         } else if(!exists){// 토큰이 유효하지 않을때
             throw new InvalidTokenException("인증되지 않은 토큰입니다.", "[JWT] 인증도지 않은 토큰: " + refreshToken);
         } else {// 토큰이 만료됬을때
-            throw new ExpiredTokenException("토큰이 만료됬습니다.", "[JWT] refresh token 만료: " + refreshToken);
+            throw new ExpiredRefreshTokenException("Refresh 토큰이 만료됬습니다.", "[JWT] refresh token 만료: " + refreshToken);
         }
     }
 
