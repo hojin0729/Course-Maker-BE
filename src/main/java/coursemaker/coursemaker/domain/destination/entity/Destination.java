@@ -30,7 +30,7 @@ public class Destination extends BaseEntity {
     private String pictureLink;
 
     @Column(name = "views")
-    private Integer views;
+    private int views = 0;
 
     @Column(name = "content", columnDefinition = "MEDIUMTEXT")
     private String content;
@@ -61,4 +61,8 @@ public class Destination extends BaseEntity {
     @Column(name = "apiData")
     @ColumnDefault("0")
     private Integer apiData;
+
+    public void incrementViews() {
+        this.views += 1;
+    }
 }
