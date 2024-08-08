@@ -16,4 +16,6 @@ public interface DestinationReviewService {
     DestinationReview findById(Long id);
     // 여행지 리뷰 전체 보기
     CourseMakerPagination<DestinationReview> findAll(Pageable pageable);
+    // 특정 여행지의 평균 평점 조회
+    Double getAverageRating(Long destinationId);
 }

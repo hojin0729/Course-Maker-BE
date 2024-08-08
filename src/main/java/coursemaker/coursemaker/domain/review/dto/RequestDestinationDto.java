@@ -14,7 +14,7 @@ public class RequestDestinationDto {
     private String title;
     private String description;
     private String picture;
-    private BigDecimal rating;
+    private Double rating;
 
     public DestinationReview toEntity(Member member) {
         DestinationReview destinationReview = new DestinationReview();

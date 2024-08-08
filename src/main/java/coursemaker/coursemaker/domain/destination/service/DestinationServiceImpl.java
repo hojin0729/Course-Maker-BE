@@ -5,14 +5,12 @@ import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.DestinationDuplicatedException;
 import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
-import coursemaker.coursemaker.domain.destination.exception.IllegalDestinationArgumentException;
 import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
+import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
-import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
@@ -24,9 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Service
@@ -34,36 +30,40 @@ public class DestinationServiceImpl implements DestinationService {
     private final DestinationRepository destinationRepository;
     private final TagService tagService;
     private final MemberService memberService;
+    private final DestinationReviewService destinationReviewService;
+
 
     @Autowired
-    public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService, MemberService memberService) {
+    public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService, MemberService memberService, @Lazy DestinationReviewService destinationReviewService) {
         this.destinationRepository = destinationRepository;
         this.tagService = tagService;
         this.memberService = memberService;
+        this.destinationReviewService = destinationReviewService;
     }
 
     @Override
     public Destination save(@Valid RequestDto requestDto) {
-        // 멤버를 가져옴
         Member member = memberService.findByNickname(requestDto.getNickname());
 
-        // 여행지 이름 중복 확인
         if (destinationRepository.existsByName(requestDto.getName())) {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
-        // DTO를 엔티티로 변환
         Destination destination = requestDto.toEntity(member);
 
-        // 여행지 엔티티를 저장
+        // 명시적으로 averageRating을 설정하는지 확인
+        destination.setAverageRating(requestDto.getAverageRating() != null ? requestDto.getAverageRating() : 0.0);
+
+        // 디버깅을 위해 설정된 평균 평점 출력
+        System.out.println("Debug: Set averageRating = " + destination.getAverageRating());
+
         Destination savedDestination = destinationRepository.save(destination);
 
-        // 태그를 추가
         tagService.addTagsByDestination(savedDestination.getId(), getTagIds(requestDto));
 
-        // 여행지 엔티티를 저장
-        return destinationRepository.save(destination);
+        return savedDestination;
     }
+
 
     @Override
     public Destination update(Long id, @Valid RequestDto requestDto) {
@@ -177,11 +177,15 @@ public class DestinationServiceImpl implements DestinationService {
     public Destination getLocation(Long destinationId, LocationDto locationDto) {
         // 여행지 id를 이용해서 dto내용들 위치, 경도, 위도 설정
         Destination destination = destinationRepository.findById(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
+                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을 수 없습니다: " + destinationId, "Destination id: " + destinationId));
 
         destination.setLocation(locationDto.getAddress());
         destination.setLatitude(locationDto.getLatitude());
         destination.setLongitude(locationDto.getLongitude());
         return destinationRepository.save(destination);
+    }
+    @Override
+    public Double getAverageRating(Long destinationId) {
+        return destinationReviewService.getAverageRating(destinationId);
     }
 }

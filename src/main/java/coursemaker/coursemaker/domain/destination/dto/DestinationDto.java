@@ -19,9 +19,6 @@ public class DestinationDto {
 
     @Schema(description = "유저 닉네임", example = "coursemaker")
     private String nickname; // 유저 이름
-//      Todo: 고도화때 예정
-//    @Schema(description = "회원 등급", example = "준회원")
-//    private String roles;
 
     @Schema(description = "여행지 이름", defaultValue = "역시 부산은 해운대!")
     @NotNull(message = "여행지 이름을 입력하세요.")
@@ -48,6 +45,10 @@ public class DestinationDto {
     @NotBlank(message = "내용은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String content; // 텍스트 에디터
 
+
+    @Schema(description = "평균 평점", example = "4.5")
+    private Double averageRating; // 평균 평점
+
     @Schema(description = "무장애 여행지 여부")
     private Long disabled;
 
@@ -56,11 +57,10 @@ public class DestinationDto {
 
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
-    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos) {
+    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, Double averageRating) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
-//        dto.setRoles(destination.getMember().getRoles());
         dto.setName(destination.getName());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
@@ -72,6 +72,8 @@ public class DestinationDto {
                 destination.getLatitude()
         );
         dto.setLocation(location);
+        dto.setAverageRating(averageRating);
+        System.out.println("ㅇebug: DestinationDto averageRating = " + dto.getAverageRating()); // 디버깅 메시지 추가
         return dto;
     }
-}
+

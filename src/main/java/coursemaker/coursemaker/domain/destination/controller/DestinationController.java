@@ -5,6 +5,7 @@ import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
@@ -37,10 +38,12 @@ import java.util.List;
 public class DestinationController {
     private final DestinationService destinationService;
     private final TagService tagService;
+    private final DestinationReviewService destinationReviewService;
 
-    public DestinationController(DestinationService destinationService, TagService tagService) {
+    public DestinationController(DestinationService destinationService, TagService tagService, DestinationReviewService destinationReviewService) {
         this.destinationService = destinationService;
         this.tagService = tagService;
+        this.destinationReviewService = destinationReviewService;
     }
 
     @Operation(summary = "전체 여행지 목록 조회", description = "한 페이지에 표시할 데이터 수(record)와 조회할 페이지 번호(page)를 입력하여 전체 여행지 목록을 조회합니다. 페이지 번호는 1부터 시작합니다.")
@@ -72,9 +75,10 @@ public class DestinationController {
 
         for (Destination destination : destinationList) {
             List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
-
-            destinationDtos.add(DestinationDto.toDto(destination, tags));
+            Double averageRating = destinationReviewService.getAverageRating(destination.getId());
+            destinationDtos.add(DestinationDto.toDto(destination, tags, averageRating));
         }
+
 
         Page<DestinationDto> responsePage = new PageImpl<>(destinationDtos, pageable, totalPage);
         CourseMakerPagination<DestinationDto> response = new CourseMakerPagination<>(pageable, responsePage, totalPage);
@@ -101,12 +105,18 @@ public class DestinationController {
             ))
     })
     @Parameter(name = "id", description = "여행지 Id")
+    // DestinationController.java
+
     @GetMapping("/{id}")
     public ResponseEntity<DestinationDto> getDestinationById(@PathVariable("id") Long id) {
         Destination destination = destinationService.findById(id);
         List<TagResponseDto> tags = tagService.findAllByDestinationId(id);
 
-        DestinationDto destinationDto = DestinationDto.toDto(destination, tags);
+        Double averageRating = destinationReviewService.getAverageRating(id);
+
+        System.out.println("Debug: averageRating = " + averageRating);
+
+        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, averageRating);
         return ResponseEntity.ok(destinationDto);
     }
 
@@ -139,10 +149,17 @@ public class DestinationController {
     public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @LoginUser String nickname) {
         request.setNickname(nickname);
         Destination savedDestination = destinationService.save(request);
+
+        Double averageRating = destinationReviewService.getAverageRating(savedDestination.getId());
+
+        System.out.println("Debug: Retrieved averageRating for response = " + averageRating);
+
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId());
-        DestinationDto response = DestinationDto.toDto(savedDestination, tags);
+        DestinationDto response = DestinationDto.toDto(savedDestination, tags, averageRating);
+
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
+
 
     @Operation(summary = "id에 해당하는 여행지 수정", description = "여행지 ID와 수정할 정보를 입력하여 해당 여행지의 정보를 수정합니다.")
     @ApiResponses(value = {
@@ -259,9 +276,11 @@ public class DestinationController {
         }
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId());
-        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags);
+        Double averageRating = destinationReviewService.getAverageRating(updatedDestination.getId());
+        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, averageRating);
         return ResponseEntity.ok(updatedDto);
     }
+
 
     @Operation(summary = "id에 해당하는 여행지 삭제", description = "여행지 ID를 입력하여 해당 여행지를 삭제합니다.")
     @ApiResponses(value = {

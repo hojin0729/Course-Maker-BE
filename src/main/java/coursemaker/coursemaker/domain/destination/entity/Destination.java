@@ -44,6 +44,9 @@ public class Destination extends BaseEntity {
     @Column(name = "latitude", precision = 15, scale = 12)
     private BigDecimal latitude;
 
+    @Column(name = "averageRating", nullable = false)
+    private Double averageRating;
+
     @Column(name = "disabled")
     private Long disabled;
 

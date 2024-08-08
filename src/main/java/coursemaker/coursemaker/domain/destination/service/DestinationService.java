@@ -45,6 +45,9 @@ public interface DestinationService {
     // 위치 정보 메서드
     Destination getLocation(Long destinationId, LocationDto locationDto);
 
+
+    Double getAverageRating(Long destinationId);
+
     /* 코스 찜목록 전체조회*/
     List<DestinationWish> getAllDestinationWishes();
 
@@ -56,4 +59,5 @@ public interface DestinationService {
 
     /* 찜하기 취소 */
     void cancelDestinationWish(Long destinationId, Long memberId);
+
 }
