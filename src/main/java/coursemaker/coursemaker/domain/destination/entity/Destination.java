@@ -57,5 +57,5 @@ public class Destination extends BaseEntity {
 
     @Column(name = "apiData")
     @ColumnDefault("0")
-    private int apiData;
+    private Integer apiData;
 }
