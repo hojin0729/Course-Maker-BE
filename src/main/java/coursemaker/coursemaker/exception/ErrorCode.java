@@ -39,7 +39,7 @@ public enum ErrorCode {
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "Authentication failed", "비밀번호가 잘못되었습니다.", "AUTH-001"),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Access 토큰이 만료됬습니다.", "AUTH-003"),
-    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004");
+    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004");
 
 
 
