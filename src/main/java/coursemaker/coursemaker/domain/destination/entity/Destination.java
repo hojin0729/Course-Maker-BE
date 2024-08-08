@@ -5,6 +5,7 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -55,5 +56,6 @@ public class Destination extends BaseEntity {
     private int seq;
 
     @Column(name = "apiData")
-    private int apiData;
+    @ColumnDefault("0")
+    private Integer apiData;
 }
