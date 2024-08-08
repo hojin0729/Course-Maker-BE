@@ -51,7 +51,7 @@ public class DestinationDto {
     @Schema(description = "무장애 여행지 여부")
     private Long disabled;
 
-    @Schema(description = "공공데이터 여부")
+    @Schema(description = "공공데이터 여부", defaultValue = "0")
     private int apiData;
 
 
