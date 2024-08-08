@@ -56,7 +56,7 @@ public class AuthController {
     @Operation(summary = "회원 로그인", description = "이메일과 비밀번호로 로그인 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다."),
-            @ApiResponse(responseCode = "401", description = "비밀번호가 잘못되었습니다.", content = @Content(
+            @ApiResponse(responseCode = "400", description = "비밀번호가 잘못되었습니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
@@ -87,11 +87,11 @@ public class AuthController {
                             value = "{\"status\": 401, \"errorType\": \"Invalid token\", \"message\": \"인증되지 않은 토큰입니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "401", description = "토큰의 유효기간이 만료됨.", content = @Content(
+            @ApiResponse(responseCode = "400", description = "리프레시 토큰의 유효기간이 만료됨.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 401, \"errorType\": \"Expired token\", \"message\": \"토큰이 만료됬습니다.\"}"
+                            value = "{\"status\": 400, \"errorType\": \"Expired token\", \"message\": \"토큰이 만료됬습니다.\"}"
                     )
             ))
     })

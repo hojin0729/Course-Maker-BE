@@ -1,7 +1,8 @@
 package coursemaker.coursemaker.domain.auth.filter;
 
 import coursemaker.coursemaker.domain.auth.dto.CustomMemberDetails;
-import coursemaker.coursemaker.domain.auth.exception.ExpiredTokenException;
+import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.ExpiredAccessTokenException;
 import coursemaker.coursemaker.domain.auth.exception.InvalidTokenException;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.auth.jwt.TokenType;
@@ -48,17 +49,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         /*토큰 만료 여부 확인*/
         if(jwtProvider.isExpired(token)) {
             log.info("[JWT] access 토큰 만료: {}", jwtProvider.isExpired(token));
-            throw new ExpiredTokenException("토큰이 만료됬습니다.", "Access Token 만료됨.");
+            throw new ExpiredAccessTokenException("토큰이 만료됬습니다.", "Access Token 만료됨.");
         }
 
         String nickname = jwtProvider.getNickname(token);
         Role roles = Role.valueOf(jwtProvider.getRoles(token));
+        LoginedInfo loginedInfo = new LoginedInfo();
         Member member = new Member();
 
         member.setNickname(nickname);
         member.setRoles(roles);
+
+        loginedInfo.setNickname(nickname);
+        loginedInfo.setRole(roles);
+
         CustomMemberDetails customMemberDetails = new CustomMemberDetails(member);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(member, null, customMemberDetails.getAuthorities());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(loginedInfo, null, customMemberDetails.getAuthorities());
 
         log.info("[JWT] 토큰 검증 성공. 사용자: {}", nickname);
 
