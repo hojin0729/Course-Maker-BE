@@ -76,4 +76,4 @@ public class DestinationDto {
         System.out.println("ㅇebug: DestinationDto averageRating = " + dto.getAverageRating()); // 디버깅 메시지 추가
         return dto;
     }
-
+}
