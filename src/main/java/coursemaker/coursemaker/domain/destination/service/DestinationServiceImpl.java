@@ -106,8 +106,13 @@ public class DestinationServiceImpl implements DestinationService {
     @Override
     public Destination findById(Long id) {
         // ID로 여행지를 찾고, 없으면 예외처리
-        return destinationRepository.findById(id)
+        Destination destination = destinationRepository.findById(id)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+
+        destination.incrementViews();
+        destinationRepository.save(destination);
+
+        return destination;
     }
 
     @Override

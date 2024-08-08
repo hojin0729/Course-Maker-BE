@@ -25,6 +25,9 @@ public class DestinationDto {
     @NotBlank(message = "여행지 이름은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String name; // 여행지 이름
 
+    @Schema(description = "조회수", example = "100")
+    private int views; // 조회수
+
     @Schema(description = "태그 리스트")
     @NotNull(message = "태그 리스트는 비어 있을 수 없습니다.")
     @Size(min = 1, message = "적어도 하나의 태그가 있어야 합니다.")
@@ -62,6 +65,7 @@ public class DestinationDto {
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
         dto.setName(destination.getName());
+        dto.setViews(destination.getViews());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
         dto.setTags(tagDtos);

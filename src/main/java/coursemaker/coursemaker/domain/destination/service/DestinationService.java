@@ -48,16 +48,16 @@ public interface DestinationService {
 
     Double getAverageRating(Long destinationId);
 
-    /* 코스 찜목록 전체조회*/
-    List<DestinationWish> getAllDestinationWishes();
-
-    /* 코스 찜목록 닉네임으로 조회 */
-    List<DestinationWish> getCourseWishesByNickname(String nickname);
-
-    /* 코스 찜하기 */
-    DestinationWish addDestinationWish(Long destinationId, Long memberId);
-
-    /* 찜하기 취소 */
-    void cancelDestinationWish(Long destinationId, Long memberId);
+//    /* 코스 찜목록 전체조회*/
+//    List<DestinationWish> getAllDestinationWishes();
+//
+//    /* 코스 찜목록 닉네임으로 조회 */
+//    List<DestinationWish> getCourseWishesByNickname(String nickname);
+//
+//    /* 코스 찜하기 */
+//    DestinationWish addDestinationWish(Long destinationId, Long memberId);
+//
+//    /* 찜하기 취소 */
+//    void cancelDestinationWish(Long destinationId, Long memberId);
 
 }
