@@ -1,18 +1,8 @@
 package coursemaker.coursemaker.domain.tag.controller;
 
-import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.tag.dto.TagUpdateDto;
-import coursemaker.coursemaker.domain.tag.service.OrderBy;
-import coursemaker.coursemaker.util.CourseMakerPagination;
-import coursemaker.coursemaker.util.LoginUser;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
-import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
-import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
-import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,10 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

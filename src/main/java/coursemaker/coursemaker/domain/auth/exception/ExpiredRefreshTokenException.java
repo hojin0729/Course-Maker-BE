@@ -5,11 +5,11 @@ import coursemaker.coursemaker.exception.RootException;
 import lombok.Getter;
 
 @Getter
-public class ExpiredTokenException extends RootException {
+public class ExpiredRefreshTokenException extends RootException {
     private final String message;
 
-    public ExpiredTokenException(String message, String logMessage) {
-        super(ErrorCode.EXPIRED_TOKEN, logMessage, message);
+    public ExpiredRefreshTokenException(String message, String logMessage) {
+        super(ErrorCode.EXPIRED_REFRESH_TOKEN, logMessage, message);
         this.message = message;
     }
 }

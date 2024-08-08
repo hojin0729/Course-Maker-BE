@@ -1,6 +1,6 @@
 package coursemaker.coursemaker.exception;
 
-import coursemaker.coursemaker.domain.auth.exception.ExpiredTokenException;
+import coursemaker.coursemaker.domain.auth.exception.ExpiredAccessTokenException;
 import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.auth.exception.InvalidTokenException;
 import coursemaker.coursemaker.domain.auth.exception.UnAuthorizedException;
@@ -27,8 +27,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 public class GlobalExceptionHandler {
 
     /*인증 관련 예외처리*/
-    @ExceptionHandler(ExpiredTokenException.class)
-    public ResponseEntity<ErrorResponse> handleExpiredTokenException(ExpiredTokenException e) {
+    @ExceptionHandler(ExpiredAccessTokenException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredTokenException(ExpiredAccessTokenException e) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorType(e.getErrorCode().getErrorType());
         response.setMessage(e.getMessage());
