@@ -7,7 +7,6 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.repository.CourseWishRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     /* 코스 찜목록 닉네임으로 조회 */
     @Override
     public List<CourseWish> getCourseWishesByNickname(String nickname) {
-        List<CourseWish> courseWishes = courseWishRepository.findByMember_Nickname(nickname);
+        List<CourseWish> courseWishes = courseWishRepository.findByMemberNickname(nickname);
         if (courseWishes.isEmpty()) {
             throw new RuntimeException("해당 코스 찜 정보가 없습니다.");
         }

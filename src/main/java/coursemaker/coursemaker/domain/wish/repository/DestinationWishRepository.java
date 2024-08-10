@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface DestinationWishRepository extends JpaRepository<DestinationWish, Long> {
     List<DestinationWish> findByMember_Nickname(String nickname);
 
-    Optional<DestinationWish> findByDestinationWishIdAndMemberId(Long courseId, Long memberId);
+    Optional<DestinationWish> findByDestinationIdAndMemberId(Long courseId, Long memberId);
 }

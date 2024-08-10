@@ -1,8 +1,6 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
-import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
-import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +35,7 @@ public class DestinationWishController {
 
     /*목적지찜 닉네임으로 조회*/
     @Operation(summary = "닉네임으로 목적지찜 목록 조회")
-    @GetMapping
+    @GetMapping("/{nickname}")
     public ResponseEntity<List<DestinationWish>> getDestinationWishesByNickname(@RequestParam String nickname) {
         List<DestinationWish> destinationWishes = destinationWishService.getDestinationWishesByNickname(nickname);
         return ResponseEntity.ok(destinationWishes);
