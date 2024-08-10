@@ -6,10 +6,12 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 import coursemaker.coursemaker.domain.wish.repository.DestinationWishRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class DestinationWishServiceImpl implements DestinationWishService {
 
     private DestinationWishRepository destinationWishRepository;
@@ -51,7 +53,7 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     /* 찜하기 취소 */
     @Override
     public void cancelDestinationWish(Long destinationId, Long memberId) {
-        Optional<DestinationWish> optionalDestinationWish = destinationWishRepository.findByDestinationWishIdAndMemberId(destinationId, memberId);
+        Optional<DestinationWish> optionalDestinationWish = destinationWishRepository.findByDestinationIdAndMemberId(destinationId, memberId);
         if (optionalDestinationWish.isPresent()) {
             destinationWishRepository.delete(optionalDestinationWish.get());
         } else {
