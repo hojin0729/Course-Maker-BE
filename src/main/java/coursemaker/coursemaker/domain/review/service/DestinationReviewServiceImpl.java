@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.OptionalDouble;
 
 @Service
 public class DestinationReviewServiceImpl implements DestinationReviewService {
@@ -72,11 +71,12 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id: " + id));
     }
 
+
     @Override
-    public CourseMakerPagination<DestinationReview> findAll(Pageable pageable) {
-        Page<DestinationReview> page = destinationReviewRepository.findAll(pageable);
-        // CourseMakerPagination<DestinationReview> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total)
-        return null;
+    public CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable) {
+        Destination destination = destinationService.findById(destinationId);
+        Page<DestinationReview> page = destinationReviewRepository.findByDestination(destination, pageable);
+        return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
     }
 
     @Override

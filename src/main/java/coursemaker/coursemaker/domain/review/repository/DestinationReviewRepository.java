@@ -15,6 +15,6 @@ import java.util.Optional;
 @Repository
 public interface DestinationReviewRepository extends JpaRepository<DestinationReview, Long>{
     Optional<DestinationReview> findByMemberAndDestination(Member member, Destination destination);
-    Page<DestinationReview> findAll(Pageable pageable);
+    Page<DestinationReview> findByDestination(Destination destination, Pageable pageable);
     List<DestinationReview> findByDestinationId(Long destinationId);
 }
