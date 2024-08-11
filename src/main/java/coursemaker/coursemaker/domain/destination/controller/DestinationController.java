@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.destination.controller;
 
+import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
@@ -7,12 +8,10 @@ import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -105,8 +105,6 @@ public class DestinationController {
             ))
     })
     @Parameter(name = "id", description = "여행지 Id")
-    // DestinationController.java
-
     @GetMapping("/{id}")
     public ResponseEntity<DestinationDto> getDestinationById(@PathVariable("id") Long id) {
         Destination destination = destinationService.findById(id);
@@ -146,7 +144,9 @@ public class DestinationController {
             ))
     })
     @PostMapping
-    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @LoginUser String nickname) {
+    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo logined) {
+        // 로그인 한 사용자 닉네임 가져오기
+        String nickname = logined.getNickname();
         request.setNickname(nickname);
         Destination savedDestination = destinationService.save(request);
 
@@ -159,7 +159,6 @@ public class DestinationController {
 
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
-
 
     @Operation(summary = "id에 해당하는 여행지 수정", description = "여행지 ID와 수정할 정보를 입력하여 해당 여행지의 정보를 수정합니다.")
     @ApiResponses(value = {
@@ -267,7 +266,9 @@ public class DestinationController {
     })
     @Parameter(name = "id", description = "여행지 Id")
     @PatchMapping("/{id}")
-    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @LoginUser String nickname) {
+    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo logined) {
+        // 로그인 한 사용자 닉네임 가져오기
+        String nickname = logined.getNickname();
         request.setNickname(nickname);
         // 해당 여행지가 로그인한 사용자에게 속하는지 확인
         Destination existingDestination = destinationService.findById(id);
@@ -309,7 +310,9 @@ public class DestinationController {
     })
     @Parameter(name = "id", description = "여행지 Id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id, @LoginUser String nickname) {
+    public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+        // 로그인 한 사용자 닉네임 가져오기
+        String nickname = logined.getNickname();
         // 해당 ID의 여행지가 존재하는지 확인합니다.
         Destination destination = destinationService.findById(id);
         if (destination == null) {

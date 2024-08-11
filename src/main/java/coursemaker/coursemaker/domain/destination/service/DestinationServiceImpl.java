@@ -109,7 +109,7 @@ public class DestinationServiceImpl implements DestinationService {
         Destination destination = destinationRepository.findById(id)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
 
-        destination.incrementViews();
+        incrementViews(destination.getId());
         destinationRepository.save(destination);
 
         return destination;
@@ -133,6 +133,14 @@ public class DestinationServiceImpl implements DestinationService {
     public void deleteById(Long id) {
         // ID의 여행지를 삭제
         destinationRepository.deleteById(id);
+    }
+    @Override
+    public void incrementViews(Long destinationId) {
+        Destination destination = destinationRepository.findById(destinationId)
+                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationId));
+
+        destination.incrementViews();
+        destinationRepository.save(destination);
     }
 
     // 여행지 id에 대한 대표사진을 추가하는 메서드
