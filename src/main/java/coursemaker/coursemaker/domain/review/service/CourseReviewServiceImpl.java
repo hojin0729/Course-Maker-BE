@@ -68,8 +68,9 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     }
 
     @Override
-    public CourseMakerPagination<CourseReview> findAll(Pageable pageable) {
-        Page<CourseReview> page = courseReviewRepository.findAll(pageable);
-        return null; // 구현 필요
+    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable) {
+        Page<CourseReview> page = courseReviewRepository.findByTravelCourseId(courseId, pageable);
+        return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
     }
+
 }

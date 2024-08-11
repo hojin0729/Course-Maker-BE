@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.review.controller;
 
+import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
@@ -9,6 +10,7 @@ import coursemaker.coursemaker.domain.review.entity.CourseReview;
 import coursemaker.coursemaker.domain.review.exception.CourseReviewNotFoundException;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
 import coursemaker.coursemaker.exception.ErrorResponse;
+import coursemaker.coursemaker.util.CourseMakerPagination;
 import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,10 +20,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @io.swagger.v3.oas.annotations.tags.Tag(name = "CourseReview", description = "코스 리뷰 API")
 @RestController
@@ -83,8 +91,12 @@ public class CourseReviewController {
     @PostMapping
     public ResponseEntity<ResponseCourseDto> createCourseReview(@RequestBody @Valid RequestCourseDto requestCourseDto,
                                                                 @RequestParam(name = "courseId") Long courseId,
-                                                                @LoginUser String nickname) {
+                                                                @AuthenticationPrincipal LoginedInfo logined) {
+
+        // 로그인한 사용자 닉네임 가져오기
+        String nickname = logined.getNickname();
         requestCourseDto.setNickname(nickname);
+
         CourseReview savedCourseReview = courseReviewService.save(requestCourseDto, courseId);
         TravelCourse travelCourse = courseService.findById(courseId);
         ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, savedCourseReview);
@@ -127,8 +139,12 @@ public class CourseReviewController {
     @PutMapping("/{id}")
     public ResponseEntity<ResponseCourseDto> updateCourseReview(@RequestBody @Valid RequestCourseDto requestCourseDto,
                                                                 @RequestParam(name = "courseId") Long courseId,
-                                                                @LoginUser String nickname) {
+                                                                @AuthenticationPrincipal LoginedInfo logined) {
+
+        // 로그인한 사용자 닉네임 가져오기
+        String nickname = logined.getNickname();
         requestCourseDto.setNickname(nickname);
+
         CourseReview updatedCourseReview = courseReviewService.update(courseId, requestCourseDto, nickname);
         TravelCourse travelCourse = courseService.findById(courseId);
         ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, updatedCourseReview);
@@ -162,15 +178,50 @@ public class CourseReviewController {
     })
     @Parameter(name = "id", description = "리뷰 ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deleteCourseReview(@PathVariable("id") Long id, @LoginUser String nickname) {
+    public ResponseEntity<Long> deleteCourseReview(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
         CourseReview courseReview = courseReviewService.findById(id);
         if (courseReview == null) {
             return ResponseEntity.notFound().build();
         }
+
+        // 로그인한 사용자 닉네임 가져오기
+        String nickname = logined.getNickname();
         if (!courseReview.getMember().getNickname().equals(nickname)) {
             throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         courseReviewService.delete(id);
         return ResponseEntity.ok(id);
     }
+
+    @Operation(summary = "코스 ID에 따른 리뷰 페이지네이션 조회", description = "특정 코스에 대한 리뷰를 페이지네이션하여 조회합니다.")
+    @Parameter(name = "courseId", description = "리뷰를 조회할 코스의 ID", required = true)
+    @Parameter(name = "record", description = "페이지당 표시할 데이터 수")
+    @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작합니다.)")
+    @GetMapping
+    public ResponseEntity<CourseMakerPagination<ResponseCourseDto>> getAllCourseReviewsByCourseId(
+            @RequestParam(name = "courseId") Long courseId,
+            @RequestParam(defaultValue = "20", name = "record") int record,
+            @RequestParam(defaultValue = "1", name = "page") int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, record);
+
+        CourseMakerPagination<CourseReview> reviewPage = courseReviewService.findAllByCourseId(courseId, pageable);
+        List<CourseReview> reviewList = reviewPage.getContents();
+
+        List<ResponseCourseDto> responseDtos = reviewList.stream()
+                .map(review -> {
+                    TravelCourse travelCourse = courseService.findById(review.getTravelCourse().getId());
+                    return ResponseCourseDto.toDto(travelCourse, review);
+                })
+                .collect(Collectors.toList());
+
+        CourseMakerPagination<ResponseCourseDto> responseReviewPage = new CourseMakerPagination<>(
+                pageable,
+                new PageImpl<>(responseDtos, pageable, reviewPage.getTotalContents()),
+                reviewPage.getTotalContents()
+        );
+
+        return ResponseEntity.ok(responseReviewPage);
+    }
+
 }
