@@ -14,5 +14,5 @@ import java.util.Optional;
 @Repository
 public interface CourseReviewRepository extends JpaRepository<CourseReview, Long> {
     Optional<CourseReview> findByMemberAndTravelCourse(Member member, TravelCourse travelCourse);
-    Page<CourseReview> findAll(Pageable pageable);
+    Page<CourseReview> findByTravelCourseId(Long courseId, Pageable pageable);
 }

@@ -13,7 +13,7 @@ public class ResponseDestinationDto {
     private String title;
     private String description;
     private String picture;
-    private BigDecimal rating;
+    private Double rating;
 
     public static ResponseDestinationDto toDto(Destination destination, DestinationReview destinationReview) {
         ResponseDestinationDto dto = new ResponseDestinationDto();

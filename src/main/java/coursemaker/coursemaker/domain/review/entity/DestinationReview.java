@@ -28,7 +28,7 @@ public class DestinationReview extends BaseEntity {
     private Member member;
 
     @Column(name = "rating")
-    private BigDecimal rating;
+    private Double rating;
 
     @ManyToOne
     @JoinColumn(name = "destinationId")

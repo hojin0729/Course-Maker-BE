@@ -17,6 +17,6 @@ public interface CourseReviewService {
     // id 기반으로 특정 코스리뷰 조회하는 메서드
     CourseReview findById(Long id);
     // 코스 리뷰 전체 보기
-    CourseMakerPagination<CourseReview> findAll(Pageable pageable);
+    CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable);
  }
 
