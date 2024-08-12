@@ -1,6 +1,5 @@
 package coursemaker.coursemaker.domain.wish.service;
 
-import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 
 import java.util.List;

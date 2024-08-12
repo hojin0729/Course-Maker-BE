@@ -1,16 +1,11 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
-import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
-import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -39,7 +34,7 @@ public class CourseWishController {
 
     /*코스찜 닉네임으로 조회*/
     @Operation(summary = "닉네임으로 코스찜 목록 조회")
-    @GetMapping
+    @GetMapping("/{nickname}")
     public ResponseEntity<List<CourseWish>> getCourseWishesByNickname(@RequestParam String nickname) {
         List<CourseWish> courseWishes = courseWishService.getCourseWishesByNickname(nickname);
         return ResponseEntity.ok(courseWishes);
