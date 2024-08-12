@@ -15,5 +15,8 @@ public interface DestinationReviewService {
     // id 기반으로 특정 여행지 리뷰 조회하는 메서드
     DestinationReview findById(Long id);
     // 여행지 리뷰 전체 보기
-    CourseMakerPagination<DestinationReview> findAll(Pageable pageable);
+    CourseMakerPagination<DestinationReview> findAllByDestinationId (Long destinationId, Pageable pageable);
+
+    // 특정 여행지의 평균 평점 조회
+    Double getAverageRating(Long destinationId);
 }

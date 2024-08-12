@@ -30,6 +30,9 @@ public interface DestinationService {
     // id 기반으로 여행지를 삭제하는 메서드
     void deleteById(Long id);
 
+    // 조회수 증가 메서드 정의
+    void incrementViews(Long destinationId);
+
     // 여행지 id에 대한 대표사진을 추가하는 메서드
     void addPictureLink(Long destinationId, String pictureLink);
 
@@ -44,4 +47,7 @@ public interface DestinationService {
 
     // 위치 정보 메서드
     Destination getLocation(Long destinationId, LocationDto locationDto);
+
+    Double getAverageRating(Long destinationId);
+
 }
