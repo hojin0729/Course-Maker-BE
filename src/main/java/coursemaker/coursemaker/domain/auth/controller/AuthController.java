@@ -146,7 +146,7 @@ public class AuthController {
             ))
     })
     @PostMapping("/validate/nickname")
-    public ResponseEntity<Void> validateNickname(@RequestBody NicknameValidateRequestDTO nickname){
+    public ResponseEntity<Void> validateNickname(@Valid @RequestBody NicknameValidateRequestDTO nickname){
         NicknameValidate validate = authService.validateNickname(nickname.getNickname());
 
         if(validate == NicknameValidate.IS_EXIST){// 닉네임 중복
