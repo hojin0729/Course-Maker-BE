@@ -3,7 +3,9 @@ package coursemaker.coursemaker.domain.auth.controller;
 import coursemaker.coursemaker.domain.auth.dto.*;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
+import coursemaker.coursemaker.domain.auth.service.NicknameValidate;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -123,6 +125,38 @@ public class AuthController {
         jwtProvider.expireRefreshToken(withdrawalRequestDto.getRefreshToken());
         authService.withdrawal(member.getNickname());
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "닉네임 검증", description = "닉네임이 존재 하는지, 닉네임이 정책에 맞는지 확인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용 가능한 닉네임일 경우"),
+            @ApiResponse(responseCode = "400", description = "닉네임 패턴이 일치하지 않음.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"닉네임은 2~10글자의 한글과 영어 소문자로 구성되야 합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임일 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 사용중인 닉네임 입니다.\"}"
+                    )
+            ))
+    })
+    @PostMapping("/validate/nickname")
+    public ResponseEntity<Void> validateNickname(@RequestBody NicknameValidateRequestDTO nickname){
+        NicknameValidate validate = authService.validateNickname(nickname.getNickname());
+
+        if(validate == NicknameValidate.IS_EXIST){// 닉네임 중복
+            throw new UserDuplicatedException("이미 사용중인 닉네임 입니다.", "[AUTH] 사용자 중복 검증: "+ nickname.getNickname());// 409 예외
+        } else if(validate == NicknameValidate.IS_NOT_MATCH_PATTERN){// 패턴이 안맞음
+            throw new IllegalArgumentException("닉네임은 2~10글자의 한글과 영어 소문자로 구성되야 합니다.");// 400 예외
+        } else{
+            return ResponseEntity.ok().build();
+        }
+
     }
 //
 //
