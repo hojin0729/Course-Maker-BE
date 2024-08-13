@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Pattern;
+
 @Slf4j
 @Service
 @Transactional
@@ -69,7 +71,7 @@ public class AuthService {
     public void withdrawal(String nickname) {
 
         if(nickname == null) {
-            throw new IllegalArgumentException("닉네임은 null 값이 들어갈 수 없습니다. 로그인 혹은 인자값을 확인해주시요.");
+            throw new IllegalArgumentException("로그인 상태를 확인해주세요.");
         }
 
         Member member = memberRepository.findByNickname(nickname).orElseThrow(() ->
@@ -79,6 +81,24 @@ public class AuthService {
         memberRepository.delete(member);
 
         log.info("[Auth] 회원 탈퇴. 닉네임: {}", member.getNickname());
+    }
+
+    public NicknameValidate validateNickname(String nickname) {
+
+        /*닉네임 정책에 적합한지 판별*/
+        String pattern = "^[a-z0-9가-힣ㄱ-ㅎ]{2,10}$";
+        boolean isMatches = Pattern.matches(pattern, nickname);
+        if(!isMatches) {
+            return NicknameValidate.IS_NOT_MATCH_PATTERN;
+        }
+
+        /*닉네임 존재 여부 판별*/
+        boolean isExist = memberRepository.findByNickname(nickname).isPresent();
+        if(!isExist) {
+            return NicknameValidate.IS_NOT_EXIST;
+        } else{
+            return NicknameValidate.IS_EXIST;
+        }
     }
 
 }
