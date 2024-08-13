@@ -55,7 +55,7 @@ public class CourseApiController {
 
     private final CourseDestinationService courseDestinationService;
 
-     // POST
+    // POST
     /*********스웨거 어노테이션**********/
     @Operation(summary = "코스 등록", description = "유저가 코스를 등록합니다.")
     @ApiResponses(value = {
@@ -174,6 +174,9 @@ public class CourseApiController {
                     )
             ))
     })
+    @Parameters({
+            @Parameter(name = "id", description = "조회할 코스의 id값 입니다.")
+    })
     /*********스웨거 어노테이션**********/
     @GetMapping("/{id}")
     public ResponseEntity<TravelCourseResponse> findTravelCourseById(@PathVariable("id") Long id) {
@@ -276,6 +279,9 @@ public class CourseApiController {
                     )
             ))
     })
+    @Parameters({
+            @Parameter(name = "id", description = "수정할 코스의 id값 입니다.")
+    })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
     public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id, @Valid @RequestBody UpdateTravelCourseRequest request, @LoginUser String nickname) {
@@ -327,6 +333,9 @@ public class CourseApiController {
                             value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 코스를 찾을 수 없습니다.\"}"
                     )
             ))
+    })
+    @Parameters({
+            @Parameter(name = "id", description = "삭제할 코스의 id값 입니다.")
     })
     /*********스웨거 어노테이션**********/
     @DeleteMapping("/{id}")

@@ -42,7 +42,7 @@ public class TourApiController {
     /*********스웨거 어노테이션**********/
     @Operation(summary = "공공데이터 id로 찾기", description = "공공데이터를 id로 찾습니다.")
     @Parameters({
-            @Parameter(name = "id", description = "공공데이터 고유의 id값 입니다."),
+            @Parameter(name = "id", description = "조회할 공공데이터 여행지의 id값 입니다."),
     })
     /*********스웨거 어노테이션**********/
     @GetMapping("/{id}")
