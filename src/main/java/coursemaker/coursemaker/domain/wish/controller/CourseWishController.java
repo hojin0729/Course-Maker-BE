@@ -55,72 +55,54 @@ public class CourseWishController {
     public ResponseEntity<CourseWishResponseDto> addCourseWish(@RequestBody CourseWishRequestDto requestDto,
                                                                @AuthenticationPrincipal LoginedInfo logined) {
 
-        String nickname = logined.getNickname();
-        requestDto.setNickname(nickname);
-        CourseWish courseWish = courseWishService.addCourseWish(requestDto.getCourseId(), requestDto.getNickname());
-        CourseWishResponseDto responseDto = new CourseWishResponseDto(
-                courseWish.getId(),
-                courseWish.getTravelCourse().getId(),
-                courseWish.getTravelCourse().getTitle(),
-                courseWish.getMember().getNickname()
-        );
+        // 인증된 사용자의 닉네임을 요청 DTO에 설정
+        requestDto.setNickname(logined.getNickname());
+
+        // 서비스 호출을 통해 코스 찜 등록
+        CourseWishResponseDto responseDto = courseWishService.addCourseWish(requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
 
 
-    /*코스찜 취소*/
+    /* 코스찜 취소 */
     @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
     @DeleteMapping("/{courseId}")
     public ResponseEntity<Void> cancelCourseWish(
             @PathVariable Long courseId,
             @AuthenticationPrincipal LoginedInfo logined) {
 
-        // 인증된 사용자와 요청된 memberId가 일치하는지 확인.
-        String nickname = logined.getNickname();
-
-        courseWishService.cancelCourseWish(courseId, nickname);
+        // 인증된 사용자의 닉네임을 사용하여 코스 찜 취소
+        courseWishService.cancelCourseWish(courseId, logined.getNickname());
         return ResponseEntity.noContent().build();
     }
 
 
-    /*코스찜 닉네임으로 조회*/
+    /* 코스찜 닉네임으로 조회 */
     @GetMapping("/{nickname}")
-    @Operation(summary = "닉네임으로 코스찜 조회", description = "넥네임을 사용하여 코스찜을 목록 조회합니다.")
-    @Parameter(name = "nickname", description = "코스찜한 사용자의 nickname", required = true)
+    @Operation(summary = "닉네임으로 코스찜 조회", description = "닉네임을 사용하여 코스찜 목록을 조회합니다.")
+    @Parameter(name = "nickname", description = "코스찜한 사용자의 닉네임", required = true)
     public ResponseEntity<List<CourseWishResponseDto>> getCourseWishesByNickname(@PathVariable String nickname,
                                                                                  @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
         if (!nickname.equals(logined.getNickname())) {
-            throw new RuntimeException("요청된 닉네임이 로그인된 사용자와 일치하지 않습니다.");
+            return ResponseEntity.status(403).build(); // Forbidden
         }
 
-        List<CourseWish> courseWishes = courseWishService.getCourseWishesByNickname(nickname);
-        List<CourseWishResponseDto> responseDtos = courseWishes.stream()
-                .map(courseWish -> new CourseWishResponseDto(
-                        courseWish.getId(),
-                        courseWish.getTravelCourse().getId(),
-                        courseWish.getTravelCourse().getTitle(),
-                        courseWish.getMember().getNickname()
-                ))
-                .toList();
+        // 서비스 호출을 통해 코스찜 목록 조회
+        List<CourseWishResponseDto> responseDtos = courseWishService.getCourseWishesByNickname(nickname);
         return ResponseEntity.ok(responseDtos);
     }
 
-    /*코스찜 전체조회*/
+
+
+    /* 코스찜 전체조회 */
     @GetMapping
-    @Operation(summary = "코스찜 목록 전체조회", description = "코스찜 목록을 전체조회합니다.")
+    @Operation(summary = "코스찜 목록 전체조회", description = "코스찜 목록을 전체 조회합니다.")
     public ResponseEntity<List<CourseWishResponseDto>> getAllCourseWishes() {
-        List<CourseWish> courseWishes = courseWishService.getAllCourseWishes();
-        List<CourseWishResponseDto> responseDtos = courseWishes.stream()
-                .map(courseWish -> new CourseWishResponseDto(
-                        courseWish.getId(),
-                        courseWish.getTravelCourse().getId(),
-                        courseWish.getTravelCourse().getTitle(),
-                        courseWish.getMember().getNickname()
-                ))
-                .toList();
+        // 서비스 호출을 통해 전체 코스찜 목록 조회
+        List<CourseWishResponseDto> responseDtos = courseWishService.getAllCourseWishes();
         return ResponseEntity.ok(responseDtos);
     }
 
