@@ -15,10 +15,10 @@ public class CourseWishRequestDto {
 
     @Schema(description = "사용자의 Id", example = "1")
     @NotNull(message = "사용자의 ID를 입력해주세요.")
-    private Long memberId;
+    private String nickname;
 
-    public CourseWishRequestDto(Long courseId, Long memberId) {
+    public CourseWishRequestDto(Long courseId, String nickname) {
         this.courseId = courseId;
-        this.memberId = memberId;
+        this.nickname = nickname;
     }
 }

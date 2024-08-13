@@ -39,10 +39,10 @@ public class CourseWishServiceImpl implements CourseWishService {
 
     /* 코스 찜하기 */
     @Override
-    public CourseWish addCourseWish(Long courseId, Long memberId) {
+    public CourseWish addCourseWish(Long courseId, String nickname) {
         TravelCourse travelCourse = travelCourseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("해당 코스를 찾을 수 없습니다."));
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new RuntimeException("해당 멤버를 찾을 수 없습니다."));
 
         CourseWish courseWish = new CourseWish();
@@ -54,8 +54,13 @@ public class CourseWishServiceImpl implements CourseWishService {
 
     /* 찜하기 취소 */
     @Override
-    public void cancelCourseWish(Long courseId, Long memberId) {
-        Optional<CourseWish> optionalCourseWish = courseWishRepository.findByTravelCourseIdAndMemberId(courseId, memberId);
+    public void cancelCourseWish(Long courseId, String nickname) {
+        // nickname을 사용하여 회원 정보를 조회
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("해당 닉네임을 가진 사용자가 존재하지 않습니다."));
+
+        // 조회된 회원의 ID를 사용하여 CourseWish를 조회
+        Optional<CourseWish> optionalCourseWish = courseWishRepository.findByTravelCourseIdAndMemberId(courseId, member.getId());
         if (optionalCourseWish.isPresent()) {
             courseWishRepository.delete(optionalCourseWish.get());
         } else {

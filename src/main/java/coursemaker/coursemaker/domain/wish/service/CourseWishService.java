@@ -10,7 +10,7 @@ public interface CourseWishService {
 
     List<CourseWish> getCourseWishesByNickname(String nickname);
 
-    CourseWish addCourseWish(Long courseId, Long memberId);
+    CourseWish addCourseWish(Long courseId, String nickname);
 
-    void cancelCourseWish(Long courseId, Long memberId);
+    void cancelCourseWish(Long courseId, String nickname);
 }

@@ -13,12 +13,12 @@ public class DestinationWishRequestDto {
     @NotNull(message = "목적지 ID를 입력해주세요.")
     private Long destinationId;
 
-    @Schema(description = "사용자의 Id", example = "1")
-    @NotNull(message = "사용자 ID를 입력해주세요.")
-    private Long memberId;
+    @Schema(description = "사용자의 nickname", example = "nickname1")
+    @NotNull(message = "사용자 nickname을 입력해주세요.")
+    private String nickname;
 
-    public DestinationWishRequestDto(Long destinationId, Long memberId) {
+    public DestinationWishRequestDto(Long destinationId, String nickname) {
         this.destinationId = destinationId;
-        this.memberId = memberId;
+        this.nickname = nickname;
     }
 }

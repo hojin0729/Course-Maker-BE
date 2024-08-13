@@ -17,17 +17,13 @@ public class CourseWishResponseDto {
     @Schema(description = "코스의 타이틀", example = "Course Title1")
     private String courseTitle;
 
-    @Schema(description = "사용자의 Id", example = "1")
-    private Long memberId;
-
     @Schema(description = "사용자의 nickname", example = "nickname1")
     private String memberNickname;
 
-    public CourseWishResponseDto(Long id, Long courseId, String courseTitle, Long memberId, String memberNickname) {
+    public CourseWishResponseDto(Long id, Long courseId, String courseTitle, String memberNickname) {
         this.id = id;
         this.courseId = courseId;
         this.courseTitle = courseTitle;
-        this.memberId = memberId;
         this.memberNickname = memberNickname;
     }
 }

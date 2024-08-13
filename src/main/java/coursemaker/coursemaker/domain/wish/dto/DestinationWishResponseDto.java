@@ -15,19 +15,16 @@ public class DestinationWishResponseDto {
     private Long destinationId;
 
     @Schema(description = "목적지의 이름", example = "Course Title1")
-    private String destinationName;  // Destination의 이름이 있다고 가정
+    private String destinationName;
 
-    @Schema(description = "사용자의 ID", example = "해운대")
-    private Long memberId;
 
     @Schema(description = "사용자의 닉네임", example = "Nickname")
-    private String memberNickname;  // Member의 닉네임이 있다고 가정
+    private String memberNickname;
 
-    public DestinationWishResponseDto(Long id, Long destinationId, String destinationName, Long memberId, String memberNickname) {
+    public DestinationWishResponseDto(Long id, Long destinationId, String destinationName, String memberNickname) {
         this.id = id;
         this.destinationId = destinationId;
         this.destinationName = destinationName;
-        this.memberId = memberId;
         this.memberNickname = memberNickname;
     }
 }
