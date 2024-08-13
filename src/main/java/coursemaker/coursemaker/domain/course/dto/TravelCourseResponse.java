@@ -47,7 +47,10 @@ public class TravelCourseResponse {
     @Schema(description = "코스 만든 멤버")
     private final CourseMemberResponse member;
 
-    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses, List<TagResponseDto> tags) {
+    @Schema(description = "해당 코스가 로그인 한 사용자가 작성한 코스인지 여부")
+    private final boolean isMine;
+
+    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses, List<TagResponseDto> tags, boolean isMine) {
         this.id = travelCourse.getId();
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
@@ -59,6 +62,7 @@ public class TravelCourseResponse {
         this.member = new CourseMemberResponse(travelCourse.getMember());
         this.courseDestinations = courseDestinationResponses;
         this.tags = tags;
+        this.isMine = isMine;
         // TODO: 코스태그 - 코스간에 연관관계를 잘 공부해보세여
 //        this.courseTags = travelCourse.getCourseTags().stream()
 //                .map(courseTag -> {
