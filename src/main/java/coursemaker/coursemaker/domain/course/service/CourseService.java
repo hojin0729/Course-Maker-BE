@@ -13,6 +13,8 @@ public interface CourseService {
     CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable);
     TravelCourse findById(Long id);
     CourseMakerPagination<TravelCourse> findByTitleContaining(String title, Pageable pageable);
+    // 닉네임으로 코스를 검색하는 메서드
+    CourseMakerPagination<TravelCourse> findByMemberNickname(String nickname, Pageable pageable);
     TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname);
     void delete(Long id, String nickname);
     TravelCourse incrementViews(Long id);
