@@ -142,7 +142,7 @@ public class CourseApiController {
         List<TravelCourse> travelCourses = travelCoursePage.getContents();
 
         for (TravelCourse travelCourse : travelCourses) {
-            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -184,7 +184,8 @@ public class CourseApiController {
         TravelCourse travelCourse = courseService.incrementViews(id);
 
         // 로그인 한 사용자의 닉네임과 코스를 작성한 사용자의 닉네임을 비교
-        boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+        // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
+        boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
@@ -227,7 +228,7 @@ public class CourseApiController {
 
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
-            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -294,7 +295,14 @@ public class CourseApiController {
                                                                    @Valid @RequestBody UpdateTravelCourseRequest request, /*@LoginUser String nickname*/
                                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
-        String nickname = loginedInfo.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         request.setNickname(nickname);
         log.info("---------------------------------------------------id = {}", id);
         TravelCourse updatedTravelCourse = courseService.update(id, request, nickname);
@@ -355,8 +363,13 @@ public class CourseApiController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id, /*@LoginUser String nickname*/
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
-        /*로그인 한 사용자 닉네임*/
-        String nickname = loginedInfo.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         courseService.delete(id, nickname);
 
         return ResponseEntity.ok()
