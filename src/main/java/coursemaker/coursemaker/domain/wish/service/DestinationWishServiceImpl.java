@@ -1,12 +1,15 @@
 package coursemaker.coursemaker.domain.wish.service;
 
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
+import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.repository.DestinationWishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,9 +69,9 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     @Transactional
     public DestinationWishResponseDto addDestinationWish(DestinationWishRequestDto requestDto) {
         Destination destination = destinationRepository.findById(requestDto.getDestinationId())
-                .orElseThrow(() -> new RuntimeException("해당 코스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new DestinationNotFoundException("해당 목적지를 찾을 수 없습니다.", "DestinationId:" + requestDto.getDestinationId()));
         Member member = memberRepository.findByNickname(requestDto.getNickname())
-                .orElseThrow(() -> new RuntimeException("해당 닉네임을 가진 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + requestDto.getNickname()));
 
         DestinationWish destinationWish = new DestinationWish();
         destinationWish.setDestination(destination);
@@ -88,10 +91,10 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     @Transactional
     public void cancelDestinationWish(Long destinationId, String nickname) {
         Member member = memberRepository.findByNickname(nickname)
-                .orElseThrow(() -> new RuntimeException("해당 닉네임을 가진 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
 
         DestinationWish destinationWish = destinationWishRepository.findByDestinationIdAndMemberId(destinationId, member.getId())
-                .orElseThrow(() -> new RuntimeException("해당 찜하기가 존재하지 않습니다."));
+                .orElseThrow(() -> new DestinationWishNotFoundException("해당 목적지 찜이 존재하지 않습니다.", "destinationId: " + destinationId));
 
         destinationWishRepository.delete(destinationWish);
     }
