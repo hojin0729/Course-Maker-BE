@@ -56,5 +56,4 @@ public class AddTravelCourseRequest {
     @NotNull(message = "최소한 한 개의 태그가 있어야 합니다.")
     @Size(min = 1, message = "최소한 한 개의 태그가 있어야 합니다.")
     private List<@Valid TagResponseDto> tags;
-
 }

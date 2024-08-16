@@ -28,5 +28,4 @@ public interface CourseService {
 
     // 특정 코스의 대표사진을 삭제하는 메서드
     void deletePictureLink(Long courseId);
-
 }

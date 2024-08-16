@@ -4,11 +4,8 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Schema(description = "여행 코스 응답 DTO")
 @Data
@@ -63,7 +60,7 @@ public class TravelCourseResponse {
         this.courseDestinations = courseDestinationResponses;
         this.tags = tags;
         this.isMine = isMine;
-        // TODO: 코스태그 - 코스간에 연관관계를 잘 공부해보세여
+        // 코스태그 - 코스간에 연관관계
 //        this.courseTags = travelCourse.getCourseTags().stream()
 //                .map(courseTag -> {
 //                    TagResponseDto tagResponseDto = new TagResponseDto();
