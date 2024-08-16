@@ -14,5 +14,4 @@ public class TravelCourseAlreadyDeletedException extends RootException {
 
         this.message = message;
     }
-
 }
