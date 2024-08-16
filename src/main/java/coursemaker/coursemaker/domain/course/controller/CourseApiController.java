@@ -6,22 +6,15 @@ import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
-import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
 
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
 
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -88,7 +81,7 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request, /*@LoginUser String nickname,*/
+    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
         String nickname = loginedInfo.getNickname();
@@ -335,7 +328,7 @@ public class CourseApiController {
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
     public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id,
-                                                                   @Valid @RequestBody UpdateTravelCourseRequest request, /*@LoginUser String nickname*/
+                                                                   @Valid @RequestBody UpdateTravelCourseRequest request,
                                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
@@ -359,7 +352,7 @@ public class CourseApiController {
                 .map(courseDestinationService::toResponse)
                 .toList();
 
-        /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+        /*순환참조*/
 //        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
 //                .stream().map(Tag::toResponseDto).toList();
         List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId());
@@ -404,7 +397,7 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id, /*@LoginUser String nickname*/
+    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
         String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
