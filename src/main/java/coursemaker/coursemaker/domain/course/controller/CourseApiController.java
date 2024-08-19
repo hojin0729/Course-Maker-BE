@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.course.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.UnAuthorizedException;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
@@ -86,7 +87,13 @@ public class CourseApiController {
     public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
-        String nickname = loginedInfo.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
+        }
         request.setNickname(nickname);
         TravelCourse savedTravelCourse = courseService.save(request);
 
@@ -347,7 +354,7 @@ public class CourseApiController {
 
         // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
         if (nickname == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
         }
 
         request.setNickname(nickname);
@@ -416,7 +423,7 @@ public class CourseApiController {
 
         // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
         if (nickname == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
         }
         courseService.delete(id, nickname);
 
