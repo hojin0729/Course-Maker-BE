@@ -48,6 +48,17 @@ public class RequestDto {
     @Schema(description = "무장애 여행지 여부")
     private Long disabled;
 
+    // tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
+    @Schema(description = "Tour Api에서 불러온 공공데이터 여행지일 경우 그 여행지에 해당하는 고유 Content ID 값 입니다. tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.")
+    private Long contentId;
+
+    // busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
+    @Schema(description ="busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.")
+    private int seq;
+
+    @Schema(description = "부산광역시 공공데이터 또는 Tour Api 공공데이터일 경우에 1이라는 값이 할당됩니다.")
+    private Integer apiData;
+
 
     // RequestDto를 Destination 엔티티로 변환하는 메서드
     public Destination toEntity(Member member) {
@@ -59,10 +70,11 @@ public class RequestDto {
         destination.setLocation(this.location.getAddress());
         destination.setLongitude(this.location.getLongitude());
         destination.setLatitude(this.location.getLatitude());
-
         destination.setAverageRating(this.averageRating);
-
         destination.setDisabled(this.disabled);
+        destination.setContentId(this.contentId);
+        destination.setApiData(this.apiData);
+        destination.setSeq(this.seq);
 
         return destination;
     }

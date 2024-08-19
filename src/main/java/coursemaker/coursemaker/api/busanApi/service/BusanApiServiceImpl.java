@@ -4,8 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import coursemaker.coursemaker.api.busanApi.dto.BusanApiResponse;
 import coursemaker.coursemaker.api.busanApi.entity.BusanApi;
 import coursemaker.coursemaker.api.busanApi.repository.BusanApiRepository;
+import coursemaker.coursemaker.domain.destination.dto.LocationDto;
+import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
+import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.repository.MemberRepository;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import coursemaker.coursemaker.domain.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +40,10 @@ public class BusanApiServiceImpl implements BusanApiService {
     private final WebClient.Builder webClientBuilder;
     private final BusanApiRepository busanApiRepository;
     private final DestinationRepository destinationRepository;
+
+    private final DestinationService destinationService;
+    private final TagService tagService;
+    private final MemberRepository memberRepository;
 
     @Override
     public BusanApiResponse initialUpdate() {
@@ -87,23 +99,21 @@ public class BusanApiServiceImpl implements BusanApiService {
             Optional<Destination> existingDestination = destinationRepository.findBySeq(busanApi.getSeq());
             if (existingDestination.isEmpty()) {
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
-                Destination destination = new Destination();
-                destination.setName(busanApi.getGuganNm());
-                destination.setViews(0);
-                destination.setContent(busanApi.getGmCourse());
-                destination.setLocation(busanApi.getStartAddr());
-                destination.setSeq(busanApi.getSeq());
-                destination.setApiData(1);
-                destination.setAverageRating(0d);
-
-                // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
-//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-//                LocalDateTime createdAt = LocalDateTime.parse(busanApi.getCreatedtime(), formatter);
-//                LocalDateTime updatedAt = LocalDateTime.parse(busanApi.getModifiedtime(), formatter);
-//                destination.setCreatedAt(createdAt);
-//                destination.setUpdatedAt(updatedAt);
-
-                destinationRepository.save(destination);
+                RequestDto dto = new RequestDto();
+                LocationDto locationDto = new LocationDto(busanApi.getStartAddr(), null, null);
+                Optional<Member> adminMember = memberRepository.findById(1L);
+                List<TagResponseDto> tags = tagService.findAllTags();
+                TagResponseDto seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "바다 태그"));
+                dto.setName(busanApi.getGuganNm());
+                dto.setContent(busanApi.getGmCourse());
+                dto.setLocation(locationDto);
+                dto.setSeq(busanApi.getSeq());
+                dto.setApiData(1);
+                dto.setAverageRating(0d);
+                dto.setNickname(adminMember.get().getNickname());
+                dto.setTags(List.of(seaTag));
+                destinationService.save(dto);
             }
         }
     }
