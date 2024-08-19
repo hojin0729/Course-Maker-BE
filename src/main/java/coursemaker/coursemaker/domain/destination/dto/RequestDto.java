@@ -42,6 +42,13 @@ public class RequestDto {
     @NotBlank(message = "내용은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String content; // 텍스트 에디터
 
+    @Schema(description = "평균 평점", example = "4.5", hidden = true)
+    private Double averageRating; // 평균 평점
+
+    @Schema(description = "무장애 여행지 여부")
+    private Long disabled;
+
+
     // RequestDto를 Destination 엔티티로 변환하는 메서드
     public Destination toEntity(Member member) {
         Destination destination = new Destination();
@@ -52,6 +59,11 @@ public class RequestDto {
         destination.setLocation(this.location.getAddress());
         destination.setLongitude(this.location.getLongitude());
         destination.setLatitude(this.location.getLatitude());
+
+        destination.setAverageRating(this.averageRating);
+
+        destination.setDisabled(this.disabled);
+
         return destination;
     }
 }

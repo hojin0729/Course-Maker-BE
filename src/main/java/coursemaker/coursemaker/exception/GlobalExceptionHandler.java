@@ -7,9 +7,12 @@ import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedExc
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.destination.exception.*;
 import coursemaker.coursemaker.domain.member.exception.*;
+import coursemaker.coursemaker.domain.review.exception.CourseReviewNotFoundException;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
+import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -364,6 +367,34 @@ public class GlobalExceptionHandler {
         response.setErrorType(ErrorCode.PICTURE_OVER_SIZE.getErrorType());
         response.setMessage(ErrorCode.PICTURE_OVER_SIZE.getDescription());
         response.setStatus(ErrorCode.PICTURE_OVER_SIZE.getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+    // Review 관련 예외처리
+    @ExceptionHandler(CourseReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCourseReviewNotFoundException(CourseReviewNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    // Wish 관련 예외처리
+    @ExceptionHandler(CourseWishNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCourseWishNotFoundException(CourseWishNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DestinationWishNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleDestinationWishNotFoundException(DestinationWishNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

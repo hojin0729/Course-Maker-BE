@@ -69,10 +69,17 @@ dependencies {
 	// aop
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+	//redis를 위한 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	//임시
 	implementation 'org.modelmapper:modelmapper:3.1.0'//객체 간의 필드 매핑을 자동으로 처리
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.2.2' //thymeleaf
 	implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-springsecurity6', version: '3.1.2.RELEASE'
+
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
+	// MacOS에서 DNS 해상도 문제
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64'
 }
 
 tasks.named('test') {

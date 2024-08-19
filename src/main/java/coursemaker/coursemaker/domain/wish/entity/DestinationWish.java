@@ -1,7 +1,9 @@
 package coursemaker.coursemaker.domain.wish.entity;
 
+import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,14 +16,13 @@ public class DestinationWish {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "count")
-    private Long count;
-
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "destinationId")
     private Destination destination;
 
-//    @OneToOne
-//    @JoinColumn(name = "memberId")
-//    private Member member
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "memberId")
+    private Member member;
 }
