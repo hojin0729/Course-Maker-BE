@@ -225,15 +225,16 @@ public class CourseApiController {
 
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
-            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
-                    .map(courseDestinationService::toResponse)
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine));
+            Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -268,7 +269,8 @@ public class CourseApiController {
 
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
-            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
