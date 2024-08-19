@@ -230,6 +230,7 @@ public class CourseApiController {
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
             boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
+
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
                     .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
