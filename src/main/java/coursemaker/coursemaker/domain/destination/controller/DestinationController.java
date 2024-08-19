@@ -15,6 +15,7 @@ import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -126,6 +127,90 @@ public class DestinationController {
         return ResponseEntity.ok(destinationDto);
     }
 
+    @Operation(summary = "제목으로 여행지 검색", description = "제목에 특정 문자열이 포함된 여행지를 검색합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "검색 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청 형식입니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "title", description = "검색할 여행지의 제목", required = true),
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", example = "20"),
+            @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작합니다)", example = "1")
+    })
+    @GetMapping("/search")
+    public ResponseEntity<CourseMakerPagination<DestinationDto>> searchDestinationsByTitle(
+            @RequestParam String title,
+            @RequestParam(defaultValue = "20", name = "record") Integer record,
+            @RequestParam(defaultValue = "1", name = "page") Integer page,
+            @AuthenticationPrincipal LoginedInfo loginedInfo) {
+
+        Pageable pageable = PageRequest.of(page - 1, record);
+        CourseMakerPagination<Destination> destinationPage = destinationService.findByNameContaining(title, pageable);
+
+        // 변환 로직 (CourseMakerPagination<Destination> -> CourseMakerPagination<DestinationDto>)
+        List<DestinationDto> contents = destinationPage.getContents().stream()
+                .map(destination -> {
+                    boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
+                    List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
+                    Double averageRating = destinationReviewService.getAverageRating(destination.getId());
+                    return DestinationDto.toDto(destination, tags, averageRating, isMine);
+                })
+                .toList();
+
+        Page<DestinationDto> responsePage = new PageImpl<>(contents, pageable, destinationPage.getTotalPage());
+        CourseMakerPagination<DestinationDto> response = new CourseMakerPagination<>(pageable, responsePage, destinationPage.getTotalContents());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "닉네임으로 여행지 조회", description = "특정 닉네임의 사용자가 생성한 모든 여행지를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 닉네임에 맞는 여행지를 찾을 수 없음", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 여행지를 찾을 수 없습니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "nickname", description = "조회할 사용자의 닉네임", required = true),
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", example = "20"),
+            @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작합니다)", example = "1")
+    })
+    @GetMapping("/nickname/{nickname}")
+    public ResponseEntity<CourseMakerPagination<DestinationDto>> findDestinationsByNickname(
+            @PathVariable("nickname") String nickname,
+            @RequestParam(defaultValue = "20", name = "record") Integer record,
+            @RequestParam(defaultValue = "1", name = "page") Integer page,
+            @AuthenticationPrincipal LoginedInfo loginedInfo) {
+
+        Pageable pageable = PageRequest.of(page - 1, record);
+        CourseMakerPagination<Destination> destinationPage = destinationService.findByMemberNickname(nickname, pageable);
+
+        // 변환 로직 (CourseMakerPagination<Destination> -> CourseMakerPagination<DestinationDto>)
+        List<DestinationDto> contents = destinationPage.getContents().stream()
+                .map(destination -> {
+                    boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
+                    List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
+                    Double averageRating = destinationReviewService.getAverageRating(destination.getId());
+                    return DestinationDto.toDto(destination, tags, averageRating, isMine);
+                })
+                .toList();
+
+        Page<DestinationDto> responsePage = new PageImpl<>(contents, pageable, destinationPage.getTotalPage());
+        CourseMakerPagination<DestinationDto> response = new CourseMakerPagination<>(pageable, responsePage, destinationPage.getTotalContents());
+
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "여행지 생성", description = "새로운 여행지 정보를 입력하여 여행지를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "여행지가 성공적으로 생성되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
@@ -152,10 +237,10 @@ public class DestinationController {
             ))
     })
     @PostMapping
-    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         // 로그인 한 사용자 닉네임 가져오기
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
-        String nickname = logined != null ? logined.getNickname() : null;
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
 
         // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
         if (nickname == null) {
@@ -278,10 +363,10 @@ public class DestinationController {
     })
     @Parameter(name = "id", description = "여행지 Id")
     @PatchMapping("/{id}")
-    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         // 로그인 한 사용자 닉네임 가져오기
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
-        String nickname = logined != null ? logined.getNickname() : null;
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
 
         // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
         if (nickname == null) {
@@ -328,10 +413,10 @@ public class DestinationController {
     })
     @Parameter(name = "id", description = "여행지 Id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         // 로그인 한 사용자 닉네임 가져오기
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
-        String nickname = logined != null ? logined.getNickname() : null;
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
 
         // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
         if (nickname == null) {
