@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.course.service;
 
+import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
@@ -10,9 +11,11 @@ import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 @Service
 public class CourseDestinationService {
@@ -29,10 +32,14 @@ public class CourseDestinationService {
         this.destinationReviewService = destinationReviewService;
     }
 
-    public CourseDestinationResponse toResponse(CourseDestination courseDestination) {
+    public CourseDestinationResponse toResponse(CourseDestination courseDestination, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId());
         Double averageRating = destinationReviewService.getAverageRating(courseDestination.getDestination().getId());
-        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, averageRating);
+
+        boolean isMine = loginedInfo != null &&
+                loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
+
+        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, averageRating, isMine);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }
 

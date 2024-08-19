@@ -145,7 +145,7 @@ public class CourseApiController {
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
-                    .map(courseDestinationService::toResponse)
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
@@ -188,7 +188,7 @@ public class CourseApiController {
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                 .stream()
-                .map(courseDestinationService::toResponse)
+                .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                 .toList();
 
         /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
@@ -232,7 +232,7 @@ public class CourseApiController {
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
-                    .map(courseDestinationService::toResponse)
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
@@ -309,7 +309,7 @@ public class CourseApiController {
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(updatedTravelCourse)
                 .stream()
-                .map(courseDestinationService::toResponse)
+                .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                 .toList();
 
         /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
