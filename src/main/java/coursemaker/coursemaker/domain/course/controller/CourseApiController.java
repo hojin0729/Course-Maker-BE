@@ -227,6 +227,50 @@ public class CourseApiController {
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
             boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
+            List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
+                    .stream()
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
+                    .toList();
+
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
+            Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+        }
+
+        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, travelCoursePage.getTotalContents());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "닉네임으로 여행 코스 조회", description = "특정 닉네임의 사용자가 생성한 모든 여행 코스를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 코스를 찾을 수 없습니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "nickname", description = "조회할 사용자의 닉네임"),
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지부터 시작합니다.)")
+    })
+    @GetMapping("/nickname/{nickname}")
+    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findCoursesByNickname(@PathVariable("nickname") String nickname,
+                                                                                             @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                             @RequestParam(defaultValue = "1", name = "page") Integer page,
+                                                                                             @AuthenticationPrincipal LoginedInfo loginedInfo) {
+        Pageable pageable = PageRequest.of(page - 1, record);
+        CourseMakerPagination<TravelCourse> travelCoursePage = courseService.findByMemberNickname(nickname, pageable);
+
+        List<TravelCourseResponse> contents = new ArrayList<>();
+        for (TravelCourse travelCourse : travelCoursePage.getContents()) {
+            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
