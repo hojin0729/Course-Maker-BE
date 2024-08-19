@@ -6,21 +6,17 @@ import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.dto.UpdateTravelCourseRequest;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
-import coursemaker.coursemaker.domain.course.exception.IllegalTravelCourseArgumentException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDeletedException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
+
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
+
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
-import coursemaker.coursemaker.domain.tag.entity.Tag;
 
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -87,7 +83,7 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
-    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request, /*@LoginUser String nickname,*/
+    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
         String nickname = loginedInfo.getNickname();
@@ -141,7 +137,7 @@ public class CourseApiController {
         List<TravelCourse> travelCourses = travelCoursePage.getContents();
 
         for (TravelCourse travelCourse : travelCourses) {
-            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -183,7 +179,8 @@ public class CourseApiController {
         TravelCourse travelCourse = courseService.incrementViews(id);
 
         // 로그인 한 사용자의 닉네임과 코스를 작성한 사용자의 닉네임을 비교
-        boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+        // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
+        boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
@@ -228,7 +225,50 @@ public class CourseApiController {
 
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
-            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+
+            List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
+                    .stream()
+                    .map(courseDestinationService::toResponse)
+                    .toList();
+
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine));
+        }
+
+        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, travelCoursePage.getTotalContents());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "닉네임으로 여행 코스 조회", description = "특정 닉네임의 사용자가 생성한 모든 여행 코스를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 코스를 찾을 수 없습니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "nickname", description = "조회할 사용자의 닉네임"),
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지부터 시작합니다.)")
+    })
+    @GetMapping("/nickname/{nickname}")
+    public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> findCoursesByNickname(@PathVariable("nickname") String nickname,
+                                                                                             @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                             @RequestParam(defaultValue = "1", name = "page") Integer page,
+                                                                                             @AuthenticationPrincipal LoginedInfo loginedInfo) {
+        Pageable pageable = PageRequest.of(page - 1, record);
+        CourseMakerPagination<TravelCourse> travelCoursePage = courseService.findByMemberNickname(nickname, pageable);
+
+        List<TravelCourseResponse> contents = new ArrayList<>();
+        for (TravelCourse travelCourse : travelCoursePage.getContents()) {
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -295,10 +335,17 @@ public class CourseApiController {
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
     public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id,
-                                                                   @Valid @RequestBody UpdateTravelCourseRequest request, /*@LoginUser String nickname*/
+                                                                   @Valid @RequestBody UpdateTravelCourseRequest request,
                                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
-        String nickname = loginedInfo.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         request.setNickname(nickname);
         log.info("---------------------------------------------------id = {}", id);
         TravelCourse updatedTravelCourse = courseService.update(id, request, nickname);
@@ -312,7 +359,7 @@ public class CourseApiController {
                 .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                 .toList();
 
-        /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
+        /*순환참조*/
 //        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
 //                .stream().map(Tag::toResponseDto).toList();
         List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId());
@@ -358,10 +405,15 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id, /*@LoginUser String nickname*/
+    public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
-        /*로그인 한 사용자 닉네임*/
-        String nickname = loginedInfo.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         courseService.delete(id, nickname);
 
         return ResponseEntity.ok()
