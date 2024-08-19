@@ -12,19 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.yaml.snakeyaml.util.UriEncoder;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.net.URI;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,19 +32,6 @@ public class BusanApiServiceImpl implements BusanApiService {
     private final WebClient.Builder webClientBuilder;
     private final BusanApiRepository busanApiRepository;
     private final DestinationRepository destinationRepository;
-
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
-
-    @Override
-    public BusanApiResponse updateAndGetTour() {
-        CompletableFuture<BusanApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
-
-        initialUpdateFuture
-                .thenRunAsync(this::busanConvertAndSaveToDestination, executorService)
-                .join();
-
-        return initialUpdateFuture.join();
-    }
 
     @Override
     public BusanApiResponse initialUpdate() {
@@ -98,16 +77,6 @@ public class BusanApiServiceImpl implements BusanApiService {
             log.error("Exception occurred while updating tours: ", e);
             throw new RuntimeException("Failed to update tours", e);
         }
-    }
-
-    @Override
-    public List<BusanApi> getAllTours() {
-        return busanApiRepository.findAll();
-    }
-
-    @Override
-    public Optional<BusanApi> getTourById(Long id) {
-        return busanApiRepository.findById(id);
     }
 
     @Override

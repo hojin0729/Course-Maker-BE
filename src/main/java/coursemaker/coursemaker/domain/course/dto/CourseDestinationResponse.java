@@ -2,11 +2,8 @@ package coursemaker.coursemaker.domain.course.dto;
 
 import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
-import coursemaker.coursemaker.domain.destination.entity.Destination;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Schema(description = "코스 여행지 응답 DTO")
 @Data

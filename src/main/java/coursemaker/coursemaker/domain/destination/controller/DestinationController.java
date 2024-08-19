@@ -65,7 +65,8 @@ public class DestinationController {
     public ResponseEntity<CourseMakerPagination<DestinationDto>> getAllDestinations(@RequestParam(name = "tagIds", required = false) List<Long> tagIds,
                                                                                     @RequestParam(defaultValue = "20", name = "record") int record,
                                                                                     @RequestParam(defaultValue = "1", name = "page") int page,
-                                                                                    @RequestParam(name = "orderBy", defaultValue = "NEWEST") OrderBy orderBy) {
+                                                                                    @RequestParam(name = "orderBy", defaultValue = "NEWEST") OrderBy orderBy,
+                                                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         Pageable pageable = PageRequest.of(page - 1, record);
 
         List<DestinationDto> destinationDtos = new ArrayList<>();
@@ -74,9 +75,10 @@ public class DestinationController {
         List<Destination> destinationList = destinations.getContents();
 
         for (Destination destination : destinationList) {
+            boolean isMine = loginedInfo.getNickname().equals(destination.getMember().getNickname());
             List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
             Double averageRating = destinationReviewService.getAverageRating(destination.getId());
-            destinationDtos.add(DestinationDto.toDto(destination, tags, averageRating));
+            destinationDtos.add(DestinationDto.toDto(destination, tags, averageRating, isMine));
         }
 
 
@@ -106,15 +108,17 @@ public class DestinationController {
     })
     @Parameter(name = "id", description = "여행지 Id")
     @GetMapping("/{id}")
-    public ResponseEntity<DestinationDto> getDestinationById(@PathVariable("id") Long id) {
+    public ResponseEntity<DestinationDto> getDestinationById(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         Destination destination = destinationService.findById(id);
+
+        // 로그인한 사용자와 여행지를 작성한 사용자가 동일한지 확인
+        boolean isMine = loginedInfo.getNickname().equals(destination.getMember().getNickname());
+
         List<TagResponseDto> tags = tagService.findAllByDestinationId(id);
 
         Double averageRating = destinationReviewService.getAverageRating(id);
 
-        System.out.println("Debug: averageRating = " + averageRating);
-
-        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, averageRating);
+        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, averageRating, isMine);
         return ResponseEntity.ok(destinationDto);
     }
 
@@ -152,10 +156,8 @@ public class DestinationController {
 
         Double averageRating = destinationReviewService.getAverageRating(savedDestination.getId());
 
-        System.out.println("Debug: Retrieved averageRating for response = " + averageRating);
-
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId());
-        DestinationDto response = DestinationDto.toDto(savedDestination, tags, averageRating);
+        DestinationDto response = DestinationDto.toDto(savedDestination, tags, averageRating, true);
 
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
@@ -278,7 +280,7 @@ public class DestinationController {
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId());
         Double averageRating = destinationReviewService.getAverageRating(updatedDestination.getId());
-        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, averageRating);
+        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, averageRating, true);
         return ResponseEntity.ok(updatedDto);
     }
 

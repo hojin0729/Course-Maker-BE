@@ -40,11 +40,19 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Access 토큰이 만료됬습니다.", "AUTH-003"),
     EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004"),
+  
+    UNSEND_EMAIL(HttpStatus.NOT_FOUND, "Invalid item", "이메일 전송 기록이 없습니다.", "AUTH-005"),
+    UNMATCH_CODE(HttpStatus.UNAUTHORIZED, "Unmatch code", "검증 코드가 일치하지 않습니다.", "AUTH-006"),
+
+    TIME_OUT(HttpStatus.BAD_REQUEST, "Timeout", "유효 시간이 지났습니다.", "TIME-OUT"),
 
     /* Review 도메인 예외 */
     INVALID_REVIEW(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 리뷰가 없습니다.", "REVIEW-001"),
     DUPLICATED_REVIEW(HttpStatus.CONFLICT, "Duplicated item", "해당 리뷰가 이미 존재합니다.", "REVIEW-002"),
-    ILLEGAL_REVIEW_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "리뷰에 알맞은 인자값이 아닙니다.", "REVIEW-003");
+    ILLEGAL_REVIEW_ARGUMENT(HttpStatus.BAD_REQUEST, "Illegal argument", "리뷰에 알맞은 인자값이 아닙니다.", "REVIEW-003"),
+
+    /* Wish 찜하기 도매인 예외*/
+    INVALID_WISH(HttpStatus.NOT_FOUND, "Invalid wish", "해당하는 찜이 없습니다.", "WISH-001");
 
 
 

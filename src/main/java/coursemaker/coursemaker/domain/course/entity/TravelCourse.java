@@ -1,13 +1,9 @@
 package coursemaker.coursemaker.domain.course.entity;
 
 import coursemaker.coursemaker.BaseEntity;
-import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
-import java.util.ArrayList;
 
 @Entity
 @Getter

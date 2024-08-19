@@ -3,8 +3,6 @@ package coursemaker.coursemaker.domain.course.dto;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Schema(description = "멤버에서 코스로 닉네임 가져오는 DTO")
 @Data

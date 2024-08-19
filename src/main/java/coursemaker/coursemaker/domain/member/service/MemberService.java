@@ -2,20 +2,14 @@ package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.member.dto.*;
 import coursemaker.coursemaker.domain.member.entity.Member;
-import coursemaker.coursemaker.domain.member.entity.Role;
 import coursemaker.coursemaker.domain.member.exception.*;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 
@@ -111,43 +105,5 @@ public class MemberService {
         return myPageResponse;
     }
 
-    public ValidateNicknameResponse isValid(ValidateNicknameRequest validateNicknameRequest) {
-        String nickname = validateNicknameRequest.getNickname();
-
-        // 중복 여부 확인
-        Boolean isDuplicate = memberRepository.findByNickname(nickname).isPresent();
-
-        // 조건 불일치 여부 확인
-        String regex = "[a-zA-Z가-힣]{2,10}";
-        Boolean isInappropriate = !nickname.matches(regex);
-
-        // 닉네임 유효 여부 반환
-        ValidateNicknameResponse validateNicknameResponse = ValidateNicknameResponse.builder()
-                .isDuplicate(isDuplicate)
-                .isInappropriate(isInappropriate)
-                .build();
-
-        return validateNicknameResponse;
-    }
-
-    //TODO: 작성중
-    public ValidateEmailResponse isEmailValid(ValidateEmailRequest validateEmailRequest) {
-        String email = validateEmailRequest.getEmail();
-
-        // 이메일 중복 여부 확인
-        Boolean isDuplicate = memberRepository.findByEmail(email).isPresent();
-
-        // 조건 불일치 여부 확인
-        String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
-        Boolean isInappropriate = !email.matches(emailRegex);
-
-        // 이메일 유효 여부 반환
-        ValidateEmailResponse validateEmailResponse = ValidateEmailResponse.builder()
-                .isDuplicate(isDuplicate)
-                .isInappropriate(isInappropriate)
-                .build();
-
-        return validateEmailResponse;
-    }
 
 }

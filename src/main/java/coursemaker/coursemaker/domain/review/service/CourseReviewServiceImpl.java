@@ -16,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
+import java.util.List;
+
 @Service
 public class CourseReviewServiceImpl implements CourseReviewService {
     private final CourseReviewRepository courseReviewRepository;
@@ -35,6 +38,9 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     public CourseReview save(@Valid RequestCourseDto requestCourseDto, Long courseId) {
         Member member = memberService.findByNickname(requestCourseDto.getNickname());
         TravelCourse travelCourse = courseService.findById(courseId);
+        if (courseReviewRepository.findByMemberAndTravelCourse(member, travelCourse).isPresent()) {
+            throw new IllegalStateException("해당 코스에 이미 리뷰를 남겼습니다.");
+        }
         CourseReview courseReview = requestCourseDto.toEntity(member);
         courseReview.setTravelCourse(travelCourse);
         return courseReviewRepository.save(courseReview);
@@ -72,5 +78,26 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         Page<CourseReview> page = courseReviewRepository.findByTravelCourseId(courseId, pageable);
         return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
     }
+    @Override
+    public Double getAverageRating(Long courseId) {
+        List<CourseReview> reviews = courseReviewRepository.findByTravelCourseId(courseId);
 
+        System.out.println("Debug: Number of reviews found = " + reviews.size());
+
+        for (CourseReview review : reviews) {
+            System.out.println("Debug: Review ID = " + review.getId() + ", Rating = " + review.getRating());
+        }
+
+        // 평균 평점 계산
+        double averageRating = reviews.stream().mapToDouble(CourseReview::getRating).average().orElse(0.0);
+
+        // 평균 평점을 소수점 첫째 자리로 포맷팅
+        DecimalFormat df = new DecimalFormat("#.#");
+        double formattedAverageRating = Double.parseDouble(df.format(averageRating));
+
+        System.out.println("Debug: Calculated formatted averageRating = " + formattedAverageRating);
+
+        return formattedAverageRating;
+    }
 }
+

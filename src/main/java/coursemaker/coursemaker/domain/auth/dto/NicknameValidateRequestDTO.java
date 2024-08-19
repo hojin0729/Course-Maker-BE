@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class NicknameValidateRequestDTO {
-    @NotEmpty
+    @NotEmpty(message = "검증할 닉네임을 입력해주세요.")
     @Schema(description = "검증할 닉네임", example = "혁진쨩")
     private String nickname;
 }

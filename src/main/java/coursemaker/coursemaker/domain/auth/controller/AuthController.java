@@ -98,7 +98,7 @@ public class AuthController {
             ))
     })
     @PostMapping("/reissue")
-    public ResponseEntity<ReIssueResponseDto> reissue(@RequestBody ReIssueRequestDto     reissueRequest) {
+    public ResponseEntity<ReIssueResponseDto> reissue(@RequestBody ReIssueRequestDto reissueRequest) {
 
         ReIssueResponseDto dto = authService.reissueToken(reissueRequest);
 
@@ -158,87 +158,69 @@ public class AuthController {
         }
 
     }
-//
-//
-//    @Operation(summary = "닉네임 유효 확인", description = "회원가입 및 회원정보 수정 시, 중복 또는 글자 수 등, 닉네임 유효 여부를 검증한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "닉네임 유효성이 정상적으로 확인되었습니다."),
-//            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-//                    )
-//            )),
-//            @ApiResponse(responseCode = "409", description = "이미 존재하는 닉네임입니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 닉네임입니다.\"}"
-//                    )
-//            ))
-//    })
-//    @PostMapping(value = "/validate-nickname")
-//    public ResponseEntity<ValidateNicknameResponse> validateNickname(@Valid @RequestBody ValidateNicknameRequest validateNicknameRequest) {
-//        ValidateNicknameResponse validateNicknameResponse = memberService.isValid(validateNicknameRequest);
-//        return ResponseEntity.ok(validateNicknameResponse);
-//    }
-//
-//    @Operation(summary = "이메일 유효 확인", description = "회원가입 및 회원정보 수정 시,  중복 또는 글자 수 등, 이메일 중복 여부를 검증한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "이메일 유효성이 정상적으로 확인되었습니다."),
-//            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-//                    )
-//            )),
-//            @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일입니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 이메일입니다.\"}"
-//                    )
-//            ))
-//    })
-//    @PostMapping(value = "/validate-email")
-//    public ResponseEntity<ValidateEmailResponse> validateEmail(@Valid @RequestBody ValidateEmailRequest validateEmailRequest) {
-//        ValidateEmailResponse validateEmailResponse = memberService.isEmailValid(validateEmailRequest);
-//        return ResponseEntity.ok(validateEmailResponse);
-//    }
-//
-//    @Operation(summary = "이메일 검증", description = "이메일 검증을 위한 인증코드를 해당 메일로 발송한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 정상적으로 발송되었습니다."),
-//            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-//                    )
-//            ))
-//    })
-//    @PostMapping("/signup/send-validate")
-//    public ResponseEntity<ValidateEmailResponse> SendMailToValidate(@Valid @RequestBody EmailRequest emailRequest) throws MessagingException {
-//        ValidateEmailResponse validateEmailResponse = emailService.sendValidateSignupMail(emailRequest.getEmail());
-//        return ResponseEntity.ok(validateEmailResponse);
-//    }
-//
-//    @Operation(summary = "인증코드 검증", description = "이메일 인증코드의 유효성을 검증한다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "이메일 인증 코드가 일치합니다."),
-//            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content(
-//                    mediaType = "application/json",
-//                    schema = @Schema(implementation = ErrorResponse.class),
-//                    examples = @ExampleObject(
-//                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청입니다.\"}"
-//                    )
-//            ))
-//    })
-//    @PostMapping("/signup/verify-validate")
-//    public ResponseEntity<EmailCodeVerifyResponse> verifyEmailCode(@Valid @RequestBody EmailCodeVerifyRequest emailCodeVerifyRequest) {
-//        EmailCodeVerifyResponse emailCodeVerifyResponse = emailService.verifyEmailCode(emailCodeVerifyRequest);
-//        return ResponseEntity.ok(emailCodeVerifyResponse);
-//    }
+
+    @Operation(summary = "이메일 코드 전송", description = "해당 이메일로 인증 코드를 전송합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 전송"),
+            @ApiResponse(responseCode = "400", description = "이메일 형식이 올바르지 않은 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"이메일은 example@email.com 과 같은 이메일 형식이어야 합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일인 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 이메일 입니다.\"}"
+                    )
+            ))
+    })
+    @PostMapping("/validate/email")
+    public ResponseEntity<Void> validateEmail(@Valid @RequestBody SendValidateCodeRequestDTO sendValidateCodeRequestDTO) {
+        authService.sendValidationCode(sendValidateCodeRequestDTO);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "이메일 코드 검증", description = "이메일로 전송된 코드와 입력한 코드가 일치하는지 검증합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 검증 성공"),
+            @ApiResponse(responseCode = "400", description = "이메일 형식이 올바르지 않은 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"이메일은 example@email.com 과 같은 이메일 형식이어야 합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "400", description = "인증 시간이 만료된 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"timeout\", \"message\": \"인증 시간이 초과됬습니다. 다시 이메일을 전송해주세요.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "401", description = "전송된 검증 코드와 일치하지 않은 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"Illegal argument\", \"message\": \"이메일은 example@email.com 과 같은 이메일 형식이어야 합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "이메일이 전송되지 않은 경우", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Duplicated item\", \"message\": \"이미 존재하는 이메일 입니다.\"}"
+                    )
+            ))
+    })
+    @PostMapping("/validate/email/code")
+    public ResponseEntity<Void> validateEmailCode(@Valid @RequestBody ValidateEmailRequestDTO dto) {
+
+        authService.validateEmail(dto);
+        return ResponseEntity.ok().build();
+
+    }
 }
