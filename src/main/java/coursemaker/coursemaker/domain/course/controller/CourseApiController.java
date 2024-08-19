@@ -225,7 +225,8 @@ public class CourseApiController {
 
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
-            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -269,7 +270,8 @@ public class CourseApiController {
 
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
-            boolean isMine = loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
 
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
