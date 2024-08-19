@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.destination.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.UnAuthorizedException;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -152,7 +154,13 @@ public class DestinationController {
     @PostMapping
     public ResponseEntity<DestinationDto> createDestination(@Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인 한 사용자 닉네임 가져오기
-        String nickname = logined.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = logined != null ? logined.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
+        }
         request.setNickname(nickname);
         Destination savedDestination = destinationService.save(request);
 
@@ -272,7 +280,13 @@ public class DestinationController {
     @PatchMapping("/{id}")
     public ResponseEntity<DestinationDto> updateDestination(@PathVariable("id") Long id, @Valid @RequestBody RequestDto request, @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인 한 사용자 닉네임 가져오기
-        String nickname = logined.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = logined != null ? logined.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
+        }
         request.setNickname(nickname);
         // 해당 여행지가 로그인한 사용자에게 속하는지 확인
         Destination existingDestination = destinationService.findById(id);
@@ -316,7 +330,13 @@ public class DestinationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Long> deleteDestinationById(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인 한 사용자 닉네임 가져오기
-        String nickname = logined.getNickname();
+        // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
+        String nickname = logined != null ? logined.getNickname() : null;
+
+        // 로그인이 되어 있지 않으면 401 Unauthorized 응답을 반환
+        if (nickname == null) {
+            throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
+        }
         // 해당 ID의 여행지가 존재하는지 확인합니다.
         Destination destination = destinationService.findById(id);
         if (destination == null) {
