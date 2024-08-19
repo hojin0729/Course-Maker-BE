@@ -75,7 +75,8 @@ public class DestinationController {
         List<Destination> destinationList = destinations.getContents();
 
         for (Destination destination : destinationList) {
-            boolean isMine = loginedInfo.getNickname().equals(destination.getMember().getNickname());
+            // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
+            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
             List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
             Double averageRating = destinationReviewService.getAverageRating(destination.getId());
             destinationDtos.add(DestinationDto.toDto(destination, tags, averageRating, isMine));
@@ -112,7 +113,8 @@ public class DestinationController {
         Destination destination = destinationService.findById(id);
 
         // 로그인한 사용자와 여행지를 작성한 사용자가 동일한지 확인
-        boolean isMine = loginedInfo.getNickname().equals(destination.getMember().getNickname());
+        // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
+        boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
 
         List<TagResponseDto> tags = tagService.findAllByDestinationId(id);
 
