@@ -18,5 +18,7 @@ public interface CourseReviewService {
     CourseReview findById(Long id);
     // 코스 리뷰 전체 보기
     CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable);
+    // 코스 평균 평점 계산
+    Double getAverageRating(Long courseId);
  }
 

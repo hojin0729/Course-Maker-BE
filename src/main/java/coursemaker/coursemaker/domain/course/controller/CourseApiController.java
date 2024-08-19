@@ -12,8 +12,7 @@ import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedExc
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
-import coursemaker.coursemaker.domain.destination.exception.PictureNotFoundException;
-
+import coursemaker.coursemaker.domain.review.service.CourseReviewService;
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
@@ -56,7 +55,7 @@ public class CourseApiController {
     private final CourseService courseService;
 
     private final TagService tagService;
-
+    private final CourseReviewService courseReviewService;
     private final CourseDestinationService courseDestinationService;
 
     // POST
@@ -146,18 +145,18 @@ public class CourseApiController {
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
-                    .map(courseDestinationService::toResponse)
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine));
+            Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
         }
 
-        Page<TravelCourseResponse> responsePagepage = new PageImpl<>(contents, pageable, totalPage);
-
-        long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
-        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePagepage, total);
+        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, travelCoursePage.getTotalContents());
 
         return ResponseEntity.ok(response);
     }
@@ -189,7 +188,7 @@ public class CourseApiController {
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                 .stream()
-                .map(courseDestinationService::toResponse)
+                .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                 .toList();
 
         /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
@@ -197,7 +196,9 @@ public class CourseApiController {
 //                .stream().map(Tag::toResponseDto).toList();
         List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
 
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine));
+        Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
     }
 
     // GET - Search by title
@@ -231,11 +232,14 @@ public class CourseApiController {
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
-                    .map(courseDestinationService::toResponse)
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine));
+
+            Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -305,7 +309,7 @@ public class CourseApiController {
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(updatedTravelCourse)
                 .stream()
-                .map(courseDestinationService::toResponse)
+                .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
                 .toList();
 
         /*TODO: 제가 왜 이렇게 해결했는지 설명ㄱㄱ*/
@@ -313,8 +317,9 @@ public class CourseApiController {
 //                .stream().map(Tag::toResponseDto).toList();
         List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId());
 
-        // 새로운 isMine 필드를 포함한 TravelCourseResponse 객체 생성
-        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMine);
+        Double averageRating = courseReviewService.getAverageRating(updatedTravelCourse.getId());
+
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMine, averageRating);
 
         return (updatedTravelCourse != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
