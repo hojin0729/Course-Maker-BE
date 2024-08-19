@@ -2,18 +2,20 @@ package coursemaker.coursemaker.domain.wish.service;
 
 
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.CourseWish;
+import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.repository.CourseWishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,9 +69,9 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Transactional
     public CourseWishResponseDto addCourseWish(CourseWishRequestDto requestDto) {
         TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("해당 코스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));
         Member member = memberRepository.findByNickname(requestDto.getNickname())
-                .orElseThrow(() -> new RuntimeException("해당 멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 멤버를 찾을 수 없습니다.", "Nickname: " + requestDto.getNickname()));
 
         CourseWish courseWish = new CourseWish();
         courseWish.setTravelCourse(travelCourse);
@@ -88,10 +90,10 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Transactional
     public void cancelCourseWish(Long courseId, String nickname) {
         Member member = memberRepository.findByNickname(nickname)
-                .orElseThrow(() -> new RuntimeException("해당 닉네임을 가진 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
 
         CourseWish courseWish = courseWishRepository.findByTravelCourseIdAndMemberId(courseId, member.getId())
-                .orElseThrow(() -> new RuntimeException("해당 찜하기가 존재하지 않습니다."));
+                .orElseThrow(() -> new CourseWishNotFoundException("해당 코스 찜이 존재하지 않습니다.", "CourseId: " + courseId));
 
         courseWishRepository.delete(courseWish);
     }
