@@ -685,7 +685,7 @@ public class TourApiServiceImpl implements TourApiService {
                 dto.setDisabled(tourApi.getDisabled());
 //                dto.setWithPet(tourApi.getWithPet());
                 dto.setContentId(tourApi.getContentid());
-                dto.setApiData(1);
+                dto.setApiData(true);
                 dto.setAverageRating(0d);
                 dto.setNickname(adminMember.get().getNickname());
 
