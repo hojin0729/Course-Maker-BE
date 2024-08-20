@@ -122,6 +122,20 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     @Override
+    public CourseMakerPagination<Destination> findByNameContaining(String name, Pageable pageable) {
+        Page<Destination> page = destinationRepository.findByNameContainingAndDeletedAtIsNull(name, pageable);
+        long total = tagService.findAllDestinationByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
+        return new CourseMakerPagination<>(pageable, page, total);
+    }
+
+    @Override
+    public CourseMakerPagination<Destination> findByMemberNickname(String nickname, Pageable pageable) {
+        Page<Destination> page = destinationRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
+        long total = page.getTotalElements();
+        return new CourseMakerPagination<>(pageable, page, total);
+    }
+
+    @Override
     public CourseMakerPagination<Destination> findAll(Pageable pageable) {
         Page<Destination> page = destinationRepository.findAll(pageable);
         long total = tagService.findAllDestinationByTagIds(null,pageable,OrderBy.NEWEST).getTotalContents();
