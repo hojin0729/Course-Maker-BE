@@ -50,9 +50,6 @@ public class Destination extends BaseEntity {
     @Column(name = "disabled")
     private Long disabled;
 
-    @Column(name = "withPet")
-    private Integer withPet;
-
     // tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
     @Column(name = "contentId")
     private Long contentId;
