@@ -58,11 +58,11 @@ public class DestinationDto {
     private Long disabled;
 
     @Schema(description = "공공데이터 여부", defaultValue = "0")
-    private int apiData;
+    private Integer apiData;
 
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
-    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, Double averageRating, boolean isMine) {
+    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, Integer apiData, Double averageRating, boolean isMine) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
@@ -80,6 +80,7 @@ public class DestinationDto {
         dto.setLocation(location);
         dto.setAverageRating(averageRating);
         dto.setMine(isMine);
+        dto.setApiData(apiData);
         return dto;
     }
 }

@@ -6,6 +6,7 @@ import coursemaker.coursemaker.domain.course.entity.CourseDestination;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.service.TagService;
@@ -34,11 +35,13 @@ public class CourseDestinationService {
     public CourseDestinationResponse toResponse(CourseDestination courseDestination, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId());
         Double averageRating = destinationReviewService.getAverageRating(courseDestination.getDestination().getId());
+        Destination destination = courseDestination.getDestination();
+        int apiData = destination.getApiData();
 
         boolean isMine = loginedInfo != null &&
                 loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
 
-        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, averageRating, isMine);
+        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, apiData, averageRating, isMine);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }
 
