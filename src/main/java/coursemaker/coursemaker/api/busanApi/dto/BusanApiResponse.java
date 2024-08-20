@@ -104,6 +104,6 @@ public class BusanApiResponse {
 
         @Schema(description = "순번", example = "2")
         @JsonProperty("seq")
-        private int seq;
+        private Integer seq;
     }
 }

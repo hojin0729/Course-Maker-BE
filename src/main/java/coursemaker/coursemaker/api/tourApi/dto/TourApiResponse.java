@@ -75,7 +75,7 @@ public class TourApiResponse {
         @Schema(description = "소분류", example = "A02020600")
         private String cat3;
         @Schema(description = "콘텐츠타입 ID", example = "14")
-        private int contenttypeid;
+        private Integer contenttypeid;
         @Schema(description = "교과서속여행지 여부", example = "0")
         private String booktour;
 
@@ -97,5 +97,7 @@ public class TourApiResponse {
         private String homepage;
         @Schema(description = "개요")
         private String overview;
+        @Schema(description = "애견동반 여행지", example = "1")
+        private Integer withPet;
     }
 }

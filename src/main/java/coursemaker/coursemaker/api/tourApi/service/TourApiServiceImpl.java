@@ -51,6 +51,9 @@ public class TourApiServiceImpl implements TourApiService {
     @Value("${tourapi.disableUpdateUrl}")
     private String disableUpdateUrl;
 
+    @Value("${tourapi.withPetUrl}")
+    private String withPetUrl;
+
     private final MemberRepository memberRepository;
 
 
@@ -66,27 +69,47 @@ public class TourApiServiceImpl implements TourApiService {
 
     @Override
     public TourApiResponse updateAndGetTour() {
+        // Step 1: 국문 관광 API 데이터를 초기화하고 업데이트
         CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
 
+        // Step 2: 부산 API 데이터를 업데이트
         CompletableFuture<BusanApiResponse> busanApiUpdateFuture = CompletableFuture.supplyAsync(busanApiService::initialUpdate, executorService);
 
+        // Step 3: 초기화된 데이터를 기반으로 비활성화된 투어 업데이트 및 누락된 비활성화 데이터 처리
         initialUpdateFuture
                 .thenComposeAsync(response -> updateDisabledTours()
                         .thenRunAsync(this::handleMissingDisabledData, executorService)
                         .thenComposeAsync(aVoid -> {
-                            List<CompletableFuture<Void>> updateFutures = tourApiRepository.findAll().stream()
-                                    .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
+                            // 필터링된 데이터를 처리하기 위해 필터링된 TourApi 리스트 생성
+                            List<TourApi> filteredTours = tourApiRepository.findAll().stream()
+                                    .filter(tour -> !isExcludedCat1(tour.getCat1()))
+                                    .filter(tour -> !isExcludedCat3(tour.getCat3()))
                                     .collect(Collectors.toList());
-                            return CompletableFuture.allOf(updateFutures.toArray(new CompletableFuture[0]));
-                        }, executorService), executorService)
-                .thenRunAsync(this::updateMissingData, executorService)
-                .thenRunAsync(this::convertAndSaveToDestination, executorService)
-                .join();
 
+                            // Step 4: 필터링된 투어 데이터에서 반려동물 여행지 여부를 확인하고 업데이트
+                            return updateWithPetTours(filteredTours)
+                                    .thenComposeAsync(v -> {
+                                        // Step 5: 필터링된 투어 데이터를 기반으로 기본 데이터를 업데이트
+                                        List<CompletableFuture<Void>> updateFutures = filteredTours.stream()
+                                                .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
+                                                .collect(Collectors.toList());
+                                        return CompletableFuture.allOf(updateFutures.toArray(new CompletableFuture[0]));
+                                    });
+                        }, executorService), executorService)
+                .thenRunAsync(this::updateMissingData, executorService) // Step 6: 누락된 데이터를 처리
+                .thenRunAsync(this::convertAndSaveToDestination, executorService) // Step 7: 데이터를 Destination 엔티티로 변환 및 저장
+                .join(); // 모든 작업이 완료될 때까지 대기
+
+        // Step 8: 부산 API 데이터를 Destination 엔티티로 변환 및 저장
         busanApiUpdateFuture
                 .thenRunAsync(busanApiService::busanConvertAndSaveToDestination, executorService)
-                .join();
+                .join(); // 모든 작업이 완료될 때까지 대기
 
+        // Step 9: 반려동물 여행지 데이터에서 누락된 데이터를 확인하고 다시 요청하여 처리
+        CompletableFuture.runAsync(this::updateMissingPetFriendlyTours, executorService)
+                .join(); // 모든 작업이 완료될 때까지 대기
+
+        // Step 10: 초기 업데이트 결과 반환
         return initialUpdateFuture.join();
     }
 
@@ -355,6 +378,98 @@ public class TourApiServiceImpl implements TourApiService {
         }
     }
 
+    private CompletableFuture<Void> updateWithPetTours(List<TourApi> filteredTours) {
+        URI uri = UriComponentsBuilder.fromHttpUrl(withPetUrl)
+                .queryParam("numOfRows", 100) // 한 페이지에 가져올 데이터 수
+                .queryParam("pageNo", 1)
+                .queryParam("MobileOS", "WIN")
+                .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
+                .queryParam("_type", "json")
+                .queryParam("serviceKey", serviceKey)
+                .build(true)
+                .toUri();
+
+        return CompletableFuture.runAsync(() -> {
+            try {
+                TourApiResponse response = webClientBuilder.build().get()
+                        .uri(uri)
+                        .retrieve()
+                        .bodyToMono(TourApiResponse.class)
+                        .block();
+
+                if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                    List<Long> petFriendlyContentIds = response.getResponse().getBody().getItems().getItem().stream()
+                            .map(TourApiResponse.Item::getContentid)
+                            .collect(Collectors.toList());
+
+                    filteredTours.forEach(tour -> {
+                        if (petFriendlyContentIds.contains(tour.getContentid())) {
+                            tour.setWithPet(1);  // 반려동물 여행지 표시
+                        } else {
+                            tour.setWithPet(0);  // 반려동물 여행지가 아니면 0으로 설정
+                        }
+                        tourApiRepository.save(tour);
+                    });
+                }
+            } catch (Exception e) {
+                log.error("Error fetching with pet info: ", e);
+            }
+        }, executorService);
+    }
+
+
+    private void updateMissingPetFriendlyTours() {
+        // withPet 값이 null인 데이터를 필터링하여 처리
+        List<TourApi> missingPetFriendlyTours = tourApiRepository.findAll().stream()
+                .filter(tour -> tour.getWithPet() == null) // withPet 값이 null인 데이터만 필터링
+                .collect(Collectors.toList());
+
+        // 누락된 데이터를 대상으로 재요청
+        for (TourApi tour : missingPetFriendlyTours) {
+            retryUpdateWithPet(tour.getContentid());
+        }
+    }
+
+
+    private void retryUpdateWithPet(long contentId) {
+        URI uri = UriComponentsBuilder.fromHttpUrl(withPetUrl)
+                .queryParam("numOfRows", 1)
+                .queryParam("pageNo", 1)
+                .queryParam("MobileOS", "WIN")
+                .queryParam("MobileApp", UriEncoder.encode("코스메이커"))
+                .queryParam("_type", "json")
+                .queryParam("serviceKey", serviceKey)
+                .queryParam("contentId", contentId) // contentId로 다시 조회
+                .build(true)
+                .toUri();
+
+        try {
+            TourApiResponse response = webClientBuilder.build().get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(TourApiResponse.class)
+                    .timeout(Duration.ofSeconds(10)) // 타임아웃 설정
+                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(10))) // 재시도 로직 추가
+                    .block();
+
+            if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
+                response.getResponse().getBody().getItems().getItem().forEach(item -> {
+                    Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
+                    tourApiOptional.ifPresent(tourApi -> {
+                        synchronized (this) {
+                            tourApi.setWithPet(1); // 반려동물 여행지로 확인되면 withPet 값을 1로 설정
+                            tourApiRepository.save(tourApi);
+                        }
+                    });
+                });
+            } else {
+                log.error("Invalid response for contentId: {}", contentId);
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred while retrying pet-friendly data for contentId: {}", contentId, e);
+        }
+    }
+
     @Override
     public List<TourApi> getAllTours() {
         return tourApiRepository.findAll();
@@ -389,6 +504,7 @@ public class TourApiServiceImpl implements TourApiService {
                 dto.setContent(tourApi.getOverview());
                 dto.setLocation(locationDto);
                 dto.setDisabled(tourApi.getDisabled());
+                dto.setWithPet(tourApi.getWithPet());
                 dto.setContentId(tourApi.getContentid());
                 dto.setApiData(1);
                 dto.setAverageRating(0d);
