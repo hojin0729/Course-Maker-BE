@@ -69,7 +69,7 @@ public class TourApi {
     private String cat3;
 
     @Column(name = "contenttypeid")
-    private int contenttypeid;
+    private Integer contenttypeid;
 
     @Column(name = "disabled")
     private Long disabled;
@@ -79,6 +79,9 @@ public class TourApi {
 
     @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
+
+    @Column(name = "withPet")
+    private Integer withPet;
 
 //    @OneToOne
 //    private Tag tag;
