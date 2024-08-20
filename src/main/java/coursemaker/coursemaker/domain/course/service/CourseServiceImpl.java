@@ -149,7 +149,7 @@ public class CourseServiceImpl implements CourseService{
 
         String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();
         if (!existingCourseNickname.equals(nickname)) {
-            throw new CourseForbiddenException("Course Forbidden", "사용자가 해당 코스에 접근할 권한이 없습니다.");
+            throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
 
         travelCourseRepository.findByIdAndDeletedAtIsNull(id)
@@ -211,7 +211,7 @@ public class CourseServiceImpl implements CourseService{
 
         String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();
         if (!existingCourseNickname.equals(nickname)) {
-            throw new CourseForbiddenException("Course Forbidden", "사용자가 해당 코스에 접근할 권한이 없습니다.");
+            throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
 
         TravelCourse travelCourse = travelCourseRepository.findById(id)

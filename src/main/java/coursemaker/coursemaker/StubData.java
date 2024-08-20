@@ -33,17 +33,8 @@ public class StubData implements CommandLineRunner {
     private final CourseService courseService;
     private final AuthService authService;
 
-//    @Autowired
-//    public StubData(TagService tagService, MemberService memberService, DestinationService destinationService, CourseService courseService, AuthService authService) {
-//        this.tagService = tagService;
-//        this.memberService = memberService;
-//        this.destinationService = destinationService;
-//        this.courseService = courseService;
-////        this.authService = authService;
-//    }
-
     public void MemberStubData() throws Exception { // 1 ~ 5번 회원 생성
-        
+
         /*회원가입*/
         JoinRequestDto request;
         for(long i = 1; i <= 5; i++) {
@@ -290,7 +281,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 1 번째 여행지 ----------
 
         RequestDto dto1 = new RequestDto();
-        dto1.setName("해운대 해수욕장");
+        dto1.setName("해운대 해수욕장?");
         dto1.setContent("부산의 대표적인 해변으로, 아름다운 백사장과 푸른 바다가 인상적입니다.");
 
         // Location 객체 생성 및 설정
@@ -308,7 +299,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 2 번째 여행지 ----------
 
         RequestDto dto2 = new RequestDto();
-        dto2.setName("허심청");
+        dto2.setName("허심청?");
         dto2.setContent("동래온천장에 위치한 국내에서 가장 큰 대형 온천 시설로, 다양한 온천탕과 스파를 즐길 수 있습니다.");
 
         // Location 객체 생성 및 설정
@@ -326,7 +317,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 3 번째 여행지 ----------
 
         RequestDto dto3 = new RequestDto();
-        dto3.setName("씨라이프부산아쿠아리움");
+        dto3.setName("씨라이프부산아쿠아리움?");
         dto3.setContent("다양한 해양 생물을 관찰하고 체험할 수 있는 대형 아쿠아리움입니다.");
 
         // Location 객체 생성 및 설정
@@ -344,7 +335,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 4 번째 여행지 ----------
 
         RequestDto dto4 = new RequestDto();
-        dto4.setName("흰여울문화마을");
+        dto4.setName("흰여울문화마을?");
         dto4.setContent("영도의 절벽 위에 위치한 마을로, 예술 작품과 벽화가 있는 곳입니다. 바다를 배경으로 산책하기에 좋습니다.");
 
         // Location 객체 생성 및 설정
@@ -362,7 +353,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 5 번째 여행지 ----------
 
         RequestDto dto5 = new RequestDto();
-        dto5.setName("송도 해상 케이블카");
+        dto5.setName("송도 해상 케이블카?");
         dto5.setContent("송도 해수욕장에서 출발하여 송도 스카이파크까지 연결되는 케이블카입니다. 케이블카를 타고 공중에서 바다를 감상하며 즐길 수 있습니다.");
 
         // Location 객체 생성 및 설정
@@ -380,7 +371,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 6 번째 여행지 ----------
 
         RequestDto dto6 = new RequestDto();
-        dto6.setName("부산 현대미술관");
+        dto6.setName("부산 현대미술관?");
         dto6.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -398,7 +389,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 7 번째 여행지 ----------
 
         RequestDto dto7 = new RequestDto();
-        dto7.setName("전포 공구길");
+        dto7.setName("전포 공구길?");
         dto7.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -416,7 +407,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 8 번째 여행지 ----------
 
         RequestDto dto8 = new RequestDto();
-        dto8.setName("감전 야생화단지");
+        dto8.setName("감전 야생화단지?");
         dto8.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -434,7 +425,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 9 번째 여행지 ----------
 
         RequestDto dto9 = new RequestDto();
-        dto9.setName("해운대 수목원");
+        dto9.setName("해운대 수목원?");
         dto9.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -452,7 +443,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 10 번째 여행지 ----------
 
         RequestDto dto10 = new RequestDto();
-        dto10.setName("산평소공원");
+        dto10.setName("산평소공원?");
         dto10.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -470,7 +461,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 11 번째 여행지 ----------
 
         RequestDto dto11 = new RequestDto();
-        dto11.setName("영도대교");
+        dto11.setName("영도대교?");
         dto11.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -488,7 +479,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 12 번째 여행지 ----------
 
         RequestDto dto12 = new RequestDto();
-        dto12.setName("가덕도");
+        dto12.setName("가덕도?");
         dto12.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -506,7 +497,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 13 번째 여행지 ----------
 
         RequestDto dto13 = new RequestDto();
-        dto13.setName("국립부산과학관");
+        dto13.setName("국립부산과학관?");
         dto13.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -524,7 +515,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 14 번째 여행지 ----------
 
         RequestDto dto14 = new RequestDto();
-        dto14.setName("백양산");
+        dto14.setName("백양산?");
         dto14.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -542,7 +533,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 15 번째 여행지 ----------
 
         RequestDto dto15 = new RequestDto();
-        dto15.setName("벡스코(BEXCO)");
+        dto15.setName("벡스코(BEXCO)?");
         dto15.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -560,7 +551,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 16 번째 여행지 ----------
 
         RequestDto dto16 = new RequestDto();
-        dto16.setName("성지곡수원지");
+        dto16.setName("성지곡수원지?");
         dto16.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -578,7 +569,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 17 번째 여행지 ----------
 
         RequestDto dto17 = new RequestDto();
-        dto17.setName("아미동 비석문화마을");
+        dto17.setName("아미동 비석문화마을?");
         dto17.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -596,7 +587,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 18 번째 여행지 ----------
 
         RequestDto dto18 = new RequestDto();
-        dto18.setName("오랑대공원");
+        dto18.setName("오랑대공원?");
         dto18.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -614,7 +605,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 19 번째 여행지 ----------
 
         RequestDto dto19 = new RequestDto();
-        dto19.setName("솔로몬로파크");
+        dto19.setName("솔로몬로파크?");
         dto19.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정
@@ -632,7 +623,7 @@ public class StubData implements CommandLineRunner {
         // ---------- 20 번째 여행지 ----------
 
         RequestDto dto20 = new RequestDto();
-        dto20.setName("수영사적공원");
+        dto20.setName("수영사적공원?");
         dto20.setContent("여행지 내용");
 
         // Location 객체 생성 및 설정

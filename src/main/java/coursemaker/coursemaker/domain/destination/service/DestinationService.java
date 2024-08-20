@@ -24,6 +24,12 @@ public interface DestinationService {
     // 모든 여행지를 조회하는 메서드
     List<Destination> findAll();
 
+    // 제목으로 검색하는 메서드
+    CourseMakerPagination<Destination> findByNameContaining(String name, Pageable pageable);
+
+    // 닉네임으로 검색하는 메서드
+    CourseMakerPagination<Destination> findByMemberNickname(String nickname, Pageable pageable);
+
     // 페이징을 지원하는 모든 여행지 조회 메서드
     CourseMakerPagination<Destination> findAll(Pageable pageable);
 

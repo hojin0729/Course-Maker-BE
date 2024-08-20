@@ -5,8 +5,16 @@ import coursemaker.coursemaker.api.busanApi.service.BusanApiService;
 import coursemaker.coursemaker.api.tourApi.dto.TourApiResponse;
 import coursemaker.coursemaker.api.tourApi.entity.TourApi;
 import coursemaker.coursemaker.api.tourApi.repository.TourApiRepository;
+import coursemaker.coursemaker.domain.destination.dto.LocationDto;
+import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
+import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.repository.MemberRepository;
+import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
+import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
+import coursemaker.coursemaker.domain.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +27,6 @@ import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -45,10 +51,16 @@ public class TourApiServiceImpl implements TourApiService {
     @Value("${tourapi.disableUpdateUrl}")
     private String disableUpdateUrl;
 
+    private final MemberRepository memberRepository;
+
+
+
     private final WebClient.Builder webClientBuilder;
     private final TourApiRepository tourApiRepository;
     private final DestinationRepository destinationRepository;
     private final BusanApiService busanApiService;
+    private final DestinationService destinationService;
+    private final TagService tagService;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -365,27 +377,26 @@ public class TourApiServiceImpl implements TourApiService {
             Optional<Destination> existingDestination = destinationRepository.findByContentId(tourApi.getContentid());
             if (existingDestination.isEmpty()) {
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
-                Destination destination = new Destination();
-                destination.setName(tourApi.getTitle());
-                destination.setPictureLink(tourApi.getFirstimage());
-                destination.setViews(0);
-                destination.setContent(tourApi.getOverview());
-                destination.setLocation(tourApi.getAddr1());
-                destination.setLongitude(tourApi.getMapx());
-                destination.setLatitude(tourApi.getMapy());
-                destination.setDisabled(tourApi.getDisabled());
-                destination.setContentId(tourApi.getContentid());
-                destination.setApiData(1);
-                destination.setAverageRating(0d);
+                RequestDto dto = new RequestDto();
+                LocationDto locationDto = new LocationDto(tourApi.getAddr1(), tourApi.getMapy(), tourApi.getMapx());
+                Optional<Member> adminMember = memberRepository.findById(1L);
+                List<TagResponseDto> tags = tagService.findAllTags();
+                TagResponseDto seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "바다 태그"));
 
-                // createdAt과 updatedAt은 String에서 LocalDateTime으로 변환하여 설정
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-                LocalDateTime createdAt = LocalDateTime.parse(tourApi.getCreatedtime(), formatter);
-                LocalDateTime updatedAt = LocalDateTime.parse(tourApi.getModifiedtime(), formatter);
-                destination.setCreatedAt(createdAt);
-                destination.setUpdatedAt(updatedAt);
+                dto.setName(tourApi.getTitle());
+                dto.setPictureLink(tourApi.getFirstimage());
+                dto.setContent(tourApi.getOverview());
+                dto.setLocation(locationDto);
+                dto.setDisabled(tourApi.getDisabled());
+                dto.setContentId(tourApi.getContentid());
+                dto.setApiData(1);
+                dto.setAverageRating(0d);
+                dto.setNickname(adminMember.get().getNickname());
+                dto.setTags(List.of(seaTag));
 
-                destinationRepository.save(destination);
+
+                destinationService.save(dto);
             }
         }
     }

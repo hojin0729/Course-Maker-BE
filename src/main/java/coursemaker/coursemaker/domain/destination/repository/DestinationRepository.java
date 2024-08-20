@@ -17,4 +17,8 @@ public interface DestinationRepository extends JpaRepository<Destination, Long> 
     Optional<Destination> findByContentId(Long contentid);
     // busanApi에서 DestinationDB로 저장할 때 사용됩니다.
     Optional<Destination> findBySeq(int seq);
+    // 제목에 특정 문자열이 포함된 여행지를 검색하는 메서드
+    Page<Destination> findByNameContainingAndDeletedAtIsNull(String name, Pageable pageable);
+    // 닉네임으로 여행지를 검색하는 메서드
+    Page<Destination> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
 }
