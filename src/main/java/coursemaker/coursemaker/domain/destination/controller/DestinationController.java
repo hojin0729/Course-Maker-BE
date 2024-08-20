@@ -81,7 +81,7 @@ public class DestinationController {
             boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
             List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
             Double averageRating = destinationReviewService.getAverageRating(destination.getId());
-            destinationDtos.add(DestinationDto.toDto(destination, tags, destination.getApiData(), averageRating, isMine));
+            destinationDtos.add(DestinationDto.toDto(destination, tags, destination.isApiData(), averageRating, isMine));
         }
 
 
@@ -122,7 +122,7 @@ public class DestinationController {
 
         Double averageRating = destinationReviewService.getAverageRating(id);
 
-        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, destination.getApiData(), averageRating, isMine);
+        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, destination.isApiData(), averageRating, isMine);
         return ResponseEntity.ok(destinationDto);
     }
 
@@ -158,7 +158,7 @@ public class DestinationController {
                     boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
                     List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
                     Double averageRating = destinationReviewService.getAverageRating(destination.getId());
-                    return DestinationDto.toDto(destination, tags, destination.getApiData(), averageRating, isMine);
+                    return DestinationDto.toDto(destination, tags, destination.isApiData(), averageRating, isMine);
                 })
                 .toList();
 
@@ -200,7 +200,7 @@ public class DestinationController {
                     boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
                     List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
                     Double averageRating = destinationReviewService.getAverageRating(destination.getId());
-                    return DestinationDto.toDto(destination, tags, destination.getApiData(), averageRating, isMine);
+                    return DestinationDto.toDto(destination, tags, destination.isApiData(), averageRating, isMine);
                 })
                 .toList();
 
@@ -251,7 +251,7 @@ public class DestinationController {
         Double averageRating = destinationReviewService.getAverageRating(savedDestination.getId());
 
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId());
-        DestinationDto response = DestinationDto.toDto(savedDestination, tags, request.getApiData(), averageRating, true);
+        DestinationDto response = DestinationDto.toDto(savedDestination, tags, request.isApiData(), averageRating, true);
 
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
@@ -380,7 +380,7 @@ public class DestinationController {
         Destination updatedDestination = destinationService.update(id, request);
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId());
         Double averageRating = destinationReviewService.getAverageRating(updatedDestination.getId());
-        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, request.getApiData(), averageRating, true);
+        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, request.isApiData(), averageRating, true);
         return ResponseEntity.ok(updatedDto);
     }
 

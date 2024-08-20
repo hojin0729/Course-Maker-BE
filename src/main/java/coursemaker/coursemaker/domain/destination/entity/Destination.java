@@ -58,9 +58,8 @@ public class Destination extends BaseEntity {
     @Column(name = "seq")
     private Integer seq;
 
-    @Column(name = "apiData")
-    @ColumnDefault("0")
-    private Integer apiData;
+    @Column(name = "isApiData")
+    private boolean isApiData;
 
     public void incrementViews() {
         this.views += 1;
