@@ -55,7 +55,7 @@ public class BusanApi {
     private String gmDegree;
 
     @Column(name = "seq")
-    private int seq;
+    private Integer seq;
 
 //    @OneToOne
 //    private Tag tag;

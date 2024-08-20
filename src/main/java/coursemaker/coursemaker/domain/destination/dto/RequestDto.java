@@ -54,7 +54,7 @@ public class RequestDto {
 
     // busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
     @Schema(description ="busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.")
-    private int seq;
+    private Integer seq;
 
     @Schema(description = "부산광역시 공공데이터 또는 Tour Api 공공데이터일 경우에 1이라는 값이 할당됩니다.")
     private Integer apiData;

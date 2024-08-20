@@ -103,8 +103,65 @@ public class BusanApiServiceImpl implements BusanApiService {
                 LocationDto locationDto = new LocationDto(busanApi.getStartAddr(), null, null);
                 Optional<Member> adminMember = memberRepository.findById(1L);
                 List<TagResponseDto> tags = tagService.findAllTags();
+                // 태그 찾기
+
+                // 자연
+                TagResponseDto mountainTag = tags.stream().filter(tag -> "산".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "산 태그"));
                 TagResponseDto seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
                         .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "바다 태그"));
+                TagResponseDto natureViewTag = tags.stream().filter(tag -> "자연경관".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "자연경관 태그"));
+                TagResponseDto nationalParkTag = tags.stream().filter(tag -> "국/공립공원".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "국/공립공원 태그"));
+                TagResponseDto trailTag = tags.stream().filter(tag -> "둘레길".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "둘레길 태그"));
+
+                // 동행
+                TagResponseDto soloTravelTag = tags.stream().filter(tag -> "나홀로 여행".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "나홀로 여행 태그"));
+                TagResponseDto withKidsTag = tags.stream().filter(tag -> "유아동반".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "유아동반 태그"));
+                TagResponseDto accessibleTravelTag = tags.stream().filter(tag -> "무장애여행".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "무장애여행 태그"));
+                TagResponseDto childrenTravelTag = tags.stream().filter(tag -> "어린이여행".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "어린이여행 태그"));
+                TagResponseDto parentsTravelTag = tags.stream().filter(tag -> "부모님".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "부모님 태그"));
+                TagResponseDto coupleTravelTag = tags.stream().filter(tag -> "연인/배우자".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "연인/배우자 태그"));
+                TagResponseDto friendsTravelTag = tags.stream().filter(tag -> "친구".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "친구 태그"));
+                TagResponseDto withPetsTag = tags.stream().filter(tag -> "애견동반".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "애견동반 태그"));
+
+
+                // 활동
+                TagResponseDto activityTag = tags.stream().filter(tag -> "액티비티".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "액티비티 태그"));
+                TagResponseDto cultureMuseumTag = tags.stream().filter(tag -> "문화/박물관".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "문화/박물관 태그"));
+                TagResponseDto festivalPerformanceTag = tags.stream().filter(tag -> "축제/공연".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "축제/공연 태그"));
+                TagResponseDto experienceTravelTag = tags.stream().filter(tag -> "체험여행".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "체험여행 태그"));
+                TagResponseDto traditionalMarketTag = tags.stream().filter(tag -> "전통시장".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "전통시장 태그"));
+                TagResponseDto historicalSiteTag = tags.stream().filter(tag -> "역사/유적지".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "역사/유적지 태그"));
+                TagResponseDto restFacilityTag = tags.stream().filter(tag -> "휴식시설".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "휴식시설 태그"));
+                TagResponseDto foodTravelTag = tags.stream().filter(tag -> "식도락".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "식도락 태그"));
+
+                // 날씨
+                TagResponseDto operatingInRainTag = tags.stream().filter(tag -> "우천시 운영".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "우천시 운영 태그"));
+                TagResponseDto indoorSpaceTag = tags.stream().filter(tag -> "실내공간".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "실내공간 태그"));
+                TagResponseDto vacationSpotTag = tags.stream().filter(tag -> "피서지".equals(tag.getName())).findFirst()
+                        .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "피서지 태그"));
+
                 dto.setName(busanApi.getGuganNm());
                 dto.setContent(busanApi.getGmCourse());
                 dto.setLocation(locationDto);
@@ -112,7 +169,7 @@ public class BusanApiServiceImpl implements BusanApiService {
                 dto.setApiData(1);
                 dto.setAverageRating(0d);
                 dto.setNickname(adminMember.get().getNickname());
-                dto.setTags(List.of(seaTag));
+                dto.setTags(List.of(trailTag));
                 destinationService.save(dto);
             }
         }
