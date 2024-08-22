@@ -130,6 +130,21 @@ public class CourseServiceImpl implements CourseService{
     }
 
     @Override
+    public CourseMakerPagination<TravelCourse> findByTitleContaining(String title, Pageable pageable) {
+        Page<TravelCourse> page = travelCourseRepository.findByTitleContainingAndDeletedAtIsNull(title, pageable);
+        long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
+        CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);
+        return courseMakerPagination;
+    }
+
+    @Override
+    public CourseMakerPagination<TravelCourse> findByMemberNickname(String nickname, Pageable pageable) {
+        Page<TravelCourse> page = travelCourseRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
+        long total = page.getTotalElements();
+        return new CourseMakerPagination<>(pageable, page, total);
+    }
+
+    @Override
     public TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname) {
 
         String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();

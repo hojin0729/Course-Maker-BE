@@ -1,13 +1,9 @@
 package coursemaker.coursemaker.domain.course.entity;
 
 import coursemaker.coursemaker.BaseEntity;
-import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
-import java.util.ArrayList;
 
 @Entity
 @Getter
@@ -20,7 +16,7 @@ public class TravelCourse extends BaseEntity {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false, length = 50)
+    @Column(name = "title", nullable = false, length = 30)
     private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "MEDIUMTEXT")
