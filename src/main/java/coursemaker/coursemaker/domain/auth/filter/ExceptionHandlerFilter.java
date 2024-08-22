@@ -1,9 +1,12 @@
 package coursemaker.coursemaker.domain.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import coursemaker.coursemaker.domain.auth.exception.ExpiredAccessTokenException;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.exception.RootException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,9 +27,11 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (RootException e) {
             returnErrorResponse(request, response, e);
-        } catch (SignatureException e) {
+        } catch (SignatureException | MalformedJwtException e) {
             RootException exception = new RootException(ErrorCode.INVALID_TOKEN, "토큰이 변조됬습니다."+e.getMessage(), "토큰이 변조됬습니다.", e);
-
+            returnErrorResponse(request, response, exception);
+        } catch (ExpiredJwtException e) {
+            ExpiredAccessTokenException exception = new ExpiredAccessTokenException("토큰이 만료됬습니다.", "Access Token 만료됨.");
             returnErrorResponse(request, response, exception);
         } catch (Exception e) {
             log.error("[FILTER] 예상치 못한 오류 발생: {}", e.getMessage());
