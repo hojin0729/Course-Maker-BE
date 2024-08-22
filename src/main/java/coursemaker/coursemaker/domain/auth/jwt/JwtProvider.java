@@ -93,14 +93,19 @@ public class JwtProvider {
     }
 
     public Boolean isExpired(String token){
-        return Jwts
-                .parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration()
-                .before(new Date(System.currentTimeMillis()));
+        try{
+            Jwts
+                    .parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration()
+                    .before(new Date(System.currentTimeMillis()));
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+        return false;
     }
 
     public String getNickname(String token) {
