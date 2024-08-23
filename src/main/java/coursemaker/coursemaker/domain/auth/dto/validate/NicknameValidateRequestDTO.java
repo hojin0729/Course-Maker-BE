@@ -1,4 +1,4 @@
-package coursemaker.coursemaker.domain.auth.dto;
+package coursemaker.coursemaker.domain.auth.dto.validate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;

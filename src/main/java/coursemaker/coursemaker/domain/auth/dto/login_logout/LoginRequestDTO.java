@@ -1,4 +1,4 @@
-package coursemaker.coursemaker.domain.auth.dto;
+package coursemaker.coursemaker.domain.auth.dto.login_logout;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class LoginRequestDto {
+public class LoginRequestDTO {
 
     @Schema(description = "이메일", example = "user@example.com")
     @NotNull(message = "이메일을 입력하세요.")

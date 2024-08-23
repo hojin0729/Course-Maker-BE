@@ -1,6 +1,6 @@
 package coursemaker.coursemaker;
 
-import coursemaker.coursemaker.domain.auth.dto.JoinRequestDto;
+import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
 import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
@@ -36,9 +36,9 @@ public class StubData implements CommandLineRunner {
     public void MemberStubData() throws Exception { // 1 ~ 5번 회원 생성
 
         /*회원가입*/
-        JoinRequestDto request;
+        JoinRequestDTO request;
         for(long i = 1; i <= 5; i++) {
-            request = new JoinRequestDto();
+            request = new JoinRequestDTO();
             request.setName("User");
             request.setEmail("User" + i + "@example.com");
             request.setNickname("nickname" + i);

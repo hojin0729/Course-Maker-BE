@@ -1,7 +1,7 @@
 package coursemaker.coursemaker.domain.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import coursemaker.coursemaker.domain.auth.dto.LogoutRequestDto;
+import coursemaker.coursemaker.domain.auth.dto.login_logout.LogoutRequestDTO;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +22,7 @@ public class EmailLogoutHandler implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         try {
 
-            LogoutRequestDto dto = objectMapper.readValue(request.getInputStream(), LogoutRequestDto.class);
+            LogoutRequestDTO dto = objectMapper.readValue(request.getInputStream(), LogoutRequestDTO.class);
             String nickname = jwtProvider.getNickname(dto.getRefreshToken());
             log.info("[AUTH] 로그아웃: {}", nickname);
             jwtProvider.expireRefreshToken(dto.getRefreshToken());

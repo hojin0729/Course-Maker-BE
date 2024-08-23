@@ -9,7 +9,7 @@ public class UnSendEmailException extends RootException {
 
     private final String message;
     public UnSendEmailException(String message, String logMessage){
-        super(ErrorCode.UNSEND_EMAIL, logMessage, message);
+        super(ErrorCode.MISMATCH_EMAIL, logMessage, message);
         this.message = message;
     }
 }

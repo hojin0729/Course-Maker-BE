@@ -1,11 +1,11 @@
-package coursemaker.coursemaker.domain.auth.dto;
+package coursemaker.coursemaker.domain.auth.dto.join_withdraw;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class JoinRequestDto {
+public class JoinRequestDTO {
     @Schema(description = "이메일", example = "user@example.com")
     @NotNull(message = "이메일을 입력하세요.")
     @NotBlank(message = "이메일은 공백 혹은 빈 문자는 허용하지 않습니다.")

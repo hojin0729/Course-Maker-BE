@@ -9,7 +9,7 @@ public class UnMatchValidateCodeException extends RootException {
 
     private final String message;
     public UnMatchValidateCodeException(String message, String logMessage){
-        super(ErrorCode.UNMATCH_CODE, logMessage, message);
+        super(ErrorCode.MISMATCH_CODE, logMessage, message);
         this.message = message;
     }
 }
