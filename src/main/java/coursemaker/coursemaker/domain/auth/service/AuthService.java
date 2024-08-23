@@ -1,6 +1,11 @@
 package coursemaker.coursemaker.domain.auth.service;
 
-import coursemaker.coursemaker.domain.auth.dto.*;
+import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinResponseDTO;
+import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueResponseDTO;
+import coursemaker.coursemaker.domain.auth.dto.validate.SendValidateCodeRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.validate.ValidateEmailRequestDTO;
 import coursemaker.coursemaker.domain.auth.exception.TimeOutValidationException;
 import coursemaker.coursemaker.domain.auth.exception.UnMatchValidateCodeException;
 import coursemaker.coursemaker.domain.auth.exception.UnSendEmailException;
@@ -35,8 +40,8 @@ public class AuthService {
     private final EmailCodeRepository emailCodeRepository;
 
     /*회원가입*/
-    public JoinResponseDto join(JoinRequestDto request){
-        JoinResponseDto response = new JoinResponseDto();
+    public JoinResponseDTO join(JoinRequestDTO request){
+        JoinResponseDTO response = new JoinResponseDTO();
         Member member = new Member();
 
         /*닉네임 중복 검증*/
@@ -68,8 +73,8 @@ public class AuthService {
     }
 
     /*토큰 재발행*/
-    public ReIssueResponseDto reissueToken(ReIssueRequestDto request){
-        ReIssueResponseDto response = new ReIssueResponseDto();
+    public ReIssueResponseDTO reissueToken(ReIssueRequestDTO request){
+        ReIssueResponseDTO response = new ReIssueResponseDTO();
 
         response.setAccessToken(jwtProvider.reIssue(request.getRefreshToken()) );
 

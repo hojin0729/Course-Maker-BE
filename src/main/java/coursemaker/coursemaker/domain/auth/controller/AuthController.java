@@ -1,6 +1,16 @@
 package coursemaker.coursemaker.domain.auth.controller;
 
-import coursemaker.coursemaker.domain.auth.dto.*;
+import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinResponseDTO;
+import coursemaker.coursemaker.domain.auth.dto.join_withdraw.WithdrawalRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueResponseDTO;
+import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginResponseDTO;
+import coursemaker.coursemaker.domain.auth.dto.login_logout.LogoutRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.validate.NicknameValidateRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.validate.SendValidateCodeRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.validate.ValidateEmailRequestDTO;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
 import coursemaker.coursemaker.domain.auth.service.NicknameValidate;
@@ -49,8 +59,8 @@ public class AuthController {
             ))
     })
     @PostMapping("/join")
-    public ResponseEntity<JoinResponseDto> signUp(@Valid @RequestBody JoinRequestDto joinRequest) {
-        JoinResponseDto joinResponse = authService.join(joinRequest);
+    public ResponseEntity<JoinResponseDTO> signUp(@Valid @RequestBody JoinRequestDTO joinRequest) {
+        JoinResponseDTO joinResponse = authService.join(joinRequest);
         return ResponseEntity.ok().body(joinResponse);
     }
 
@@ -74,7 +84,7 @@ public class AuthController {
             ))
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequest) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
         return ResponseEntity.ok().body(null);
     }
 
@@ -98,9 +108,9 @@ public class AuthController {
             ))
     })
     @PostMapping("/reissue")
-    public ResponseEntity<ReIssueResponseDto> reissue(@RequestBody ReIssueRequestDto reissueRequest) {
+    public ResponseEntity<ReIssueResponseDTO> reissue(@RequestBody ReIssueRequestDTO reissueRequest) {
 
-        ReIssueResponseDto dto = authService.reissueToken(reissueRequest);
+        ReIssueResponseDTO dto = authService.reissueToken(reissueRequest);
 
         return ResponseEntity.ok().body(dto);
     }
@@ -111,7 +121,7 @@ public class AuthController {
             responseCode = "200", description = "정상적으로 로그아웃되었습니다."
     )
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequestDTO logoutRequestDto) {
         return ResponseEntity.ok().build();
     }
 
@@ -121,7 +131,7 @@ public class AuthController {
     )
     @PostMapping("/withdrawal")
     public ResponseEntity<Void> withdrawal(@AuthenticationPrincipal Member member,
-                                           @RequestBody WithdrawalRequestDto withdrawalRequestDto) {
+                                           @RequestBody WithdrawalRequestDTO withdrawalRequestDto) {
         jwtProvider.expireRefreshToken(withdrawalRequestDto.getRefreshToken());
         authService.withdrawal(member.getNickname());
         return ResponseEntity.ok().build();
