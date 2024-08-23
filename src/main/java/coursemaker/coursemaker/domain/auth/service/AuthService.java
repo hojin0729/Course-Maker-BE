@@ -152,7 +152,7 @@ public class AuthService {
 
         /*전송된 코드와 일치하지 않을때*/
         if(!code.getValidateCode().equals(dto.getCode())){
-            throw new UnMatchValidateCodeException("이메일 코드가 일치하지 않습니다.", "인증코드 불일치: "+ dto.getCode());
+            throw new UnMatchValidateCodeException("이메일 인증코드가 일치하지 않습니다.", "인증코드 불일치: "+ dto.getCode());
         }
 
         /*시간초과*/

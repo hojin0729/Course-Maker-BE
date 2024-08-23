@@ -92,18 +92,11 @@ public class AuthController {
     @Operation(summary = "access token 재발행", description = "refresh token을 이용해 access token을 재발행 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상적으로 토큰이 재발행 됨."),
-            @ApiResponse(responseCode = "401", description = "토큰이 유효하지 않음.", content = @Content(
+            @ApiResponse(responseCode = "401", description = "1. 토큰이 유효하지 않음.(Invalid token)\t\n2. 리프레시 토큰의 유효기간이 만료됨.(Expired token)", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
                             value = "{\"status\": 401, \"errorType\": \"Invalid token\", \"message\": \"인증되지 않은 토큰입니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "401", description = "리프레시 토큰의 유효기간이 만료됨.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 401, \"errorType\": \"Expired token\", \"message\": \"토큰이 만료됬습니다.\"}"
                     )
             ))
     })
@@ -197,25 +190,11 @@ public class AuthController {
     @Operation(summary = "이메일 코드 검증", description = "이메일로 전송된 코드와 입력한 코드가 일치하는지 검증합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이메일 검증 성공"),
-            @ApiResponse(responseCode = "400", description = "이메일 형식이 올바르지 않은 경우", content = @Content(
+            @ApiResponse(responseCode = "400", description = "1. 이메일 형식이 올바르지 않은 경우(Illegal argument)\t\n 1. 인증 시간이 만료된 경우(Timeout)\t\n2. 전송된 검증 코드와 일치하지 않은 경우(Mismatch code)\"", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
                             value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"이메일은 example@email.com 과 같은 이메일 형식이어야 합니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "400", description = "인증 시간이 만료된 경우", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 400, \"errorType\": \"timeout\", \"message\": \"인증 시간이 초과됬습니다. 다시 이메일을 전송해주세요.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "401", description = "전송된 검증 코드와 일치하지 않은 경우", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 401, \"errorType\": \"Illegal argument\", \"message\": \"이메일은 example@email.com 과 같은 이메일 형식이어야 합니다.\"}"
                     )
             )),
             @ApiResponse(responseCode = "404", description = "이메일이 전송되지 않은 경우", content = @Content(
