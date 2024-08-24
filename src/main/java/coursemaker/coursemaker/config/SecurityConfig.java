@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -130,5 +132,27 @@ public class SecurityConfig {
     }
 
 
+    @Bean
+    public static RoleHierarchy roleHierarchy(){
+        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+
+        /**
+         * 권한 종류:
+         *     USER("ROLE_USER"),// 일반 회원
+         *     ADMIN("ROLE_ADMIN"),// 관리자
+         *     PARTNER("ROLE_PARTNER"),// 파트너사
+         *     BEGINNER_TRAVELER("ROLE_BEGINNER_TRAVELER"),// 일반 여행가
+         *     INTERMEDIATE_TRAVELER("ROLE_INTERMEDIATE_TRAVELER"),// 중급 여행가
+         *     PRO_TRAVELER("ROLE_PRO_TRAVELER");// 프로 여행가
+         * */
+        hierarchy.setHierarchy("ROLE_ADMIN > ROLE_PRO_TRAVELER > ROLE_INTERMEDIATE_TRAVELER > ROLE_BEGINNER_TRAVELER");
+
+
+        return hierarchy;
+    }
+
+    /*
+
+    */
 
 }
