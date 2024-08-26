@@ -4,6 +4,8 @@ import coursemaker.coursemaker.BaseEntity;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
@@ -32,7 +34,8 @@ public class TravelCourse extends BaseEntity {
     private int travelerCount;
 
     @Column(name = "travelType")
-    private int travelType;
+    @ColumnDefault("0")
+    private Integer travelType;
 
     @Column(name = "pictureLink", length = 300)
     private String pictureLink;

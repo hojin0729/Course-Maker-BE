@@ -59,6 +59,7 @@ public class Destination extends BaseEntity {
     private Integer seq;
 
     @Column(name = "isApiData")
+    @ColumnDefault("false")
     private Boolean isApiData;
 
     public void incrementViews() {
