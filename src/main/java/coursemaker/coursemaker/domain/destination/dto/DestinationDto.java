@@ -48,19 +48,21 @@ public class DestinationDto {
     @NotBlank(message = "내용은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String content; // 텍스트 에디터
 
-
     @Schema(description = "평균 평점", example = "4.5")
     private Double averageRating; // 평균 평점
+
+    @Schema(description = "해당 여행지가 로그인 한 사용자가 작성한 여행지인지 여부")
+    private boolean isMine;
 
     @Schema(description = "무장애 여행지 여부")
     private Long disabled;
 
-    @Schema(description = "공공데이터 여부", defaultValue = "0")
-    private int apiData;
+    @Schema(description = "공공데이터 여부", defaultValue = "false")
+    private boolean isApiData;
 
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
-    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, Double averageRating) {
+    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, boolean isApiData, Double averageRating, boolean isMine) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
@@ -77,7 +79,8 @@ public class DestinationDto {
         );
         dto.setLocation(location);
         dto.setAverageRating(averageRating);
-        System.out.println("ㅇebug: DestinationDto averageRating = " + dto.getAverageRating()); // 디버깅 메시지 추가
+        dto.setMine(isMine);
+        dto.setApiData(isApiData);
         return dto;
     }
 }

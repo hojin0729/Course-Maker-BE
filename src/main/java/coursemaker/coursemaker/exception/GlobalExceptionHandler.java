@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                     ExpiredRefreshTokenException.class
             }
     )
-    public ResponseEntity<ErrorResponse> handleExpiredTokenException(ExpiredAccessTokenException e) {
+    public ResponseEntity<ErrorResponse> handleExpiredTokenException(RootException e) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorType(e.getErrorCode().getErrorType());
         response.setMessage(e.getMessage());
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @ExceptionHandler({InvalidTokenException.class, SignatureException.class})
+    @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException e) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorType(e.getErrorCode().getErrorType());

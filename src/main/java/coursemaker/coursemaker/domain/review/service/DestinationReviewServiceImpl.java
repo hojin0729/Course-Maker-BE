@@ -34,6 +34,9 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
     public DestinationReview save(@Valid RequestDestinationDto requestDestinationDto, Long destinationId) {
         Member member = memberService.findByNickname(requestDestinationDto.getNickname());
         Destination destination = destinationService.findById(destinationId);
+        if (destinationReviewRepository.findByMemberAndDestination(member, destination).isPresent()) {
+            throw new IllegalStateException("해당 목적지에 이미 리뷰를 남겼습니다.");
+        }
         DestinationReview destinationReview = requestDestinationDto.toEntity(member);
         destinationReview.setDestination(destination);
 

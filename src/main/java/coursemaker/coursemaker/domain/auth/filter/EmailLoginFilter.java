@@ -2,8 +2,8 @@ package coursemaker.coursemaker.domain.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import coursemaker.coursemaker.domain.auth.dto.CustomMemberDetails;
-import coursemaker.coursemaker.domain.auth.dto.LoginRequestDto;
-import coursemaker.coursemaker.domain.auth.dto.LoginResponseDto;
+import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginResponseDTO;
 import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
@@ -40,7 +40,7 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         /*로그인 정보 가져옴*/
         try {
-            LoginRequestDto dto = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
+            LoginRequestDTO dto = objectMapper.readValue(request.getInputStream(), LoginRequestDTO.class);
             log.info("[AUTH] 로그인 요청: {}", dto.getLoginEmail());
 
             /*검증용 객체에 담음*/
@@ -65,7 +65,7 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
     
     /*로그인 성공시*/
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         CustomMemberDetails member = (CustomMemberDetails) authResult.getPrincipal();
         log.info("[AUTH] 로그인 성공: {}, JWT 발급 진행", authResult.getName());
 
@@ -83,7 +83,7 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
         log.info("[JWT] JWT 발급 완료");
 
         /*토큰을 반환 객체에 담아서 반환*/
-        LoginResponseDto responseDto = new LoginResponseDto();
+        LoginResponseDTO responseDto = new LoginResponseDTO();
         responseDto.setAccessToken(accessToken);
         responseDto.setRefreshToken(refreshToken);
 
@@ -93,7 +93,7 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
     
     /*로그인 실패시*/
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
 
         log.error("[AUTH] 로그인 실패: {}", failed.getMessage());
         if(failed.getCause() instanceof UserNotFoundException) {

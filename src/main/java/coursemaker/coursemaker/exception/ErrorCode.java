@@ -39,7 +39,12 @@ public enum ErrorCode {
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "Authentication failed", "비밀번호가 잘못되었습니다.", "AUTH-001"),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Access 토큰이 만료됬습니다.", "AUTH-003"),
-    EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004"),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004"),
+
+    MISMATCH_EMAIL(HttpStatus.NOT_FOUND, "Invalid item", "이메일 전송 기록이 없습니다.", "AUTH-005"),
+    MISMATCH_CODE(HttpStatus.BAD_REQUEST, "Mismatch code", "검증 코드가 일치하지 않습니다.", "AUTH-006"),
+
+    TIME_OUT(HttpStatus.BAD_REQUEST, "Timeout", "유효 시간이 지났습니다.", "TIME-OUT"),
 
     /* Review 도메인 예외 */
     INVALID_REVIEW(HttpStatus.NOT_FOUND, "Invalid item", "해당하는 리뷰가 없습니다.", "REVIEW-001"),
@@ -49,6 +54,7 @@ public enum ErrorCode {
     /* Wish 찜하기 도매인 예외*/
     INVALID_WISH(HttpStatus.NOT_FOUND, "Invalid wish", "해당하는 찜이 없습니다.", "WISH-001"),
     WISH_FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-002");
+
 
 
 
