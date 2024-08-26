@@ -74,7 +74,7 @@ public class CourseWishController {
             @PathVariable Long courseId,
             @AuthenticationPrincipal LoginedInfo logined) {
 
-        // 인증된 사용자의 닉네임을 사용하여 코스 찜 취소
+        // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
         courseWishService.cancelCourseWish(courseId, logined.getNickname());
         return ResponseEntity.noContent().build();
     }

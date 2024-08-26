@@ -89,12 +89,17 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     @Transactional
     public void cancelCourseWish(Long courseId, String nickname) {
+        // 회원 정보 가져오기
         Member member = memberRepository.findByNickname(nickname)
                 .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
 
+        // 찜 정보 가져오기
         CourseWish courseWish = courseWishRepository.findByTravelCourseIdAndMemberId(courseId, member.getId())
-                .orElseThrow(() -> new CourseWishNotFoundException("해당 코스 찜이 존재하지 않습니다.", "CourseId: " + courseId));
+                .orElseThrow(() -> new CourseWishNotFoundException("해당 코스 찜이 존재하지 않습니다.", "CourseId: " + courseId + ", Nickname: " + nickname));
 
+        // 코스 찜 삭제
         courseWishRepository.delete(courseWish);
     }
+
+
 }
