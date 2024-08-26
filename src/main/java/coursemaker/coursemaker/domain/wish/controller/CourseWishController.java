@@ -65,11 +65,13 @@ public class CourseWishController {
 
 
     /* 코스찜 취소 */
+    @DeleteMapping("/{courseId}")
     @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "목적지 찜이 성공적으로 취소되었습니다.")
+            @ApiResponse(responseCode = "204", description = "코스 찜이 성공적으로 취소되었습니다."),
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 취소할 수 없습니다."),
+            @ApiResponse(responseCode = "404", description = "코스찜을 찾을 수 없습니다.")
     })
-    @DeleteMapping("/{courseId}")
     public ResponseEntity<Void> cancelCourseWish(
             @PathVariable Long courseId,
             @AuthenticationPrincipal LoginedInfo logined) {
