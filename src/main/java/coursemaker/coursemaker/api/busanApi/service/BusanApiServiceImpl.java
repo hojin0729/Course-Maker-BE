@@ -166,7 +166,7 @@ public class BusanApiServiceImpl implements BusanApiService {
                 dto.setContent(busanApi.getGmCourse());
                 dto.setLocation(locationDto);
                 dto.setSeq(busanApi.getSeq());
-                dto.setApiData(true);
+                dto.setIsApiData(true);
                 dto.setAverageRating(0d);
                 dto.setNickname(adminMember.get().getNickname());
                 dto.setTags(List.of(trailTag));

@@ -57,7 +57,7 @@ public class RequestDto {
     private Integer seq;
 
     @Schema(description = "부산광역시 공공데이터 또는 Tour Api 공공데이터일 경우에 1이라는 값이 할당됩니다.", hidden = true)
-    private boolean isApiData;
+    private Boolean isApiData;
 
 
     // RequestDto를 Destination 엔티티로 변환하는 메서드
@@ -73,7 +73,7 @@ public class RequestDto {
         destination.setAverageRating(this.averageRating);
         destination.setDisabled(this.disabled);
         destination.setContentId(this.contentId);
-        destination.setApiData(this.isApiData);
+        destination.setIsApiData(this.isApiData);
         destination.setSeq(this.seq);
 
         return destination;
