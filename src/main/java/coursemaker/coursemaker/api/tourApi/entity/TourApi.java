@@ -72,7 +72,7 @@ public class TourApi {
     private Integer contenttypeid;
 
     @Column(name = "disabled")
-    private Long disabled;
+    private Boolean disabled;
 
     @Column(name = "homepage", columnDefinition = "TEXT")
     private String homepage;

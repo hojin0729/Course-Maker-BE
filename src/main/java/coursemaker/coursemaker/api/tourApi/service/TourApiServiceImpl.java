@@ -241,9 +241,9 @@ public class TourApiServiceImpl implements TourApiService {
                     List<TourApi> allTours = tourApiRepository.findAll();
                     allTours.forEach(tour -> {
                         if (disabledContentIds.contains(tour.getContentid())) {
-                            tour.setDisabled(1L);
+                            tour.setDisabled(true);
                         } else {
-                            tour.setDisabled(0L);
+                            tour.setDisabled(false);
                         }
                         tourApiRepository.save(tour);
                     });
@@ -289,7 +289,7 @@ public class TourApiServiceImpl implements TourApiService {
                     Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
                     tourApiOptional.ifPresent(tourApi -> {
                         synchronized (this) {
-                            tourApi.setDisabled(1L);
+                            tourApi.setDisabled(true);
                             tourApiRepository.save(tourApi);
                         }
                     });
@@ -593,98 +593,98 @@ public class TourApiServiceImpl implements TourApiService {
 
                 // 산 + (무장애)
                 if (tourApi.getCat3().equals("A01010400")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(mountainTag, accessibleTravelTag));
-                    } else if (tourApi.getDisabled() == 0) {
+                    } else {
                         dto.setTags(List.of(mountainTag));
                     }
                     // 바다 + (무장애)
                 } else if (tourApi.getCat3().equals("A01011100") || tourApi.getCat3().equals("A01011200") || tourApi.getCat3().equals("A01011300") || tourApi.getCat3().equals("A01011400") || tourApi.getCat3().equals("A01011600")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(seaTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(seaTag));
                     }
                     // 자연경관 + (무장애)
                 } else if (tourApi.getCat3().equals("A01010500") || tourApi.getCat3().equals("A01010600") || tourApi.getCat3().equals("A01010700") || tourApi.getCat3().equals("A01010800") || tourApi.getCat3().equals("A01010900") || tourApi.getCat3().equals("A01011000") || tourApi.getCat3().equals("A01011700") || tourApi.getCat3().equals("A01011800") || tourApi.getCat3().equals("A01011900") || tourApi.getCat3().equals("A01020100") || tourApi.getCat3().equals("A01020200")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(natureViewTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(natureViewTag));
                     }
                     // 국/공립공원 + (무장애)
                 } else if (tourApi.getCat3().equals("A01010100") || tourApi.getCat3().equals("A01010200") || tourApi.getCat3().equals("A01010300")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(nationalParkTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(nationalParkTag));
                     }
                     // 나홀로 여행 + (무장애)
                 } else if (tourApi.getCat3().equals("C01130001")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(soloTravelTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(soloTravelTag));
                     }
                     // 부모님 + (무장애)
                 } else if (tourApi.getCat3().equals("C01140001")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(parentsTravelTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(parentsTravelTag));
                     }
                     // 액티비티 + (무장애)
                 } else if (tourApi.getCat2().equals("A0301") || tourApi.getCat2().equals("A0302") || tourApi.getCat2().equals("A0303") || tourApi.getCat2().equals("A0304") || tourApi.getCat2().equals("A0305") || tourApi.getCat3().equals("C01160001")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(activityTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(activityTag));
                     }
                     // 문화/박물관 + (무장애)
                 } else if (tourApi.getCat3().equals("A02060100") || tourApi.getCat3().equals("A02060200") || tourApi.getCat3().equals("A02060300") || tourApi.getCat3().equals("A02060400") || tourApi.getCat3().equals("A02060500") || tourApi.getCat3().equals("A02060600") || tourApi.getCat3().equals("A02060700") || tourApi.getCat3().equals("A02060800") || tourApi.getCat3().equals("A02061100")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(cultureMuseumTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(cultureMuseumTag));
                     }
                     // 축제/공연 + (무장애)
                 } else if (tourApi.getCat3().equals("A02070100") || tourApi.getCat3().equals("A02070200") || tourApi.getCat3().equals("A02080100") || tourApi.getCat3().equals("A02081200")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(festivalPerformanceTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(festivalPerformanceTag));
                     }
                     // 체험여행 + (무장애)
                 } else if (tourApi.getCat3().equals("A02020800") || tourApi.getCat3().equals("A02030100") || tourApi.getCat3().equals("A02030200") || tourApi.getCat3().equals("A02030300") || tourApi.getCat3().equals("A02030400") || tourApi.getCat3().equals("A02030600")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(experienceTravelTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(experienceTravelTag));
                     }
                     // 전통시장 + (무장애)
                 } else if (tourApi.getCat3().equals("A04010100") || tourApi.getCat3().equals("A04010900")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(traditionalMarketTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(traditionalMarketTag));
                     }
                     // 역사/유적지 + (무장애)
                 } else if (tourApi.getCat2().equals("A0201") || tourApi.getCat3().equals("A02020200") || tourApi.getCat3().equals("A02050200")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(historicalSiteTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(historicalSiteTag));
                     }
                     // 휴식시설 + (무장애)
                 } else if (tourApi.getCat3().equals("A02020300") || tourApi.getCat3().equals("A02020400") || tourApi.getCat3().equals("A02020500")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(restFacilityTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(restFacilityTag));
                     }
                     // 식도락 + (무장애)
                 } else if (tourApi.getCat2().equals("A0502")) {
-                    if (tourApi.getDisabled() == 1) {
+                    if (tourApi.getDisabled()) {
                         dto.setTags(List.of(foodTravelTag, accessibleTravelTag));
                     } else {
                         dto.setTags(List.of(foodTravelTag));
