@@ -45,18 +45,18 @@ public class RequestDto {
     @Schema(description = "평균 평점", example = "4.5", hidden = true)
     private Double averageRating; // 평균 평점
 
-    @Schema(description = "무장애 여행지 여부", hidden = true)
+    @Schema(description = "무장애 여행지 여부", nullable = true, hidden = true)
     private Boolean disabled;
 
     // tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
-    @Schema(description = "Tour Api에서 불러온 공공데이터 여행지일 경우 그 여행지에 해당하는 고유 Content ID 값 입니다. tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.", hidden = true)
+    @Schema(description = "Tour Api에서 불러온 공공데이터 여행지일 경우 그 여행지에 해당하는 고유 Content ID 값 입니다. tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.", nullable = true, hidden = true)
     private Long contentId;
 
     // busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
-    @Schema(description ="busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.", hidden = true)
+    @Schema(description ="busanApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.", nullable = true, hidden = true)
     private Integer seq;
 
-    @Schema(description = "부산광역시 공공데이터 또는 Tour Api 공공데이터일 경우에 1이라는 값이 할당됩니다.", hidden = true)
+    @Schema(description = "부산광역시 공공데이터 또는 Tour Api 공공데이터일 경우에 1이라는 값이 할당됩니다.", example = "false", defaultValue = "false", nullable = true, hidden = true)
     private Boolean isApiData;
 
 
