@@ -1,10 +1,8 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
-import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
-import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Builder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +34,13 @@ public class CourseWishController {
     @Operation(summary = "코스찜 등록", description = "코스 찜 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "코스 찜이 성공적으로 등록되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -62,6 +66,9 @@ public class CourseWishController {
 
     /* 코스찜 취소 */
     @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "목적지 찜이 성공적으로 취소되었습니다.")
+    })
     @DeleteMapping("/{courseId}")
     public ResponseEntity<Void> cancelCourseWish(
             @PathVariable Long courseId,
