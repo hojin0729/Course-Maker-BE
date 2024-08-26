@@ -1,8 +1,10 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
+import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,10 +55,15 @@ public class CourseWishController {
     public ResponseEntity<CourseWishResponseDto> addCourseWish(@RequestBody CourseWishRequestDto requestDto,
                                                                @AuthenticationPrincipal LoginedInfo logined) {
 
-        // 인증된 사용자의 닉네임을 요청 DTO에 설정
+        // 로그인된 사용자인지 확인
         if (logined == null) {
-            return null;
+            throw new WishForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
+
+        // 요청 DTO에 로그인된 사용자의 닉네임 설정
+        requestDto.setNickname(logined.getNickname());
+
+
         // 서비스 호출을 통해 코스 찜 등록
         CourseWishResponseDto responseDto = courseWishService.addCourseWish(requestDto);
         return ResponseEntity.ok(responseDto);
