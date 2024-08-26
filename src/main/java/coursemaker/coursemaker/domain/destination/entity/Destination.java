@@ -48,7 +48,7 @@ public class Destination extends BaseEntity {
     private Double averageRating;
 
     @Column(name = "disabled")
-    private Long disabled;
+    private Boolean disabled;
 
     // tourApi에서 Destination DB로 저장될 때 중복된 데이터 판별 용으로 사용됩니다.
     @Column(name = "contentId")

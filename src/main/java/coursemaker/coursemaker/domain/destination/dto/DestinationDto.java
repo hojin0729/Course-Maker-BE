@@ -55,7 +55,7 @@ public class DestinationDto {
     private boolean isMine;
 
     @Schema(description = "무장애 여행지 여부")
-    private Long disabled;
+    private Boolean disabled;
 
     @Schema(description = "공공데이터 여부", defaultValue = "false")
     private boolean isApiData;
