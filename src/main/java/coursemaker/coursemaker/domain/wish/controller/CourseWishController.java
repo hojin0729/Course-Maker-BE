@@ -1,10 +1,10 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
-import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
+import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
-import coursemaker.coursemaker.domain.wish.entity.CourseWish;
+import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,10 +49,14 @@ public class CourseWishController {
     public ResponseEntity<CourseWishResponseDto> addCourseWish(@RequestBody CourseWishRequestDto requestDto,
                                                                @AuthenticationPrincipal LoginedInfo logined) {
 
-        // 인증된 사용자의 닉네임을 요청 DTO에 설정
+
         if (logined == null) {
-            return null;
+            throw new WishForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
+
+        // 요청 DTO에 로그인된 사용자의 닉네임 설정
+        requestDto.setNickname(logined.getNickname());
+
         // 서비스 호출을 통해 코스 찜 등록
         CourseWishResponseDto responseDto = courseWishService.addCourseWish(requestDto);
         return ResponseEntity.ok(responseDto);
@@ -61,13 +65,18 @@ public class CourseWishController {
 
 
     /* 코스찜 취소 */
-    @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
     @DeleteMapping("/{courseId}")
+    @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "코스 찜이 성공적으로 취소되었습니다."),
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 취소할 수 없습니다."),
+            @ApiResponse(responseCode = "404", description = "코스찜을 찾을 수 없습니다.")
+    })
     public ResponseEntity<Void> cancelCourseWish(
             @PathVariable Long courseId,
             @AuthenticationPrincipal LoginedInfo logined) {
 
-        // 인증된 사용자의 닉네임을 사용하여 코스 찜 취소
+        // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
         courseWishService.cancelCourseWish(courseId, logined.getNickname());
         return ResponseEntity.noContent().build();
     }

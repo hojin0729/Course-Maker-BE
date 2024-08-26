@@ -4,6 +4,7 @@ import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinResponseDTO;
 import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueResponseDTO;
+import coursemaker.coursemaker.domain.auth.dto.role.RoleUpdateDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.SendValidateCodeRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.ValidateEmailRequestDTO;
 import coursemaker.coursemaker.domain.auth.exception.TimeOutValidationException;
@@ -61,7 +62,7 @@ public class AuthService {
         member.setNickname(request.getNickname());
         member.setPassword(passwordEncoder.encode(request.getPassword()) );
         member.setPhoneNumber(request.getPhoneNumber());
-        member.setRoles(Role.USER);
+        member.setRoles(Role.BEGINNER_TRAVELER);
 
         /*DB에 회원정보 저장*/
         member = memberRepository.save(member);
@@ -146,6 +147,7 @@ public class AuthService {
         return validateCode;
     }
 
+    /*이메일 인증*/
     public void validateEmail(ValidateEmailRequestDTO dto){
         EmailCode code = emailCodeRepository.findById(dto.getEmail()).orElseThrow(() ->
                 new UnSendEmailException("전송되지 않은 이메일 입니다.", "이메일 전송 기록이 없음. email: "+dto.getEmail()));
@@ -164,6 +166,22 @@ public class AuthService {
 
         /*검증 끝났으면 삭제함.*/
         emailCodeRepository.delete(code);
+    }
+
+    /*사용자 권한 업데이트*/
+    public void updateRole(RoleUpdateDTO dto){
+        Member member = memberRepository.findByNickname(dto.getNickname()).orElseThrow(() ->
+                new UserNotFoundException(
+                        "사용자를 찾을 수 없습니다.",
+                        "[AUTH] 권한 업데이트 실패: nickname: " + dto.getNickname()
+                )
+        );
+
+        log.info("[AUTH] 사용자 권한 업데이트: {}, 기존: {}, 업데이트: {}", member.getNickname(), member.getRoles(), dto.getRole());
+
+        member.setRoles(dto.getRole());
+
+        memberRepository.save(member);
     }
 
     private String generateValidateCode(){
