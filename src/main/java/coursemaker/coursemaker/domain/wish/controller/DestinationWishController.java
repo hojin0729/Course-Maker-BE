@@ -3,7 +3,6 @@ package coursemaker.coursemaker.domain.wish.controller;
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
-import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,6 +60,16 @@ public class DestinationWishController {
 
     /*목적지찜 취소*/
     @Operation(summary = "목적지찜 취소", description = "등록한 목적지찜을 취소합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "코스 찜이 성공적으로 취소되었습니다."),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+    })
     @DeleteMapping("/{destinationId}")
     public ResponseEntity<Void> cancelDestinationWish(
             @PathVariable Long destinationId,
