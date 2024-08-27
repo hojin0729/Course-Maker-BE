@@ -32,7 +32,9 @@ public class DestinationWishController {
         this.destinationWishService = destinationWishService;
     }
 
-    /*목적지찜 등록*/
+    /**
+     * 목적지찜 등록
+     * */
     @Operation(summary = "목적지찜 등록", description = "목적지 찜 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "목적지 찜이 성공적으로 등록되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
@@ -74,7 +76,9 @@ public class DestinationWishController {
 
 
 
-    /*목적지찜 취소*/
+    /**
+     * 목적지찜 취소
+     * */
     @Operation(summary = "목적지찜 취소", description = "등록한 목적지찜을 취소합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "목적지 찜이 성공적으로 취소되었습니다."),
@@ -109,7 +113,9 @@ public class DestinationWishController {
         return ResponseEntity.noContent().build(); // 성공 시 204 No Content 반환
     }
 
-    /*목적지찜 닉네임으로 조회*/
+    /**
+     * 목적지찜 닉네임으로 조회
+     * */
     @GetMapping("/{nickname}")
     @Operation(summary = "닉네임으로 목적지찜 조회", description = "닉네임을 사용하여 목적지찜을 조회합니다.")
     @ApiResponses(value = {
@@ -141,7 +147,9 @@ public class DestinationWishController {
         return ResponseEntity.ok(destinationWishes);
     }
 
-    /*목적지찜 전체조회*/
+    /**
+     * 목적지찜 전체조회
+     * */
     @GetMapping
     @Operation(summary = "목적지찜 목록 전체조회", description = "목적지찜 목록을 전체 조회합니다.")
     @ApiResponses(value = {

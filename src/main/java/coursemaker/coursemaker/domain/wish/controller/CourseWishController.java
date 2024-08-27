@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Builder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,9 @@ public class CourseWishController {
         this.courseWishService = courseWishService;
     }
 
-    /*코스찜 등록*/
+    /**
+     * 코스찜 등록
+     * */
     @Operation(summary = "코스찜 등록", description = "코스 찜 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "코스 찜이 성공적으로 등록되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
@@ -68,7 +69,9 @@ public class CourseWishController {
 
 
 
-    /* 코스찜 취소 */
+    /**
+     *  코스찜 취소
+     *  */
     @DeleteMapping("/{courseId}")
     @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
     @ApiResponses(value = {
@@ -104,7 +107,9 @@ public class CourseWishController {
     }
 
 
-    /* 코스찜 닉네임으로 조회 */
+    /**
+     *  코스찜 닉네임으로 조회
+     *  */
     @GetMapping("/{nickname}")
     @Operation(summary = "닉네임으로 코스찜 조회", description = "닉네임을 사용하여 코스찜 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -138,7 +143,9 @@ public class CourseWishController {
 
 
 
-    /* 코스찜 전체조회 */
+    /**
+     *  코스찜 전체조회
+     *  */
     @GetMapping
     @Operation(summary = "코스찜 목록 전체조회", description = "코스찜 목록을 전체 조회합니다.")
     @ApiResponses(value = {
