@@ -49,7 +49,7 @@ public class DestinationWishController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 목적지입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
                     )
             ))
     })
@@ -89,12 +89,18 @@ public class DestinationWishController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "다른 사용자의 목적지찜을 취소할 수 없습니다."),
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 목적지찜을 취소할 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"다른 사용자의 목적지찜을 취소할 수 없습니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 목적지입니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 목적지입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
                     )
             ))
     })
@@ -127,7 +133,13 @@ public class DestinationWishController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "다른 사용자의 목적지찜을 조회할 수 없습니다.")
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 조회할 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"다른 사용자의 목적지찜을 조회할 수 없습니다.\"}"
+                    )
+            ))
     })
     @Parameter(name = "nickname", description = "목적지찜한 사용자의 닉네임", required = true)
     public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable String nickname,
@@ -154,7 +166,13 @@ public class DestinationWishController {
     @Operation(summary = "목적지찜 목록 전체조회", description = "목적지찜 목록을 전체 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "목적지 찜이 성공적으로 조회되었습니다."),
-            @ApiResponse(responseCode = "404", description = "목적지 찜이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "404", description = "목적지 찜이 존재하지 않습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                    )
+            ))
     })
     public ResponseEntity<List<DestinationWishResponseDto>> getAllDestinationWishes() {
         List<DestinationWishResponseDto> destinationWishes = destinationWishService.getAllDestinationWishes();
