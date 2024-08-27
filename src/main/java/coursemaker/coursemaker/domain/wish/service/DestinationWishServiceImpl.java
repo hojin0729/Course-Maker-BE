@@ -113,4 +113,19 @@ public class DestinationWishServiceImpl implements DestinationWishService {
         // 목적지 찜 삭제
         destinationWishRepository.delete(destinationWish);
     }
+
+    /* 특정 목적지에 대한 찜 목록 조회 */
+    public List<DestinationWishResponseDto> getWishesByDestinationId(Long destinationId) {
+        List<DestinationWish> destinationWishes = destinationWishRepository.findByDestinationId(destinationId);
+        if (destinationWishes.isEmpty()) {
+            throw new DestinationWishNotFoundException("해당 목적지에 대한 찜이 존재하지 않습니다.", "DestinationId: " + destinationId);
+        }
+        return destinationWishes.stream()
+                .map(wish -> new DestinationWishResponseDto(
+                        wish.getDestination().getId(),
+                        wish.getDestination().getName(),
+                        wish.getMember().getNickname()))
+                .collect(Collectors.toList());
+    }
+
 }

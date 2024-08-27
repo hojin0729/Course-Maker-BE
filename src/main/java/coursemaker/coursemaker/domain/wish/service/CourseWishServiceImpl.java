@@ -117,5 +117,18 @@ public class CourseWishServiceImpl implements CourseWishService {
         courseWishRepository.delete(courseWish);
     }
 
+    /* 특정 코스에 대한 찜 목록 조회 */
+    public List<CourseWishResponseDto> getWishesByCourseId(Long courseId) {
+        List<CourseWish> courseWishes = courseWishRepository.findByTravelCourseId(courseId);
+        if (courseWishes.isEmpty()) {
+            throw new CourseWishNotFoundException("해당 코스에 대한 찜이 존재하지 않습니다.", "CourseId: " + courseId);
+        }
+        return courseWishes.stream()
+                .map(courseWish -> new CourseWishResponseDto(
+                        courseWish.getTravelCourse().getId(),
+                        courseWish.getTravelCourse().getTitle(),
+                        courseWish.getMember().getNickname()))
+                .collect(Collectors.toList());
+    }
 
 }
