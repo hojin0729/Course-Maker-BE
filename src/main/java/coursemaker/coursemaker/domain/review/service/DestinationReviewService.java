@@ -19,4 +19,6 @@ public interface DestinationReviewService {
 
     // 특정 여행지의 평균 평점 조회
     Double getAverageRating(Long destinationId);
+
+    Integer getReviewCount(Long destinationId);
 }
