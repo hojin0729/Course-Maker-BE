@@ -12,7 +12,9 @@ import java.util.Optional;
 public interface DestinationWishRepository extends JpaRepository<DestinationWish, Long> {
     List<DestinationWish> findByMember_Nickname(String nickname);
 
-    Optional<DestinationWish> findByDestinationIdAndMemberId(Long courseId, Long memberId);
+    Optional<DestinationWish> findByDestinationIdAndMemberId(Long destinationId, Long memberId);
 
     boolean existsByDestinationIdAndMemberId(Long id, Long id1);
+
+    List<DestinationWish> findByDestinationId(Long destinationId);
 }
