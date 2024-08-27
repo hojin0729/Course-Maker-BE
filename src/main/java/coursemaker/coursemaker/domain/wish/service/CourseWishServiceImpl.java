@@ -105,7 +105,9 @@ public class CourseWishServiceImpl implements CourseWishService {
 
         // 찜 정보 가져오기
         CourseWish courseWish = courseWishRepository.findByTravelCourseIdAndMemberId(courseId, member.getId())
+
                 .orElseThrow(() -> new CourseWishNotFoundException("해당 코스 찜이 존재하지 않습니다.", "CourseId: " + courseId + ", Nickname: " + nickname));
+
 
         // 코스 찜 삭제
         courseWishRepository.delete(courseWish);
