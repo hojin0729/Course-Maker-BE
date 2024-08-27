@@ -42,7 +42,7 @@ public class CourseWishController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
                     )
             ))
     })
@@ -52,7 +52,7 @@ public class CourseWishController {
 
 
         if (logined == null) {
-            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -83,12 +83,18 @@ public class CourseWishController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 취소할 수 없습니다."),
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 취소할 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"다른 사용자의 코스찜을 취소할 수 없습니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
                     )
             ))
     })
@@ -98,7 +104,7 @@ public class CourseWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -121,19 +127,25 @@ public class CourseWishController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 조회할 수 없습니다.")
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 조회할 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"다른 사용자의 코스찜을 조회할 수 없습니다.\"}"
+                    )
+            ))
     })
     @Parameter(name = "nickname", description = "코스찜한 사용자의 닉네임", required = true)
     public ResponseEntity<List<CourseWishResponseDto>> getCourseWishesByNickname(@PathVariable String nickname,
                                                                                  @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
         if (!nickname.equals(logined.getNickname())) {
-            throw new WishForbiddenException("Forbidden", "다른 사용자의 코스찜을 조회할 수 없습니다.");
+            throw new WishForbiddenException("다른 사용자의 코스찜을 조회할 수 없습니다.", "Forbidden");
         }
 
         // 서비스 호출을 통해 코스찜 목록 조회
@@ -150,7 +162,13 @@ public class CourseWishController {
     @Operation(summary = "코스찜 목록 전체조회", description = "코스찜 목록을 전체 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "코스 찜이 성공적으로 조회되었습니다."),
-            @ApiResponse(responseCode = "404", description = "코스 찜이 존재하지 않습니다.")
+            @ApiResponse(responseCode = "404", description = "코스 찜이 존재하지 않습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                    )
+            ))
     })
     public ResponseEntity<List<CourseWishResponseDto>> getAllCourseWishes() {
         // 서비스 호출을 통해 전체 코스찜 목록 조회
