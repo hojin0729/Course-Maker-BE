@@ -18,7 +18,7 @@ public class DestinationWishResponseDto {
     private String destinationName;
 
 
-    @Schema(description = "사용자의 닉네임", example = "Nickname")
+    @Schema(hidden = true)
     private String memberNickname;
 
     public DestinationWishResponseDto(Long id, Long destinationId, String destinationName, String memberNickname) {
@@ -26,10 +26,5 @@ public class DestinationWishResponseDto {
         this.destinationId = destinationId;
         this.destinationName = destinationName;
         this.memberNickname = memberNickname;
-    }
-
-    // 닉네임 숨기기 위한 메서드
-    public void hideMemberNickname() {
-        this.memberNickname = null;
     }
 }

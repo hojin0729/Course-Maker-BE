@@ -68,9 +68,6 @@ public class DestinationWishController {
 
         DestinationWishResponseDto responseDto = destinationWishService.addDestinationWish(requestDto);
 
-        // 닉네임을 숨김
-        responseDto.hideMemberNickname();
-
         return ResponseEntity.ok(responseDto);
     }
 
@@ -133,7 +130,7 @@ public class DestinationWishController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 조회할 수 없습니다.", content = @Content(
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 목적지찜을 조회할 수 없습니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
