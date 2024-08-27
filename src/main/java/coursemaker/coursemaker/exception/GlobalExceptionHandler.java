@@ -12,10 +12,7 @@ import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
-import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
+import coursemaker.coursemaker.domain.wish.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
