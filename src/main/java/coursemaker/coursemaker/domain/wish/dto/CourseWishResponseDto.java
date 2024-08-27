@@ -26,4 +26,9 @@ public class CourseWishResponseDto {
         this.courseTitle = courseTitle;
         this.memberNickname = memberNickname;
     }
+
+    // 닉네임 숨기기 위한 메서드
+    public void hideMemberNickname() {
+        this.memberNickname = null;
+    }
 }

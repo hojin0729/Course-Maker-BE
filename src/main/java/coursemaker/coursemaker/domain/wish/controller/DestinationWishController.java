@@ -64,6 +64,10 @@ public class DestinationWishController {
         requestDto.setNickname(logined.getNickname());
 
         DestinationWishResponseDto responseDto = destinationWishService.addDestinationWish(requestDto);
+
+        // 닉네임을 숨김
+        responseDto.hideMemberNickname();
+
         return ResponseEntity.ok(responseDto);
     }
 

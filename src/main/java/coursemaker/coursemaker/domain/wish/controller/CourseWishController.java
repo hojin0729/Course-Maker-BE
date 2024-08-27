@@ -62,9 +62,12 @@ public class CourseWishController {
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
         requestDto.setNickname(logined.getNickname());
 
-
         // 서비스 호출을 통해 코스 찜 등록
         CourseWishResponseDto responseDto = courseWishService.addCourseWish(requestDto);
+
+        // 닉네임을 숨김
+        responseDto.hideMemberNickname();
+
         return ResponseEntity.ok(responseDto);
     }
 
