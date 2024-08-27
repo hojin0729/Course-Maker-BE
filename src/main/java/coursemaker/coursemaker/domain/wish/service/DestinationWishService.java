@@ -19,4 +19,6 @@ public interface DestinationWishService {
 
     /* 특정 목적지에 대한 찜 목록 조회 */
     List<DestinationWishResponseDto> getWishesByDestinationId(Long destinationId);
+
+    Integer getWishesCount(Long destinationId);
 }
