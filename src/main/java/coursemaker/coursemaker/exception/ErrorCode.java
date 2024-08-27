@@ -56,7 +56,13 @@ public enum ErrorCode {
     INVALID_WISH(HttpStatus.NOT_FOUND, "Invalid wish", "해당하는 찜이 없습니다.", "WISH-001"),
     UNAUTHORIZED_WISH(HttpStatus.UNAUTHORIZED, "Unauthorized", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-002"),
     FORBIDDEN_WISH(HttpStatus.CONFLICT, "Forbidden", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-003"),
-    DUPLICATED_WISH(HttpStatus.CONFLICT, "Duplicated wish", "이미 찜한 소스입니다.", "WISH-004");
+    DUPLICATED_WISH(HttpStatus.CONFLICT, "Duplicated wish", "이미 찜한 소스입니다.", "WISH-004"),
+
+    /* Like 찜하기 도매인 예외*/
+    INVALID_LIKE(HttpStatus.NOT_FOUND, "Invalid like", "해당하는 좋아요가 없습니다.", "LIKE-001"),
+    UNAUTHORIZED_LIKE(HttpStatus.UNAUTHORIZED, "Unauthorized", "좋아요 기능에 접근할 권한이 없습니다.", "LIKE-002"),
+    FORBIDDEN_LIKE(HttpStatus.CONFLICT, "Forbidden", "좋아요 기능에 접근할 권한이 없습니다.", "LIKE-003"),
+    DUPLICATED_LIKE(HttpStatus.CONFLICT, "Duplicated like", "이미 좋아요한 소스입니다.", "LIKE-004");
 
 
 

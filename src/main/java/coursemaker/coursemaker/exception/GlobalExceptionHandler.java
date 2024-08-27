@@ -6,6 +6,7 @@ import coursemaker.coursemaker.domain.course.exception.TravelCourseAlreadyDelete
 import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedException;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.destination.exception.*;
+import coursemaker.coursemaker.domain.like.exception.*;
 import coursemaker.coursemaker.domain.member.exception.*;
 import coursemaker.coursemaker.domain.review.exception.ReviewNotFoundException;
 import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException;
@@ -428,6 +429,52 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateWishException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateWishException(DuplicateWishException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    // Like 관련 예외처리
+    @ExceptionHandler(CourseLikeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCourseLikeNotFoundException(CourseLikeNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DestinationLikeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleDestinationLikeNotFoundException(DestinationLikeNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(LikeForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleLikeForbiddenException(LikeForbiddenException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(LikeUnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleLikeUnauthorizedException(LikeUnauthorizedException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DuplicateLikeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateLikeException(DuplicateLikeException e) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorType(e.getErrorCode().getErrorType());
         response.setMessage(e.getMessage());
