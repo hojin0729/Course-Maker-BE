@@ -162,7 +162,7 @@ public class CourseApiController {
 
             Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
 
-            Integer wishCount = courseWishService.getWishesCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
 
 
             contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
@@ -214,7 +214,7 @@ public class CourseApiController {
 
         Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
 
-        Integer wishCount = courseWishService.getWishesCount(travelCourse.getId());
+        Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
 
         return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
     }
@@ -259,7 +259,7 @@ public class CourseApiController {
 
             Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
 
-            Integer wishCount = courseWishService.getWishesCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
 
             contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
         }
@@ -311,7 +311,7 @@ public class CourseApiController {
 
             Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
 
-            Integer wishCount = courseWishService.getWishesCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
 
             contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
         }
@@ -402,7 +402,7 @@ public class CourseApiController {
 
         Integer reviewCount = courseReviewService.getReviewCount(updatedTravelCourse.getId());
 
-        Integer wishCount = courseWishService.getWishesCount(updatedTravelCourse.getId());
+        Integer wishCount = courseWishService.getCourseWishCount(updatedTravelCourse.getId());
 
         TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount);
 

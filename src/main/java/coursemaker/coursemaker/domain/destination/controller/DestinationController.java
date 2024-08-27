@@ -85,7 +85,7 @@ public class DestinationController {
             List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
             Double averageRating = destinationReviewService.getAverageRating(destination.getId());
             Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
-            Integer wishCount = destinationWishService.getWishesCount(destination.getId());
+            Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
             destinationDtos.add(DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount));
         }
 
@@ -127,7 +127,7 @@ public class DestinationController {
 
         Double averageRating = destinationReviewService.getAverageRating(id);
         Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
-        Integer wishCount = destinationWishService.getWishesCount(destination.getId());
+        Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
 
         DestinationDto destinationDto = DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount);
         return ResponseEntity.ok(destinationDto);
@@ -166,7 +166,7 @@ public class DestinationController {
                     List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
                     Double averageRating = destinationReviewService.getAverageRating(destination.getId());
                     Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
-                    Integer wishCount = destinationWishService.getWishesCount(destination.getId());
+                    Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
                     return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount);
                 })
                 .toList();
@@ -210,7 +210,7 @@ public class DestinationController {
                     List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
                     Double averageRating = destinationReviewService.getAverageRating(destination.getId());
                     Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
-                    Integer wishCount = destinationWishService.getWishesCount(destination.getId());
+                    Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
                     return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount);
                 })
                 .toList();
@@ -263,7 +263,7 @@ public class DestinationController {
 
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId());
         Integer reviewCount = destinationReviewService.getReviewCount(savedDestination.getId());
-        Integer wishCount = destinationWishService.getWishesCount(savedDestination.getId());
+        Integer wishCount = destinationWishService.getDestinationWishCount(savedDestination.getId());
         DestinationDto response = DestinationDto.toDto(savedDestination, tags, request.getIsApiData(), averageRating, true, reviewCount, wishCount);
 
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
@@ -394,7 +394,7 @@ public class DestinationController {
         List<TagResponseDto> updatedTags = tagService.findAllByDestinationId(updatedDestination.getId());
         Double averageRating = destinationReviewService.getAverageRating(updatedDestination.getId());
         Integer reviewCount = destinationReviewService.getReviewCount(updatedDestination.getId());
-        Integer wishCount = destinationWishService.getWishesCount(updatedDestination.getId());
+        Integer wishCount = destinationWishService.getDestinationWishCount(updatedDestination.getId());
         DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, request.getIsApiData(), averageRating, true, reviewCount, wishCount);
         return ResponseEntity.ok(updatedDto);
     }

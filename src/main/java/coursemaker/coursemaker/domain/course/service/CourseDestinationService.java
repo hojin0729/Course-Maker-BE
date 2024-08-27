@@ -42,7 +42,7 @@ public class CourseDestinationService {
         Destination destination = courseDestination.getDestination();
         boolean isApiData = destination.getIsApiData();
         Integer reviewCount = destinationReviewService.getReviewCount(courseDestination.getDestination().getId());
-        Integer wishCount = destinationWishService.getWishesCount(courseDestination.getDestination().getId());
+        Integer wishCount = destinationWishService.getDestinationWishCount(courseDestination.getDestination().getId());
 
         boolean isMine = loginedInfo != null &&
                 loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
