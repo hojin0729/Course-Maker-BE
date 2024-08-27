@@ -52,7 +52,7 @@ public class CourseWishController {
 
 
         if (logined == null) {
-            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -98,7 +98,7 @@ public class CourseWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -128,12 +128,12 @@ public class CourseWishController {
                                                                                  @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
         if (!nickname.equals(logined.getNickname())) {
-            throw new WishForbiddenException("Forbidden", "다른 사용자의 코스찜을 조회할 수 없습니다.");
+            throw new WishForbiddenException("다른 사용자의 코스찜을 조회할 수 없습니다.", "Forbidden");
         }
 
         // 서비스 호출을 통해 코스찜 목록 조회
