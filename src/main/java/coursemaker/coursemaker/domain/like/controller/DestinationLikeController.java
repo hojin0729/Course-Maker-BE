@@ -1,10 +1,10 @@
 package coursemaker.coursemaker.domain.like.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.like.dto.DestinationLikeRequestDto;
 import coursemaker.coursemaker.domain.like.dto.DestinationLikeResponseDto;
 import coursemaker.coursemaker.domain.like.exception.LikeForbiddenException;
-import coursemaker.coursemaker.domain.like.exception.LikeUnauthorizedException;
 import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,7 +66,7 @@ public class DestinationLikeController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new LikeUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationLike] addDestinationLike");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -114,7 +114,7 @@ public class DestinationLikeController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new LikeUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationLike] cancelDestinationLike");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -149,7 +149,7 @@ public class DestinationLikeController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new LikeUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationLike] getDestinationLikesByNickname");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인

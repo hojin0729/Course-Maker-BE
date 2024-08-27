@@ -455,15 +455,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @ExceptionHandler(LikeUnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleLikeUnauthorizedException(LikeUnauthorizedException e) {
-        ErrorResponse response = new ErrorResponse();
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode().getStatus().value());
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
     @ExceptionHandler(DuplicateLikeException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateLikeException(DuplicateLikeException e) {
         ErrorResponse response = new ErrorResponse();
