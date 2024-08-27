@@ -147,6 +147,10 @@ public class CourseWishController {
     /* 코스찜 전체조회 */
     @GetMapping
     @Operation(summary = "코스찜 목록 전체조회", description = "코스찜 목록을 전체 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "코스 찜이 성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "404", description = "코스 찜이 존재하지 않습니다.")
+    })
     public ResponseEntity<List<CourseWishResponseDto>> getAllCourseWishes() {
         // 서비스 호출을 통해 전체 코스찜 목록 조회
         List<CourseWishResponseDto> responseDtos = courseWishService.getAllCourseWishes();

@@ -144,6 +144,10 @@ public class DestinationWishController {
     /*목적지찜 전체조회*/
     @GetMapping
     @Operation(summary = "목적지찜 목록 전체조회", description = "목적지찜 목록을 전체 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "목적지 찜이 성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "404", description = "목적지 찜이 존재하지 않습니다.")
+    })
     public ResponseEntity<List<DestinationWishResponseDto>> getAllDestinationWishes() {
         List<DestinationWishResponseDto> destinationWishes = destinationWishService.getAllDestinationWishes();
         return ResponseEntity.ok(destinationWishes);

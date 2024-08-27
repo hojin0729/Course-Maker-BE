@@ -9,6 +9,7 @@ import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
+import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.repository.DestinationWishRepository;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,14 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     /* 목적지 찜목록 전체조회*/
     @Override
     public List<DestinationWishResponseDto> getAllDestinationWishes() {
+
         List<DestinationWish> wishes = destinationWishRepository.findAll();
+
+        if (wishes.isEmpty()) {
+            throw new DestinationWishNotFoundException("Invalid wish", "목적지 찜이 존재하지 않습니다.");
+        }
+
+
         return wishes.stream()
                 .map(wish -> new DestinationWishResponseDto(
                         wish.getId(),
