@@ -68,8 +68,10 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     @Transactional
     public CourseWishResponseDto addCourseWish(CourseWishRequestDto requestDto) {
+
         TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));
+
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 멤버를 찾을 수 없습니다.", "Nickname: " + requestDto.getNickname()));
 

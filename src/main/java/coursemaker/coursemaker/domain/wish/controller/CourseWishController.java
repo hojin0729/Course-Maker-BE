@@ -100,8 +100,6 @@ public class CourseWishController {
             throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
 
-
-
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
         courseWishService.cancelCourseWish(courseId, logined.getNickname());
         return ResponseEntity.noContent().build();
