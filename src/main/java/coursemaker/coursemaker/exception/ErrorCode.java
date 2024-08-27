@@ -40,6 +40,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Access 토큰이 만료됬습니다.", "AUTH-003"),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004"),
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "login required", "로그인 후 이용이 가능합니다.", "AUTH-005"),
 
     MISMATCH_EMAIL(HttpStatus.NOT_FOUND, "Invalid item", "이메일 전송 기록이 없습니다.", "AUTH-005"),
     MISMATCH_CODE(HttpStatus.BAD_REQUEST, "Mismatch code", "검증 코드가 일치하지 않습니다.", "AUTH-006"),
