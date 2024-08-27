@@ -20,5 +20,6 @@ public interface DestinationWishService {
     /* 특정 목적지에 대한 찜 목록 조회 */
     List<DestinationWishResponseDto> getWishesByDestinationId(Long destinationId);
 
-    Integer getWishesCount(Long destinationId);
+    /* 목적지별 찜된 수 조회 */
+    Integer getDestinationWishCount(Long destinationId);
 }

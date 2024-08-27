@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
 import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -179,6 +181,29 @@ public class CourseWishController {
         // 서비스 호출을 통해 전체 코스찜 목록 조회
         List<CourseWishResponseDto> responseDtos = courseWishService.getAllCourseWishes();
         return ResponseEntity.ok(responseDtos);
+    }
+
+    /**
+     * 코스별 찜된 수 조회
+     */
+    @GetMapping("/count/{courseId}")
+    @Operation(summary = "코스별 찜된 수 조회", description = "특정 코스에 찜된 수를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "코스 찜 수가 성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<Integer> getCourseWishCount(@PathVariable("courseId") Long courseId) {
+
+            Integer wishCount = courseWishService.getCourseWishCount(courseId);
+
+            return ResponseEntity.ok(wishCount);
+
     }
 
 }
