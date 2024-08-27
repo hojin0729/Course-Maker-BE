@@ -111,6 +111,7 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
     }
 
 
+    @Override
     public Integer getReviewCount(Long destinationId){
         return destinationReviewRepository.countByDestinationId(destinationId);
     }

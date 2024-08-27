@@ -62,6 +62,12 @@ public class Destination extends BaseEntity {
     @ColumnDefault("false")
     private Boolean isApiData;
 
+    @Column(name = "wishCount")
+    private Integer wishCount;
+
+    @Column(name = "reviewCount")
+    private Integer reviewCount;
+
     public void incrementViews() {
         this.views += 1;
     }

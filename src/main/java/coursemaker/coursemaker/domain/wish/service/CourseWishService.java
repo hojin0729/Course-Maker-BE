@@ -20,4 +20,5 @@ public interface CourseWishService {
     List<CourseWishResponseDto> getWishesByCourseId(Long courseId);
 
     Integer getCourseWishCount(Long courseId);
+
 }

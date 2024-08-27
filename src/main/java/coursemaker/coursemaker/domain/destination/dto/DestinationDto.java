@@ -60,9 +60,15 @@ public class DestinationDto {
     @Schema(description = "공공데이터 여부", example = "false", defaultValue = "false", nullable = true)
     private boolean isApiData;
 
+    @Schema(description = "여행지 찜 갯수", example = "50")
+    private Integer wishCount;
+
+    @Schema(description = "여행지 리뷰 갯수", example = "70")
+    private Integer reviewCount;
+
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
-    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, boolean isApiData, Double averageRating, boolean isMine) {
+    public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos, boolean isApiData, Double averageRating, boolean isMine, Integer reviewCount, Integer wishCount) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
@@ -81,6 +87,8 @@ public class DestinationDto {
         dto.setAverageRating(averageRating);
         dto.setMine(isMine);
         dto.setApiData(isApiData);
+        dto.setReviewCount(reviewCount);
+        dto.setWishCount(wishCount);
         return dto;
     }
 }

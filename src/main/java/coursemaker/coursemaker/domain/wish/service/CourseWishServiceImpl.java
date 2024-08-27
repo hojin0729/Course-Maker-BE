@@ -140,7 +140,6 @@ public class CourseWishServiceImpl implements CourseWishService {
         travelCourseRepository.findById(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
 
-        // 코스에 대한 찜 수 반환
         return courseWishRepository.countByTravelCourseId(courseId);
     }
 
