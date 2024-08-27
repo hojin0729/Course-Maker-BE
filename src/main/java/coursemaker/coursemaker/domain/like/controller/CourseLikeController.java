@@ -1,10 +1,10 @@
 package coursemaker.coursemaker.domain.like.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.like.dto.CourseLikeRequestDto;
 import coursemaker.coursemaker.domain.like.dto.CourseLikeResponseDto;
 import coursemaker.coursemaker.domain.like.exception.LikeForbiddenException;
-import coursemaker.coursemaker.domain.like.exception.LikeUnauthorizedException;
 import coursemaker.coursemaker.domain.like.service.CourseLikeService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +37,13 @@ public class CourseLikeController {
     @Operation(summary = "코스좋아요 등록", description = "코스 좋아요 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "코스 좋아요가 성공적으로 등록되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -58,7 +65,7 @@ public class CourseLikeController {
 
 
         if (logined == null) {
-            throw new LikeUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[CourseLike] addCourseLike");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -107,7 +114,7 @@ public class CourseLikeController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new LikeUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[CourseLike] cancelCourseLike");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -142,7 +149,7 @@ public class CourseLikeController {
                                                                                  @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new LikeUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[CourseLike] getCourseLikesByNickname");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
