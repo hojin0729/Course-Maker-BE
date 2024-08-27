@@ -51,9 +51,11 @@ public class AddTravelCourseRequest {
     //@NotNull(message = "닉네임이 비어있지 않아야 합니다.")
     private String nickname;// 유저 닉네임
 
-    // 태그를 빼먹어여?! 대가리 박고있죠ㅇㅇ
     @Schema(description = "코스 태그 목록")
     @NotNull(message = "최소한 한 개의 태그가 있어야 합니다.")
     @Size(min = 1, message = "최소한 한 개의 태그가 있어야 합니다.")
     private List<@Valid TagResponseDto> tags;
+
+    @Schema(description = "평균 평점", example = "4.5", hidden = true)
+    private Double averageRating; // 평균 평점
 }
