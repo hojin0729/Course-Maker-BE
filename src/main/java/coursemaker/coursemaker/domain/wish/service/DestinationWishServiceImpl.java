@@ -129,4 +129,9 @@ public class DestinationWishServiceImpl implements DestinationWishService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Integer getWishesCount(Long destinationId){
+        return destinationWishRepository.countByDestinationId(destinationId);
+    }
+
 }

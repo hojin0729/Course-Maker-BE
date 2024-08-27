@@ -17,4 +17,6 @@ public interface DestinationWishRepository extends JpaRepository<DestinationWish
     boolean existsByDestinationIdAndMemberId(Long id, Long id1);
 
     List<DestinationWish> findByDestinationId(Long destinationId);
+
+    Integer countByDestinationId(Long destinationId);
 }

@@ -108,6 +108,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         return formattedAverageRating;
     }
 
+    @Override
     public Integer getReviewCount(Long courseId){
         return courseReviewRepository.countByTravelCourseId(courseId);
     }

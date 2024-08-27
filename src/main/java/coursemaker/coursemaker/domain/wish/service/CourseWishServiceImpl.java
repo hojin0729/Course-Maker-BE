@@ -132,4 +132,9 @@ public class CourseWishServiceImpl implements CourseWishService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Integer getWishesCount(Long courseId){
+        return courseWishRepository.countByTravelCourseId(courseId);
+    }
+
 }

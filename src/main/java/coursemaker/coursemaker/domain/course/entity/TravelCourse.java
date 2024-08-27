@@ -47,6 +47,12 @@ public class TravelCourse extends BaseEntity {
     @Column(name = "averageRating", nullable = false)
     private Double averageRating;
 
+    @Column(name = "wishCount")
+    private Integer wishCount;
+
+    @Column(name = "reviewCount")
+    private Integer reviewCount;
+
 //    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<CourseDestination> courseDestinations = new ArrayList<>();
 
