@@ -11,7 +11,7 @@ public interface DestinationWishService {
 
     List<DestinationWishResponseDto> getDestinationWishesByNickname(String nickname);
 
-    /* 코스 찜목록 닉네임으로 조회 */
+    /* 목적지 찜목록 닉네임으로 조회 */
 
     DestinationWishResponseDto addDestinationWish(DestinationWishRequestDto requestDto);
 
