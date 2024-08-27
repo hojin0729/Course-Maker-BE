@@ -138,8 +138,7 @@ public class DestinationWishController {
                     )
             ))
     })
-    @Parameter(name = "nickname", description = "목적지찜한 사용자의 닉네임", required = true)
-    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable String nickname,
+    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable("nickname") String nickname,
                                                                                            @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인된 사용자인지 확인
