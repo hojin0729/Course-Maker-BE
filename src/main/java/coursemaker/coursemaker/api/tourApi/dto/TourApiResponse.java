@@ -88,8 +88,8 @@ public class TourApiResponse {
 //        @Schema(description = "공공데이터 여행지 태그")
 //        private TagResponseDto tag;
 
-        @Schema(description = "무장애 여행지", example = "1")
-        private Long disabled;
+        @Schema(description = "무장애 여행지", example = "true")
+        private Boolean disabled;
 
         @Schema(description = "telname")
         private String telname;

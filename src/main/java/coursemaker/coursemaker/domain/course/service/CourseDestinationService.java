@@ -36,7 +36,7 @@ public class CourseDestinationService {
         List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId());
         Double averageRating = destinationReviewService.getAverageRating(courseDestination.getDestination().getId());
         Destination destination = courseDestination.getDestination();
-        boolean isApiData = destination.isApiData();
+        boolean isApiData = destination.getIsApiData();
 
         boolean isMine = loginedInfo != null &&
                 loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());

@@ -304,6 +304,7 @@ public class StubData implements CommandLineRunner {
         location1.setLatitude(BigDecimal.valueOf(35.1586975));
         location1.setLongitude(BigDecimal.valueOf(129.1603842));
         location1.setAddress("부산 해운대구 우동 해운대 해수욕장");
+        dto1.setIsApiData(false);
         dto1.setLocation(location1);
 
         dto1.setPictureLink("https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20150831_219%2F1440992305953sjrCF_JPEG%2F157155537056075_0.jpg");
@@ -322,6 +323,7 @@ public class StubData implements CommandLineRunner {
         location2.setLatitude(BigDecimal.valueOf(35.2210076));
         location2.setLongitude(BigDecimal.valueOf(129.0826365));
         location2.setAddress("부산 동래구 온천장로107번길 32");
+        dto2.setIsApiData(false);
         dto2.setLocation(location2);
 
         dto2.setPictureLink("https://www.hotelnongshim.com/kr/_Img/Contents/hsc_gall_img01.jpg");
@@ -340,6 +342,7 @@ public class StubData implements CommandLineRunner {
         location3.setLatitude(BigDecimal.valueOf(35.159346428095));
         location3.setLongitude(BigDecimal.valueOf(129.16099019727));
         location3.setAddress("부산 해운대구 해운대해변로 266");
+        dto3.setIsApiData(false);
         dto3.setLocation(location3);
 
         dto3.setPictureLink("https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/SEA_LIFE_%EB%B6%80%EC%82%B0%EC%95%84%EC%BF%A0%EC%95%84%EB%A6%AC%EC%9B%80_%EB%A1%9C%EA%B3%A0.png/440px-SEA_LIFE_%EB%B6%80%EC%82%B0%EC%95%84%EC%BF%A0%EC%95%84%EB%A6%AC%EC%9B%80_%EB%A1%9C%EA%B3%A0.png");
@@ -358,6 +361,7 @@ public class StubData implements CommandLineRunner {
         location4.setLatitude(BigDecimal.valueOf(35.077909762));
         location4.setLongitude(BigDecimal.valueOf(129.04528782086));
         location4.setAddress("부산 영도구 영선동4가 1044-6");
+        dto4.setIsApiData(false);
         dto4.setLocation(location4);
 
         dto4.setPictureLink("http://www.ydculture.com/wp-content/uploads/2019/08/tourspot03.jpg");
@@ -376,6 +380,7 @@ public class StubData implements CommandLineRunner {
         location5.setLatitude(BigDecimal.valueOf(35.076269817));
         location5.setLongitude(BigDecimal.valueOf(129.0236624271));
         location5.setAddress("부산 서구 송도해변로 171");
+        dto5.setIsApiData(false);
         dto5.setLocation(location5);
 
         dto5.setPictureLink("https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20220801_106%2F1659333137309JPSiA_JPEG%2F%25BC%25DB%25B5%25B5_%25BD%25E6%25B3%25D7%25C0%25CF_%25C5%25B8%25C0%25CC%25C6%25B2X.jpg");
@@ -394,6 +399,7 @@ public class StubData implements CommandLineRunner {
         location6.setLatitude(BigDecimal.valueOf(35.10923055371));
         location6.setLongitude(BigDecimal.valueOf(128.9427042109));
         location6.setAddress("부산광역시 사하구 낙동남로 1191");
+        dto6.setIsApiData(false);
         dto6.setLocation(location6);
 
         dto6.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230707174450394");
@@ -412,6 +418,7 @@ public class StubData implements CommandLineRunner {
         location7.setLatitude(BigDecimal.valueOf(35.158294650018));
         location7.setLongitude(BigDecimal.valueOf(129.06384886647));
         location7.setAddress("부산광역시 부산진구 서전로37번길 20");
+        dto7.setIsApiData(false);
         dto7.setLocation(location7);
 
         dto7.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20220921114402310");
@@ -430,6 +437,7 @@ public class StubData implements CommandLineRunner {
         location8.setLatitude(BigDecimal.valueOf(35.15538169469));
         location8.setLongitude(BigDecimal.valueOf(128.97189729558));
         location8.setAddress("부산광역시 사상구 감전동 873");
+        dto8.setIsApiData(false);
         dto8.setLocation(location8);
 
         dto8.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230723172025932");
@@ -448,6 +456,7 @@ public class StubData implements CommandLineRunner {
         location9.setLatitude(BigDecimal.valueOf(35.227524));
         location9.setLongitude(BigDecimal.valueOf(129.128325));
         location9.setAddress("부산광역시 해운대구 석대동 77");
+        dto9.setIsApiData(false);
         dto9.setLocation(location9);
 
         dto9.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230202161355598");
@@ -466,6 +475,7 @@ public class StubData implements CommandLineRunner {
         location10.setLatitude(BigDecimal.valueOf(35.29377675985));
         location10.setLongitude(BigDecimal.valueOf(129.26057098227));
         location10.setAddress("부산광역시 기장군 일광면 신평리 11-1");
+        dto10.setIsApiData(false);
         dto10.setLocation(location10);
 
         dto10.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20200514115750295");
@@ -484,6 +494,7 @@ public class StubData implements CommandLineRunner {
         location11.setLatitude(BigDecimal.valueOf(35.09466175001));
         location11.setLongitude(BigDecimal.valueOf(129.03677556292));
         location11.setAddress("부산광역시 영도구 태종로 46");
+        dto11.setIsApiData(false);
         dto11.setLocation(location11);
 
         dto11.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191229150331682");
@@ -502,6 +513,7 @@ public class StubData implements CommandLineRunner {
         location12.setLatitude(BigDecimal.valueOf(35.025854));
         location12.setLongitude(BigDecimal.valueOf(128.815284));
         location12.setAddress("부산광역시 강서구 가덕해안로 21");
+        dto12.setIsApiData(false);
         dto12.setLocation(location12);
 
         dto12.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191227161822663");
@@ -520,6 +532,7 @@ public class StubData implements CommandLineRunner {
         location13.setLatitude(BigDecimal.valueOf(35.20463768723));
         location13.setLongitude(BigDecimal.valueOf(129.21273187220));
         location13.setAddress("부산광역시 기장군 기장읍 동부산관광6로 59");
+        dto13.setIsApiData(false);
         dto13.setLocation(location13);
 
         dto13.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20230901132543063");
@@ -538,6 +551,7 @@ public class StubData implements CommandLineRunner {
         location14.setLatitude(BigDecimal.valueOf(35.18333170556));
         location14.setLongitude(BigDecimal.valueOf(129.02189032784));
         location14.setAddress("부산광역시 부산진구 당감동");
+        dto14.setIsApiData(false);
         dto14.setLocation(location14);
 
         dto14.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191231092729834");
@@ -556,6 +570,7 @@ public class StubData implements CommandLineRunner {
         location15.setLatitude(BigDecimal.valueOf(35.16915289941));
         location15.setLongitude(BigDecimal.valueOf(129.1362446983));
         location15.setAddress("부산광역시 해운대구 APEC로 55");
+        dto15.setIsApiData(false);
         dto15.setLocation(location15);
 
         dto15.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191230210019945");
@@ -574,6 +589,7 @@ public class StubData implements CommandLineRunner {
         location16.setLatitude(BigDecimal.valueOf(35.185218323534));
         location16.setLongitude(BigDecimal.valueOf(129.04156904769));
         location16.setAddress("부산광역시 부산진구 새싹로 295");
+        dto16.setIsApiData(false);
         dto16.setLocation(location16);
 
         dto16.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191231100856743");
@@ -592,6 +608,7 @@ public class StubData implements CommandLineRunner {
         location17.setLatitude(BigDecimal.valueOf(35.099766699153));
         location17.setLongitude(BigDecimal.valueOf(129.01251298135));
         location17.setAddress("부산광역시 서구 아미로49");
+        dto17.setIsApiData(false);
         dto17.setLocation(location17);
 
         dto17.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226093554532");
@@ -610,6 +627,7 @@ public class StubData implements CommandLineRunner {
         location18.setLatitude(BigDecimal.valueOf(35.20591539768));
         location18.setLongitude(BigDecimal.valueOf(129.22781617477));
         location18.setAddress("부산광역시 기장군 기장읍 기장해안로 340");
+        dto18.setIsApiData(false);
         dto18.setLocation(location18);
 
         dto18.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226101451768");
@@ -628,6 +646,7 @@ public class StubData implements CommandLineRunner {
         location19.setLatitude(BigDecimal.valueOf(35.20071755418));
         location19.setLongitude(BigDecimal.valueOf(129.00195813902));
         location19.setAddress("부산광역시 북구 낙동북로 755");
+        dto19.setIsApiData(false);
         dto19.setLocation(location19);
 
         dto19.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226183133502");
@@ -646,6 +665,7 @@ public class StubData implements CommandLineRunner {
         location20.setLatitude(BigDecimal.valueOf(35.170911698023));
         location20.setLongitude(BigDecimal.valueOf(129.11433596434));
         location20.setAddress("부산광역시 수영구 수영성로 43");
+        dto20.setIsApiData(false);
         dto20.setLocation(location20);
 
         dto20.setPictureLink("https://www.visitbusan.net/uploadImgs/files/cntnts/20191226132135171");

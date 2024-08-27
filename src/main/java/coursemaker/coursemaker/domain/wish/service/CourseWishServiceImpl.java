@@ -10,6 +10,7 @@ import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.CourseWish;
+import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.repository.CourseWishRepository;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,14 @@ public class CourseWishServiceImpl implements CourseWishService {
     /* 코스 찜목록 전체조회 */
     @Override
     public List<CourseWishResponseDto> getAllCourseWishes() {
-        return courseWishRepository.findAll().stream()
+
+        List<CourseWish> wishes = courseWishRepository.findAll();
+
+        if (wishes.isEmpty()) {
+            throw new CourseWishNotFoundException("Invalid wish", "코스 찜이 존재하지 않습니다.");
+        }
+
+        return wishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(
                         courseWish.getId(),
                         courseWish.getTravelCourse().getId(),
@@ -53,7 +61,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     public List<CourseWishResponseDto> getCourseWishesByNickname(String nickname) {
         List<CourseWish> courseWishes = courseWishRepository.findByMemberNickname(nickname);
         if (courseWishes.isEmpty()) {
-            throw new RuntimeException("해당 코스 찜 정보가 없습니다.");
+            throw new CourseWishNotFoundException("코스 찜이 존재하지 않습니다.", "Nickname: " + nickname);
         }
         return courseWishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(
@@ -68,8 +76,10 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     @Transactional
     public CourseWishResponseDto addCourseWish(CourseWishRequestDto requestDto) {
+
         TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));
+
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 멤버를 찾을 수 없습니다.", "Nickname: " + requestDto.getNickname()));
 
