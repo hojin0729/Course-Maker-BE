@@ -10,15 +10,15 @@ public interface DestinationLikeService {
 
     List<DestinationLikeResponseDto> getDestinationLikesByNickname(String nickname);
 
-    /* 목적지 찜목록 닉네임으로 조회 */
+    /* 목적지 좋아요목록 닉네임으로 조회 */
 
     DestinationLikeResponseDto addDestinationLike(DestinationLikeRequestDto requestDto);
 
     void cancelDestinationLike(Long destinationId, String nickname);
 
-    /* 특정 목적지에 대한 찜 목록 조회 */
+    /* 특정 목적지에 대한 좋아요 목록 조회 */
     List<DestinationLikeResponseDto> getLikesByDestinationId(Long destinationId);
 
-    /* 목적지별 찜된 수 조회 */
+    /* 목적지별 좋아요된 수 조회 */
     Integer getDestinationLikeCount(Long destinationId);
 }

@@ -15,7 +15,7 @@ public interface CourseLikeService {
 
     void cancelCourseLike(Long courseId, String nickname);
 
-    /* 특정 코스에 대한 찜 목록 조회 */
+    /* 특정 코스에 대한 좋아요 목록 조회 */
     List<CourseLikeResponseDto> getLikesByCourseId(Long courseId);
 
     Integer getCourseLikeCount(Long courseId);
