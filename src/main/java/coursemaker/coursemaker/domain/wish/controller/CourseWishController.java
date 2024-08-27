@@ -1,22 +1,19 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
-import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
 import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
-import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +37,13 @@ public class CourseWishController {
     @Operation(summary = "코스찜 등록", description = "코스 찜 등록합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "코스 찜이 성공적으로 등록되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -61,7 +65,7 @@ public class CourseWishController {
 
 
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[CourseWish] addCourseWish");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -104,13 +108,13 @@ public class CourseWishController {
                     )
             ))
     })
-    public ResponseEntity<Void> cancelCourseWish(
-            @PathVariable Long courseId,
-            @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<Void> cancelCourseWish(@PathVariable Long courseId,
+                                                 @AuthenticationPrincipal LoginedInfo logined
+                                                 ) {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[CourseWish] cancelCourseWish");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -145,7 +149,7 @@ public class CourseWishController {
                                                                                  @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[CourseWish] getCourseWishesByNickname");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
