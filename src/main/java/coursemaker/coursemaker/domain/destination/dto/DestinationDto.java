@@ -51,13 +51,13 @@ public class DestinationDto {
     @Schema(description = "평균 평점", example = "4.5")
     private Double averageRating; // 평균 평점
 
-    @Schema(description = "해당 여행지가 로그인 한 사용자가 작성한 여행지인지 여부")
+    @Schema(description = "해당 여행지가 로그인 한 사용자가 작성한 여행지인지 여부", nullable = true)
     private boolean isMine;
 
-    @Schema(description = "무장애 여행지 여부")
-    private Long disabled;
+    @Schema(description = "무장애 여행지 여부", nullable = true, hidden = true)
+    private Boolean disabled;
 
-    @Schema(description = "공공데이터 여부", defaultValue = "false")
+    @Schema(description = "공공데이터 여부", example = "false", defaultValue = "false", nullable = true)
     private boolean isApiData;
 
 
