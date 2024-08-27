@@ -1,17 +1,16 @@
 package coursemaker.coursemaker.domain.review.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.review.dto.RequestCourseDto;
 import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.review.entity.CourseReview;
-import coursemaker.coursemaker.domain.review.exception.CourseReviewNotFoundException;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import coursemaker.coursemaker.util.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -94,6 +93,9 @@ public class CourseReviewController {
                                                                 @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인한 사용자 닉네임 가져오기
+        if(logined==null){
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        }
         String nickname = logined.getNickname();
         requestCourseDto.setNickname(nickname);
 
@@ -142,6 +144,11 @@ public class CourseReviewController {
                                                                 @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인한 사용자 닉네임 가져오기
+
+        if(logined==null){
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        }
+
         String nickname = logined.getNickname();
         requestCourseDto.setNickname(nickname);
 
@@ -179,6 +186,11 @@ public class CourseReviewController {
     @Parameter(name = "id", description = "리뷰 ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Long> deleteCourseReview(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+
+        if(logined==null){
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 삭제 실패");
+        }
+
         CourseReview courseReview = courseReviewService.findById(id);
         if (courseReview == null) {
             return ResponseEntity.notFound().build();
@@ -187,7 +199,7 @@ public class CourseReviewController {
         // 로그인한 사용자 닉네임 가져오기
         String nickname = logined.getNickname();
         if (!courseReview.getMember().getNickname().equals(nickname)) {
-            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new ForbiddenException("작성자와 정보가 일치하지 않습니다.", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         courseReviewService.delete(id);
         return ResponseEntity.ok(id);

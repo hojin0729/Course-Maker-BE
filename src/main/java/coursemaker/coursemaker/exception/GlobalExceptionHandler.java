@@ -7,12 +7,15 @@ import coursemaker.coursemaker.domain.course.exception.TravelCourseDuplicatedExc
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.destination.exception.*;
 import coursemaker.coursemaker.domain.member.exception.*;
-import coursemaker.coursemaker.domain.review.exception.CourseReviewNotFoundException;
+import coursemaker.coursemaker.domain.review.exception.ReviewNotFoundException;
+import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.*;
-import io.jsonwebtoken.security.SignatureException;
+import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
+import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
+import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
+import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,9 +62,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnAuthorizedException e) {
         ErrorResponse response = new ErrorResponse();
 
-        response.setErrorType("login required");
-        response.setMessage("로그인 후 이용이 가능합니다.");
-        response.setStatus(401);
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode()
+                .getStatus()
+                .value());
 
         return ResponseEntity
                 .status(response.getStatus())
@@ -369,8 +374,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
     // Review 관련 예외처리
-    @ExceptionHandler(CourseReviewNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCourseReviewNotFoundException(CourseReviewNotFoundException e) {
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DuplicatedReviewException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateReviewException(DuplicatedReviewException e) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorType(e.getErrorCode().getErrorType());
         response.setMessage(e.getMessage());

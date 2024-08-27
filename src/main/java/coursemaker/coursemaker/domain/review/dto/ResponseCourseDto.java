@@ -7,13 +7,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.math.BigDecimal;
 
 @Data
 public class ResponseCourseDto {
     @Schema(description = "코스 ID", example = "1")
     @NotNull(message = "코스 ID를 입력하세요.")
     private Long courseId;
+
+    @Schema(description = "리뷰의 고유 id", example = "1")
+    private Long reviewId;
 
     @Schema(description = "리뷰 작성자 닉네임", example = "coursemaker")
     @NotNull(message = "리뷰 작성자 닉네임을 입력하세요.")
@@ -47,6 +49,7 @@ public class ResponseCourseDto {
         dto.setDescription(courseReview.getDescription());
         dto.setPicture(courseReview.getPicture());
         dto.setRating(courseReview.getRating());
+        dto.setReviewId(courseReview.getId());
         return dto;
     }
 }
