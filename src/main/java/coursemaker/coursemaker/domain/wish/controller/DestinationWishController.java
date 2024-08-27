@@ -51,6 +51,13 @@ public class DestinationWishController {
                     examples = @ExampleObject(
                             value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
                     )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 찜한 목적지입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 목적지입니다.\"}"
+                    )
             ))
     })
     @PostMapping
@@ -138,8 +145,7 @@ public class DestinationWishController {
                     )
             ))
     })
-    @Parameter(name = "nickname", description = "목적지찜한 사용자의 닉네임", required = true)
-    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable String nickname,
+    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable("nickname") String nickname,
                                                                                            @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인된 사용자인지 확인

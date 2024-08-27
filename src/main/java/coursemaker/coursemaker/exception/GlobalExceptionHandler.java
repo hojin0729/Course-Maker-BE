@@ -428,4 +428,13 @@ public class GlobalExceptionHandler {
         response.setStatus(e.getErrorCode().getStatus().value());
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+
+    @ExceptionHandler(DuplicateWishException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateWishException(DuplicateWishException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 }

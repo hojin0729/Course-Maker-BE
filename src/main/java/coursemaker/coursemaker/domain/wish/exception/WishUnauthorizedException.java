@@ -9,7 +9,7 @@ public class WishUnauthorizedException extends RootException {
     String message;
 
     public WishUnauthorizedException(String message, String logMessage) {
-        super(ErrorCode.WISH_UNAUTHORIZED, logMessage);
+        super(ErrorCode.UNAUTHORIZED_WISH, logMessage);
 
         this.message = message;
     }

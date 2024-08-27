@@ -13,4 +13,6 @@ public interface DestinationWishRepository extends JpaRepository<DestinationWish
     List<DestinationWish> findByMember_Nickname(String nickname);
 
     Optional<DestinationWish> findByDestinationIdAndMemberId(Long courseId, Long memberId);
+
+    boolean existsByDestinationIdAndMemberId(Long id, Long id1);
 }
