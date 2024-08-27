@@ -115,6 +115,7 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     }
 
     /* 특정 목적지에 대한 찜 목록 조회 */
+    @Override
     public List<DestinationWishResponseDto> getWishesByDestinationId(Long destinationId) {
         List<DestinationWish> destinationWishes = destinationWishRepository.findByDestinationId(destinationId);
         if (destinationWishes.isEmpty()) {

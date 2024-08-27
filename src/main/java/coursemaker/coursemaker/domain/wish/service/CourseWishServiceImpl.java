@@ -118,6 +118,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     }
 
     /* 특정 코스에 대한 찜 목록 조회 */
+    @Override
     public List<CourseWishResponseDto> getWishesByCourseId(Long courseId) {
         List<CourseWish> courseWishes = courseWishRepository.findByTravelCourseId(courseId);
         if (courseWishes.isEmpty()) {
