@@ -17,6 +17,8 @@ public class DestinationWishRequestDto {
     @NotNull(message = "사용자 nickname을 입력해주세요.")
     private String nickname;
 
+    public DestinationWishRequestDto() {}
+
     public DestinationWishRequestDto(Long destinationId, String nickname) {
         this.destinationId = destinationId;
         this.nickname = nickname;

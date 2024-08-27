@@ -75,6 +75,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     @Transactional
     public CourseWishResponseDto addCourseWish(CourseWishRequestDto requestDto) {
+        //dto로 로그인한 유저의 nickname 및 courseId 들어온다
 
         TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));

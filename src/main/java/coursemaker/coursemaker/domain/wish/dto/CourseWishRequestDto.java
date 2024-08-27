@@ -16,6 +16,8 @@ public class CourseWishRequestDto {
     @NotNull(message = "사용자 nickname을 입력해주세요.")
     private String nickname;
 
+    public CourseWishRequestDto() {}
+
     public CourseWishRequestDto(Long courseId, String nickname) {
         this.courseId = courseId;
         this.nickname = nickname;
