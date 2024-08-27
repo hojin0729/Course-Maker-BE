@@ -181,4 +181,27 @@ public class DestinationWishController {
         List<DestinationWishResponseDto> destinationWishes = destinationWishService.getAllDestinationWishes();
         return ResponseEntity.ok(destinationWishes);
     }
+
+    /**
+     * 코스별 찜된 수 조회
+     */
+    @GetMapping("/count/{destinationId}")
+    @Operation(summary = "목적지별 찜된 수 조회", description = "특정 목적지에 찜된 수를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "목적지 찜 수가 성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 목적지입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<Integer> getDestinationWishCount(@PathVariable("destinationId") Long destinationId) {
+
+        Integer wishCount = destinationWishService.getDestinationWishCount(destinationId);
+
+        return ResponseEntity.ok(wishCount);
+
+    }
 }

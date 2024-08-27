@@ -18,4 +18,6 @@ public interface CourseWishService {
 
     /* 특정 코스에 대한 찜 목록 조회 */
     List<CourseWishResponseDto> getWishesByCourseId(Long courseId);
+
+    Integer getCourseWishCount(Long courseId);
 }

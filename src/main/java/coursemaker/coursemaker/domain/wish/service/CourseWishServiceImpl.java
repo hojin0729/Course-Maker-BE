@@ -132,4 +132,16 @@ public class CourseWishServiceImpl implements CourseWishService {
                 .collect(Collectors.toList());
     }
 
+
+    /* 코스별 찜된 수 조회 */
+    @Override
+    public Integer getCourseWishCount(Long courseId) {
+        // 코스가 존재하는지 확인
+        travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
+
+        // 코스에 대한 찜 수 반환
+        return courseWishRepository.countByTravelCourseId(courseId);
+    }
+
 }
