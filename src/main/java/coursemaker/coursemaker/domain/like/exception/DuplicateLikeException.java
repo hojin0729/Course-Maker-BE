@@ -9,7 +9,7 @@ public class DuplicateLikeException extends RootException {
     String message;
 
     public DuplicateLikeException(String message, String logMessage) {
-        super(ErrorCode.DUPLICATED_WISH, logMessage, message);
+        super(ErrorCode.DUPLICATED_LIKE, logMessage, message);
 
         this.message = message;
     }

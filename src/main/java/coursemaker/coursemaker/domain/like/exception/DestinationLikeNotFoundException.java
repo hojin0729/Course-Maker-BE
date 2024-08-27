@@ -9,7 +9,7 @@ public class DestinationLikeNotFoundException extends RootException {
     String message;
 
     public DestinationLikeNotFoundException(String message, String logMessage) {
-        super(ErrorCode.INVALID_WISH, logMessage, message);
+        super(ErrorCode.INVALID_LIKE, logMessage, message);
         this.message = message;
     }
 }

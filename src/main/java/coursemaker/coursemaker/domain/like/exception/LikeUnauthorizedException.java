@@ -9,7 +9,7 @@ public class LikeUnauthorizedException extends RootException {
     String message;
 
     public LikeUnauthorizedException(String message, String logMessage) {
-        super(ErrorCode.UNAUTHORIZED_WISH, logMessage);
+        super(ErrorCode.UNAUTHORIZED_LIKE, logMessage);
 
         this.message = message;
     }

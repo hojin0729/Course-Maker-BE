@@ -10,7 +10,7 @@ public class CourseLikeNotFoundException extends RootException {
 
 
     public CourseLikeNotFoundException(String message, String logMessage) {
-        super(ErrorCode.INVALID_WISH, logMessage, message);
+        super(ErrorCode.INVALID_LIKE, logMessage, message);
         this.message = message;
     }
 }

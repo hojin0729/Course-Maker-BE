@@ -9,7 +9,7 @@ public class LikeForbiddenException extends RootException {
     String message;
 
     public LikeForbiddenException(String message, String logMessage) {
-        super(ErrorCode.FORBIDDEN_WISH, logMessage, message);
+        super(ErrorCode.FORBIDDEN_LIKE, logMessage, message);
 
         this.message = message;
     }
