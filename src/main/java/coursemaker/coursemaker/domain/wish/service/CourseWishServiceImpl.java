@@ -53,7 +53,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     public List<CourseWishResponseDto> getCourseWishesByNickname(String nickname) {
         List<CourseWish> courseWishes = courseWishRepository.findByMemberNickname(nickname);
         if (courseWishes.isEmpty()) {
-            throw new RuntimeException("해당 코스 찜 정보가 없습니다.");
+            throw new CourseWishNotFoundException("코스 찜이 존재하지 않습니다.", "Nickname: " + nickname);
         }
         return courseWishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(

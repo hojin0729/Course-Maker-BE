@@ -51,7 +51,7 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     public List<DestinationWishResponseDto> getDestinationWishesByNickname(String nickname) {
         List<DestinationWish> destinationWishes = destinationWishRepository.findByMember_Nickname(nickname);
         if (destinationWishes.isEmpty()) {
-            throw new RuntimeException("해당 코스 찜 정보가 없습니다.");
+            throw new DestinationWishNotFoundException("목적지 찜이 존재하지 않습니다.", "Nickname: " + nickname);
         }
         return destinationWishes.stream()
                 .map(wish -> new DestinationWishResponseDto(

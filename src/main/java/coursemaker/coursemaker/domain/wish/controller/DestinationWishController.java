@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.wish.controller;
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
+import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
 import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
 import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
@@ -111,8 +112,31 @@ public class DestinationWishController {
     /*목적지찜 닉네임으로 조회*/
     @GetMapping("/{nickname}")
     @Operation(summary = "닉네임으로 목적지찜 조회", description = "닉네임을 사용하여 목적지찜을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "목적지 찜이 성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 목적지찜을 조회할 수 없습니다.")
+    })
     @Parameter(name = "nickname", description = "목적지찜한 사용자의 닉네임", required = true)
-    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable String nickname) {
+    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable String nickname,
+                                                                                           @AuthenticationPrincipal LoginedInfo logined) {
+
+        // 로그인된 사용자인지 확인
+        if (logined == null) {
+            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+        }
+
+        // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
+        if (!nickname.equals(logined.getNickname())) {
+            throw new WishForbiddenException("Forbidden", "다른 사용자의 목적지찜을 조회할 수 없습니다.");
+        }
+
         List<DestinationWishResponseDto> destinationWishes = destinationWishService.getDestinationWishesByNickname(nickname);
         return ResponseEntity.ok(destinationWishes);
     }
