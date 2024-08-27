@@ -61,9 +61,6 @@ public class CourseWishController {
         // 서비스 호출을 통해 코스 찜 등록
         CourseWishResponseDto responseDto = courseWishService.addCourseWish(requestDto);
 
-        // 닉네임을 숨김
-        responseDto.hideMemberNickname();
-
         return ResponseEntity.ok(responseDto);
     }
 
