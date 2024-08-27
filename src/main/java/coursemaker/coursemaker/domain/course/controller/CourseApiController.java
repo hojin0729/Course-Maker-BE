@@ -10,12 +10,16 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 
+import coursemaker.coursemaker.domain.review.entity.CourseReview;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
 
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 
 import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
+import coursemaker.coursemaker.domain.wish.entity.CourseWish;
+import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +58,7 @@ public class CourseApiController {
     private final TagService tagService;
     private final CourseReviewService courseReviewService;
     private final CourseDestinationService courseDestinationService;
+    private final CourseWishService courseWishService;
 
     // POST
     /*********스웨거 어노테이션**********/
@@ -155,7 +160,12 @@ public class CourseApiController {
 
             Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -202,7 +212,11 @@ public class CourseApiController {
 
         Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
 
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+        Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+
+        Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
     }
 
     // GET - Search by title
@@ -242,7 +256,12 @@ public class CourseApiController {
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
             Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -290,7 +309,11 @@ public class CourseApiController {
 
             Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -377,7 +400,11 @@ public class CourseApiController {
 
         Double averageRating = courseReviewService.getAverageRating(updatedTravelCourse.getId());
 
-        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMine, averageRating);
+        Integer reviewCount = courseReviewService.getReviewCount(updatedTravelCourse.getId());
+
+        Integer wishCount = courseWishService.getCourseWishCount(updatedTravelCourse.getId());
+
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMine, averageRating, reviewCount, wishCount);
 
         return (updatedTravelCourse != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :
