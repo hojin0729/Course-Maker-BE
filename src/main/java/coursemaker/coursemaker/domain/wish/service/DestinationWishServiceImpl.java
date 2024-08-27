@@ -45,7 +45,6 @@ public class DestinationWishServiceImpl implements DestinationWishService {
 
         return wishes.stream()
                 .map(wish -> new DestinationWishResponseDto(
-                        wish.getId(),
                         wish.getDestination().getId(),
                         wish.getDestination().getName(),
                         wish.getMember().getNickname()))
@@ -62,7 +61,6 @@ public class DestinationWishServiceImpl implements DestinationWishService {
         }
         return destinationWishes.stream()
                 .map(wish -> new DestinationWishResponseDto(
-                        wish.getId(),
                         wish.getDestination().getId(),
                         wish.getDestination().getName(),
                         wish.getMember().getNickname()))
@@ -87,7 +85,6 @@ public class DestinationWishServiceImpl implements DestinationWishService {
 
         DestinationWish savedWish = destinationWishRepository.save(destinationWish);
         return new DestinationWishResponseDto(
-                savedWish.getId(),
                 savedWish.getDestination().getId(),
                 savedWish.getDestination().getName(),
                 savedWish.getMember().getNickname());

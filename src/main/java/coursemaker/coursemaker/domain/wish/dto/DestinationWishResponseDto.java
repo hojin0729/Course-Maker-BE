@@ -8,8 +8,6 @@ import lombok.Setter;
 @Setter
 public class DestinationWishResponseDto {
 
-    @Schema(description = "목적지찜의 ID", example = "1")
-    private Long id;
 
     @Schema(description = "목적지의 ID", example = "1")
     private Long destinationId;
@@ -21,8 +19,7 @@ public class DestinationWishResponseDto {
     @Schema(hidden = true)
     private String memberNickname;
 
-    public DestinationWishResponseDto(Long id, Long destinationId, String destinationName, String memberNickname) {
-        this.id = id;
+    public DestinationWishResponseDto(Long destinationId, String destinationName, String memberNickname) {
         this.destinationId = destinationId;
         this.destinationName = destinationName;
         this.memberNickname = memberNickname;

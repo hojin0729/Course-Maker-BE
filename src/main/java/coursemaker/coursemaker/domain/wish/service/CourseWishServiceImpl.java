@@ -46,7 +46,6 @@ public class CourseWishServiceImpl implements CourseWishService {
 
         return wishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(
-                        courseWish.getId(),
                         courseWish.getTravelCourse().getId(),
                         courseWish.getTravelCourse().getTitle(),
                         courseWish.getMember().getNickname()))
@@ -64,7 +63,6 @@ public class CourseWishServiceImpl implements CourseWishService {
         }
         return courseWishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(
-                        courseWish.getId(),
                         courseWish.getTravelCourse().getId(),
                         courseWish.getTravelCourse().getTitle(),
                         courseWish.getMember().getNickname()))
@@ -89,7 +87,6 @@ public class CourseWishServiceImpl implements CourseWishService {
 
         CourseWish savedWish = courseWishRepository.save(courseWish);
         return new CourseWishResponseDto(
-                savedWish.getId(),
                 savedWish.getTravelCourse().getId(),
                 savedWish.getTravelCourse().getTitle(),
                 savedWish.getMember().getNickname());
