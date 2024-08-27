@@ -1,20 +1,16 @@
 package coursemaker.coursemaker.domain.tag.service;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.sun.jdi.request.DuplicateRequestException;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.entity.QDestination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.dto.TagUpdateDto;
 import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
-import coursemaker.coursemaker.domain.tag.entity.QDestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
@@ -22,7 +18,6 @@ import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.repository.CourseTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.DestinationTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.TagRepository;
-import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +35,6 @@ import static coursemaker.coursemaker.domain.course.entity.QTravelCourse.travelC
 import static coursemaker.coursemaker.domain.destination.entity.QDestination.destination;
 import static coursemaker.coursemaker.domain.tag.entity.QCourseTag.courseTag;
 import static coursemaker.coursemaker.domain.tag.entity.QDestinationTag.destinationTag;
-import static coursemaker.coursemaker.domain.tag.entity.QTag.tag;
 
 // TODO: 삭제 연산 soft delete로 전환
 @Service
@@ -149,43 +143,6 @@ public class TagServiceImpl implements TagService{
             throw new IllegalTagArgumentException("코스에 추가할 태그가 없습니다.", "course id: " + courseId );
         }
 
-        // TODO: 쿼리 최적화
-//        /*태그 유효성 검사*/
-//        List <Tag> tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.notIn(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagNotFoundException("추가할 태그가 존재하지 않습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//
-//        /*코스에 태그가 이미 포함되있는지 확인*/
-//        tags = queryFactory
-//                .select(tag)
-//                .from(courseTag)
-//                .where(courseTag.course.id.eq(courseId), courseTag.tag.id.in(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagDuplicatedException("코스에 이미 추가된 태그가 있습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//        /*추가할 태그 찾아서 추가*/
-//        tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.in(tagIds))
-//                .fetch();
-//        TravelCourse course = courseService.findById(courseId);
-//        for(Tag insertTag : tags){
-//            queryFactory
-//                    .insert(courseTag)
-//                    .set(courseTag.course, course)
-//                    .set(courseTag.tag, insertTag)
-//                    .execute();
-//        }
-
-
-
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
             CourseTag courseTag = new CourseTag();
@@ -230,7 +187,6 @@ public class TagServiceImpl implements TagService{
 
         OrderSpecifier<?> orderBySpecifier = null;
 
-        // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
         switch(orderBy) {
             case VIEWS:
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
@@ -239,10 +195,10 @@ public class TagServiceImpl implements TagService{
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.createdAt);
                 break;
             case POPULAR:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.wishCount);
                 break;
             case RATING:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.averageRating);
                 break;
         }
 
@@ -275,12 +231,8 @@ public class TagServiceImpl implements TagService{
                 .stream()
                 .toList().get(0);
 
-        // TODO: 페이지네이션 전체 요소 수 오류 수정
         Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
 
-//        System.out.println("coursePage.getTotalPages() = " + coursePage.getTotalPages());
-//        System.out.println("coursePage.getNumber() = " + coursePage.getNumber());
-//        System.out.println("coursePage.getSize() = " + coursePage.getSize());
 
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage, total);
 
@@ -323,42 +275,6 @@ public class TagServiceImpl implements TagService{
         if(tagIds == null || tagIds.isEmpty()){
             throw new IllegalTagArgumentException("여행지에 추가할 태그가 없습니다.", "destination id: " + destinationId );
         }
-
-        // TODO: 쿼리 최적화
-
-//        /*태그 유효성 검사*/
-//        List <Tag> tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.notIn(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagNotFoundException("추가할 태그가 존재하지 않습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//        /*여행지에 태그가 이미 포함되있는지 확인*/
-//        tags = queryFactory
-//                .select(tag)
-//                .from(destinationTag)
-//                .where(destinationTag.destination.id.eq(destinationId), destinationTag.tag.id.in(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagDuplicatedException("여행지에 이미 추가된 태그가 있습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//        /*추가할 태그 찾아서 추가*/
-//        tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.in(tagIds))
-//                .fetch();
-//        Destination course = destinationService.findById(destinationId);
-//        for(Tag insertTag : tags){
-//            queryFactory
-//                    .insert(destinationTag)
-//                    .set(destinationTag.destination, destination)
-//                    .set(destinationTag.tag, insertTag)
-//                    .execute();
-//        }
-
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
@@ -411,10 +327,10 @@ public class TagServiceImpl implements TagService{
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.createdAt);
                 break;
             case POPULAR:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.wishCount);
                 break;
             case RATING:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.averageRating);
                 break;
         }
 
