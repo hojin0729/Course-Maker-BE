@@ -418,15 +418,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @ExceptionHandler(WishUnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleWishUnauthorizedException(WishUnauthorizedException e) {
-        ErrorResponse response = new ErrorResponse();
-        response.setErrorType(e.getErrorCode().getErrorType());
-        response.setMessage(e.getMessage());
-        response.setStatus(e.getErrorCode().getStatus().value());
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
     @ExceptionHandler(DuplicateWishException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateWishException(DuplicateWishException e) {
         ErrorResponse response = new ErrorResponse();

@@ -1,14 +1,13 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
 import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
-import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
 import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,7 +66,7 @@ public class DestinationWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationWish] addDestinationWish");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -115,7 +114,7 @@ public class DestinationWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationWish] cancelDestinationWish");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -150,7 +149,7 @@ public class DestinationWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationWish] getDestinationWishesByNickname");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
@@ -173,7 +172,7 @@ public class DestinationWishController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 여행지입니다.\"}"
                     )
             ))
     })

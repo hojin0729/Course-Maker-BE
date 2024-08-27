@@ -1,6 +1,5 @@
 package coursemaker.coursemaker.domain.wish.service;
 
-import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
