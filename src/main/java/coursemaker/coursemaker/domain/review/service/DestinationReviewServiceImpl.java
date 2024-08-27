@@ -6,9 +6,12 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.review.dto.RequestDestinationDto;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
+import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException;
+import coursemaker.coursemaker.domain.review.exception.ReviewNotFoundException;
 import coursemaker.coursemaker.domain.review.repository.DestinationReviewRepository;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.text.DecimalFormat;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DestinationReviewServiceImpl implements DestinationReviewService {
     private final DestinationReviewRepository destinationReviewRepository;
@@ -35,13 +39,14 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         Member member = memberService.findByNickname(requestDestinationDto.getNickname());
         Destination destination = destinationService.findById(destinationId);
         if (destinationReviewRepository.findByMemberAndDestination(member, destination).isPresent()) {
-            throw new IllegalStateException("해당 목적지에 이미 리뷰를 남겼습니다.");
+            throw new DuplicatedReviewException("해당 여행지에 이미 리뷰를 남겼습니다.",
+                    "[DestinationReview] nickname: "+ member.getNickname() + " destination id: " + destinationId);
         }
         DestinationReview destinationReview = requestDestinationDto.toEntity(member);
         destinationReview.setDestination(destination);
 
         // 디버깅: 저장 전 리뷰 평점 출력
-        System.out.println("Debug: Saving Review with Rating = " + destinationReview.getRating());
+        log.debug("Debug: Saving Review with Rating = " + destinationReview.getRating());
 
         return destinationReviewRepository.save(destinationReview);
     }
@@ -53,7 +58,7 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         Destination destination = destinationService.findById(destinationId);
 
         DestinationReview existingReview = destinationReviewRepository.findByMemberAndDestination(member, destination)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. destinationId: " + destinationId + ", nickname: " + nickname));
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] nickname: " + nickname));
 
         existingReview.setTitle(requestDestinationDto.getTitle());
         existingReview.setDescription(requestDestinationDto.getDescription());
@@ -65,13 +70,16 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
     @Override
     public void delete(Long id) {
+        destinationReviewRepository.findById(id).orElseThrow(() ->
+                new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] delete id: "+ id)
+        );
         destinationReviewRepository.deleteById(id);
     }
 
     @Override
     public DestinationReview findById(Long id) {
         return destinationReviewRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다. id: " + id));
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] id: "+ id));
     }
 
 
@@ -86,10 +94,10 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
     public Double getAverageRating(Long destinationId) {
         List<DestinationReview> reviews = destinationReviewRepository.findByDestinationId(destinationId);
 
-        System.out.println("Debug: Number of reviews found = " + reviews.size());
+        log.debug("Debug: Number of reviews found = " + reviews.size());
 
         for (DestinationReview review : reviews) {
-            System.out.println("Debug: Review ID = " + review.getId() + ", Rating = " + review.getRating());
+            log.debug("Debug: Review ID = " + review.getId() + ", Rating = " + review.getRating());
         }
 
         double averageRating = reviews.stream().mapToDouble(DestinationReview::getRating).average().orElse(0.0);
@@ -97,7 +105,7 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         DecimalFormat df = new DecimalFormat("#.#");
         double formattedAverageRating = Double.parseDouble(df.format(averageRating));
 
-        System.out.println("Debug: Calculated formatted averageRating = " + formattedAverageRating);
+        log.debug("Debug: Calculated formatted averageRating = " + formattedAverageRating);
 
         return formattedAverageRating;
     }

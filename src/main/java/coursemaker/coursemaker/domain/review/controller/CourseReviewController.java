@@ -188,7 +188,7 @@ public class CourseReviewController {
     public ResponseEntity<Long> deleteCourseReview(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
 
         if(logined==null){
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 삭제 실패");
         }
 
         CourseReview courseReview = courseReviewService.findById(id);
@@ -199,7 +199,7 @@ public class CourseReviewController {
         // 로그인한 사용자 닉네임 가져오기
         String nickname = logined.getNickname();
         if (!courseReview.getMember().getNickname().equals(nickname)) {
-            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new ForbiddenException("작성자와 정보가 일치하지 않습니다.", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         courseReviewService.delete(id);
         return ResponseEntity.ok(id);
