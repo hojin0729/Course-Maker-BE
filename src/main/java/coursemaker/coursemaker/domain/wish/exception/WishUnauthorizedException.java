@@ -2,12 +2,14 @@ package coursemaker.coursemaker.domain.wish.exception;
 
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.RootException;
+import lombok.Getter;
 
-public class WishForbiddenException extends RootException {
+@Getter
+public class WishUnauthorizedException extends RootException {
     String message;
 
-    public WishForbiddenException(String message, String logMessage) {
-        super(ErrorCode.WISH_FORBIDDEN, logMessage);
+    public WishUnauthorizedException(String message, String logMessage) {
+        super(ErrorCode.WISH_UNAUTHORIZED, logMessage);
 
         this.message = message;
     }

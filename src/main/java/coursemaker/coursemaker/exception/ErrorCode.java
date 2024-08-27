@@ -48,7 +48,7 @@ public enum ErrorCode {
 
     /* Wish 찜하기 도매인 예외*/
     INVALID_WISH(HttpStatus.NOT_FOUND, "Invalid wish", "해당하는 찜이 없습니다.", "WISH-001"),
-    WISH_FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-002");
+    WISH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-002");
 
 
 

@@ -1,10 +1,9 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
-import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
-import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
+import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,7 +56,7 @@ public class CourseWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
@@ -76,12 +75,32 @@ public class CourseWishController {
     @Operation(summary = "코스찜 취소", description = "등록한 코스찜을 취소합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "코스 찜이 성공적으로 취소되었습니다."),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 취소할 수 없습니다."),
-            @ApiResponse(responseCode = "404", description = "코스찜을 찾을 수 없습니다.")
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                    )
+            ))
     })
     public ResponseEntity<Void> cancelCourseWish(
             @PathVariable Long courseId,
             @AuthenticationPrincipal LoginedInfo logined) {
+
+        // 로그인된 사용자인지 확인
+        if (logined == null) {
+            throw new WishUnauthorizedException("Unauthorized", "사용자가 이 자원에 접근할 권한이 없습니다.");
+        }
+
+
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
         courseWishService.cancelCourseWish(courseId, logined.getNickname());

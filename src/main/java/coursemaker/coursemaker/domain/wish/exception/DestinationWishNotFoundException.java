@@ -2,7 +2,9 @@ package coursemaker.coursemaker.domain.wish.exception;
 
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.exception.RootException;
+import lombok.Getter;
 
+@Getter
 public class DestinationWishNotFoundException extends RootException {
     String message;
 
