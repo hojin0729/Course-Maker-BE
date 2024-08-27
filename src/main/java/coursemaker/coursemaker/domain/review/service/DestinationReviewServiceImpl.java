@@ -109,4 +109,9 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
         return formattedAverageRating;
     }
+
+
+    public Integer getReviewCount(Long destinationId){
+        return destinationReviewRepository.countByDestinationId(destinationId);
+    }
 }
