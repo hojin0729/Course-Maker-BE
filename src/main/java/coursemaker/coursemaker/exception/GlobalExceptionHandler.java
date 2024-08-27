@@ -11,10 +11,7 @@ import coursemaker.coursemaker.domain.review.exception.CourseReviewNotFoundExcep
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
-import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
-import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
+import coursemaker.coursemaker.domain.wish.exception.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -411,6 +408,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(WishUnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleWishUnauthorizedException(WishUnauthorizedException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(e.getErrorCode().getErrorType());
+        response.setMessage(e.getMessage());
+        response.setStatus(e.getErrorCode().getStatus().value());
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DuplicateWishException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateWishException(DuplicateWishException e) {
         ErrorResponse response = new ErrorResponse();
         response.setErrorType(e.getErrorCode().getErrorType());
         response.setMessage(e.getMessage());

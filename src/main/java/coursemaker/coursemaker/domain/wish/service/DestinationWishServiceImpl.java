@@ -10,6 +10,7 @@ import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
+import coursemaker.coursemaker.domain.wish.exception.DuplicateWishException;
 import coursemaker.coursemaker.domain.wish.repository.DestinationWishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +46,6 @@ public class DestinationWishServiceImpl implements DestinationWishService {
 
         return wishes.stream()
                 .map(wish -> new DestinationWishResponseDto(
-                        wish.getId(),
                         wish.getDestination().getId(),
                         wish.getDestination().getName(),
                         wish.getMember().getNickname()))
@@ -62,7 +62,6 @@ public class DestinationWishServiceImpl implements DestinationWishService {
         }
         return destinationWishes.stream()
                 .map(wish -> new DestinationWishResponseDto(
-                        wish.getId(),
                         wish.getDestination().getId(),
                         wish.getDestination().getName(),
                         wish.getMember().getNickname()))
@@ -81,13 +80,18 @@ public class DestinationWishServiceImpl implements DestinationWishService {
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + requestDto.getNickname()));
 
+        // 중복 체크 로직 추가
+        boolean exists = destinationWishRepository.existsByDestinationIdAndMemberId(destination.getId(), member.getId());
+        if (exists) {
+            throw new DuplicateWishException("이미 이 목적지를 찜했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
+        }
+
         DestinationWish destinationWish = new DestinationWish();
         destinationWish.setDestination(destination);
         destinationWish.setMember(member);
 
         DestinationWish savedWish = destinationWishRepository.save(destinationWish);
         return new DestinationWishResponseDto(
-                savedWish.getId(),
                 savedWish.getDestination().getId(),
                 savedWish.getDestination().getName(),
                 savedWish.getMember().getNickname());

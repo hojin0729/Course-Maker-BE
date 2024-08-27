@@ -44,6 +44,13 @@ public class CourseWishController {
                     examples = @ExampleObject(
                             value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
                     )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 찜한 코스입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 코스입니다.\"}"
+                    )
             ))
     })
     @PostMapping
@@ -132,8 +139,7 @@ public class CourseWishController {
                     )
             ))
     })
-    @Parameter(name = "nickname", description = "코스찜한 사용자의 닉네임", required = true)
-    public ResponseEntity<List<CourseWishResponseDto>> getCourseWishesByNickname(@PathVariable String nickname,
+    public ResponseEntity<List<CourseWishResponseDto>> getCourseWishesByNickname(@PathVariable("nickname") String nickname,
                                                                                  @AuthenticationPrincipal LoginedInfo logined) {
         // 로그인된 사용자인지 확인
         if (logined == null) {
@@ -144,6 +150,8 @@ public class CourseWishController {
         if (!nickname.equals(logined.getNickname())) {
             throw new WishForbiddenException("다른 사용자의 코스찜을 조회할 수 없습니다.", "Forbidden");
         }
+
+
 
         // 서비스 호출을 통해 코스찜 목록 조회
         List<CourseWishResponseDto> responseDtos = courseWishService.getCourseWishesByNickname(nickname);
