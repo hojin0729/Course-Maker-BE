@@ -51,6 +51,13 @@ public class DestinationWishController {
                     examples = @ExampleObject(
                             value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
                     )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 찜한 목적지입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 목적지입니다.\"}"
+                    )
             ))
     })
     @PostMapping
@@ -135,13 +142,6 @@ public class DestinationWishController {
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
                             value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"다른 사용자의 목적지찜을 조회할 수 없습니다.\"}"
-                    )
-            )),
-            @ApiResponse(responseCode = "409", description = "이미 찜한 목적지입니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 목적지입니다.\"}"
                     )
             ))
     })
