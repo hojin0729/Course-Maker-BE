@@ -44,6 +44,13 @@ public class CourseWishController {
                     examples = @ExampleObject(
                             value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
                     )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 찜한 코스입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 코스입니다.\"}"
+                    )
             ))
     })
     @PostMapping

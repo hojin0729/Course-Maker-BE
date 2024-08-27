@@ -5,11 +5,11 @@ import coursemaker.coursemaker.exception.RootException;
 import lombok.Getter;
 
 @Getter
-public class WishForbiddenException extends RootException {
+public class DuplicateWishException extends RootException {
     String message;
 
-    public WishForbiddenException(String message, String logMessage) {
-        super(ErrorCode.FORBIDDEN_WISH, logMessage, message);
+    public DuplicateWishException(String message, String logMessage) {
+        super(ErrorCode.DUPLICATED_WISH, logMessage, message);
 
         this.message = message;
     }

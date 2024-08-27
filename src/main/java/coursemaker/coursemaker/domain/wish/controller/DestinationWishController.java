@@ -136,6 +136,13 @@ public class DestinationWishController {
                     examples = @ExampleObject(
                             value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"다른 사용자의 목적지찜을 조회할 수 없습니다.\"}"
                     )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 찜한 목적지입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 목적지입니다.\"}"
+                    )
             ))
     })
     public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable("nickname") String nickname,
