@@ -7,6 +7,7 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.service.TagService;
@@ -25,15 +26,18 @@ public class CourseDestinationService {
     private final CourseDestinationRepository courseDestinationRepository;
     private final DestinationReviewService destinationReviewService;
     private final DestinationWishService destinationWishService;
+    private final DestinationLikeService destinationLikeService;
 
     public CourseDestinationService(@Lazy TagService tagService,
                                     CourseDestinationRepository courseDestinationRepository,
                                     DestinationReviewService destinationReviewService,
-                                    DestinationWishService destinationWishService) {
+                                    DestinationWishService destinationWishService,
+                                    DestinationLikeService destinationLikeService) {
         this.tagService = tagService;
         this.courseDestinationRepository = courseDestinationRepository;
         this.destinationReviewService = destinationReviewService;
         this.destinationWishService = destinationWishService;
+        this.destinationLikeService = destinationLikeService;
     }
 
     public CourseDestinationResponse toResponse(CourseDestination courseDestination, @AuthenticationPrincipal LoginedInfo loginedInfo) {
@@ -43,11 +47,13 @@ public class CourseDestinationService {
         boolean isApiData = destination.getIsApiData();
         Integer reviewCount = destinationReviewService.getReviewCount(courseDestination.getDestination().getId());
         Integer wishCount = destinationWishService.getDestinationWishCount(courseDestination.getDestination().getId());
+        Integer likeCount = destinationLikeService.getDestinationLikeCount(courseDestination.getDestination().getId());
+
 
         boolean isMine = loginedInfo != null &&
                 loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
 
-        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMine, reviewCount, wishCount);
+        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMine, reviewCount, wishCount, likeCount);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }
 
