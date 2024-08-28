@@ -1,5 +1,7 @@
 package coursemaker.coursemaker.domain.wish.service;
 
+import coursemaker.coursemaker.domain.course.entity.TravelCourse;
+import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
 import coursemaker.coursemaker.domain.destination.repository.DestinationRepository;
@@ -141,4 +143,17 @@ public class DestinationWishServiceImpl implements DestinationWishService {
         return destinationWishRepository.countByDestinationId(destinationId);
     }
 
+    @Override
+    public Boolean isDestinationWishedByUser(Long destinationId, String nickname) {
+        // 코스가 존재하는지 확인
+        Destination destination = destinationRepository.findById(destinationId)
+                .orElseThrow(() -> new DestinationNotFoundException("해당 여행지를 찾을 수 없습니다.", "DestinationId: " + destinationId));
+
+        // 사용자가 존재하는지 확인
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
+
+        // 사용자가 해당 코스를 찜했는지 여부를 반환
+        return destinationWishRepository.existsByDestinationIdAndMemberId(destination.getId(), member.getId());
+    }
 }
