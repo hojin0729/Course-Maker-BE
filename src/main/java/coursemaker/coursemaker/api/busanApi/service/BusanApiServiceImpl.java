@@ -96,7 +96,7 @@ public class BusanApiServiceImpl implements BusanApiService {
         List<BusanApi> busanApis = busanApiRepository.findAll();
         for (BusanApi busanApi : busanApis) {
             // Destination 테이블에 이미 해당 BusanApi의 seq가 있는지 확인
-            Optional<Destination> existingDestination = destinationRepository.findBySeq(busanApi.getSeq());
+            Optional<Destination> existingDestination = destinationRepository.findBySeqAndDeletedAtIsNull(busanApi.getSeq());
             if (existingDestination.isEmpty()) {
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
                 RequestDto dto = new RequestDto();

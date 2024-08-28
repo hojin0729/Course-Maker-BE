@@ -76,7 +76,7 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     @Transactional
     public DestinationWishResponseDto addDestinationWish(DestinationWishRequestDto requestDto) {
 
-        Destination destination = destinationRepository.findById(requestDto.getDestinationId())
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(requestDto.getDestinationId())
                 .orElseThrow(() -> new DestinationNotFoundException("해당 목적지를 찾을 수 없습니다.", "DestinationId:" + requestDto.getDestinationId()));
 
         Member member = memberRepository.findByNickname(requestDto.getNickname())
@@ -136,7 +136,7 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     @Override
     public Integer getDestinationWishCount(Long destinationId) {
         // 목적지가 존재하는지 확인
-        destinationRepository.findById(destinationId)
+        destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당 목적지를 찾을 수 없습니다.", "DestinationId: " + destinationId));
 
         // 목적지에 대한 찜 수 반환
@@ -146,7 +146,7 @@ public class DestinationWishServiceImpl implements DestinationWishService {
     @Override
     public Boolean isDestinationWishedByUser(Long destinationId, String nickname) {
         // 코스가 존재하는지 확인
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당 여행지를 찾을 수 없습니다.", "DestinationId: " + destinationId));
 
         // 사용자가 존재하는지 확인

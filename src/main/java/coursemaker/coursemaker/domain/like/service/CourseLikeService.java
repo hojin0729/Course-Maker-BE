@@ -19,4 +19,6 @@ public interface CourseLikeService {
     List<CourseLikeResponseDto> getLikesByCourseId(Long courseId);
 
     Integer getCourseLikeCount(Long courseId);
+
+    Boolean isCourseLikedByUser(Long courseId, String nickname);
 }

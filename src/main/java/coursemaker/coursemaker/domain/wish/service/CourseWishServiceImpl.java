@@ -76,7 +76,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     public CourseWishResponseDto addCourseWish(CourseWishRequestDto requestDto) {
         //dto로 로그인한 유저의 nickname 및 courseId 들어온다
 
-        TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(requestDto.getCourseId())
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));
 
         Member member = memberRepository.findByNickname(requestDto.getNickname())
@@ -137,7 +137,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     public Integer getCourseWishCount(Long courseId) {
         // 코스가 존재하는지 확인
-        travelCourseRepository.findById(courseId)
+        travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
 
         return courseWishRepository.countByTravelCourseId(courseId);
@@ -146,7 +146,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     public Boolean isCourseWishedByUser(Long courseId, String nickname) {
         // 코스가 존재하는지 확인
-        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
 
         // 사용자가 존재하는지 확인

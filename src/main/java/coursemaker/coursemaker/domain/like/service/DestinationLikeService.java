@@ -21,4 +21,6 @@ public interface DestinationLikeService {
 
     /* 목적지별 좋아요된 수 조회 */
     Integer getDestinationLikeCount(Long destinationId);
+
+    Boolean isDestinationLikedByUser(Long destinationId, String nickname);
 }

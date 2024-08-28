@@ -4,6 +4,8 @@ package coursemaker.coursemaker.domain.like.service;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.exception.TravelCourseNotFoundException;
 import coursemaker.coursemaker.domain.course.repository.TravelCourseRepository;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.exception.DestinationNotFoundException;
 import coursemaker.coursemaker.domain.like.dto.CourseLikeRequestDto;
 import coursemaker.coursemaker.domain.like.dto.CourseLikeResponseDto;
 import coursemaker.coursemaker.domain.like.entity.CourseLike;
@@ -76,7 +78,7 @@ public class CourseLikeServiceImpl implements CourseLikeService {
     public CourseLikeResponseDto addCourseLike(CourseLikeRequestDto requestDto) {
         //dto로 로그인한 유저의 nickname 및 courseId 들어온다
 
-        TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(requestDto.getCourseId())
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));
 
         Member member = memberRepository.findByNickname(requestDto.getNickname())
@@ -137,11 +139,24 @@ public class CourseLikeServiceImpl implements CourseLikeService {
     @Override
     public Integer getCourseLikeCount(Long courseId) {
         // 코스가 존재하는지 확인
-        travelCourseRepository.findById(courseId)
+        travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
 
         // 코스에 대한 좋아요 수 반환
         return courseLikeRepository.countByTravelCourseId(courseId);
     }
 
+    @Override
+    public Boolean isCourseLikedByUser(Long courseId, String nickname) {
+        // 코스가 존재하는지 확인
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당 여행지를 찾을 수 없습니다.", "CourseId: " + courseId));
+
+        // 사용자가 존재하는지 확인
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
+
+        // 사용자가 해당 코스를 찜했는지 여부를 반환
+        return courseLikeRepository.existsByTravelCourseIdAndMemberId(travelCourse.getId(), member.getId());
+    }
 }
