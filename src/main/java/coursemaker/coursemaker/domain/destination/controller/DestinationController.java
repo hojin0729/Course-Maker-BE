@@ -7,6 +7,7 @@ import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
@@ -43,12 +44,18 @@ public class DestinationController {
     private final TagService tagService;
     private final DestinationReviewService destinationReviewService;
     private final DestinationWishService destinationWishService;
+    private final DestinationLikeService destinationLikeService;
 
-    public DestinationController(DestinationService destinationService, TagService tagService, DestinationReviewService destinationReviewService, DestinationWishService destinationWishService) {
+    public DestinationController(DestinationService destinationService,
+                                 TagService tagService,
+                                 DestinationReviewService destinationReviewService,
+                                 DestinationWishService destinationWishService,
+                                 DestinationLikeService destinationLikeService) {
         this.destinationService = destinationService;
         this.tagService = tagService;
         this.destinationReviewService = destinationReviewService;
         this.destinationWishService = destinationWishService;
+        this.destinationLikeService = destinationLikeService;
     }
 
     @Operation(summary = "전체 여행지 목록 조회", description = "한 페이지에 표시할 데이터 수(record)와 조회할 페이지 번호(page)를 입력하여 전체 여행지 목록을 조회합니다. 페이지 번호는 1부터 시작합니다.")
@@ -86,7 +93,9 @@ public class DestinationController {
             Double averageRating = destinationReviewService.getAverageRating(destination.getId());
             Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
             Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
-            destinationDtos.add(DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount));
+            Integer likeCount = destinationLikeService.getDestinationLikeCount(destination.getId());
+
+            destinationDtos.add(DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount, likeCount));
         }
 
 
@@ -122,14 +131,13 @@ public class DestinationController {
         // 로그인한 사용자와 여행지를 작성한 사용자가 동일한지 확인
         // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
         boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
-
         List<TagResponseDto> tags = tagService.findAllByDestinationId(id);
-
         Double averageRating = destinationReviewService.getAverageRating(id);
         Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
         Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
+        Integer likeCount = destinationLikeService.getDestinationLikeCount(destination.getId());
 
-        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount);
+        DestinationDto destinationDto = DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount, likeCount);
         return ResponseEntity.ok(destinationDto);
     }
 
@@ -167,7 +175,8 @@ public class DestinationController {
                     Double averageRating = destinationReviewService.getAverageRating(destination.getId());
                     Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
                     Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
-                    return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount);
+                    Integer likeCount = destinationLikeService.getDestinationLikeCount(destination.getId());
+                    return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount, likeCount);
                 })
                 .toList();
 
@@ -211,7 +220,8 @@ public class DestinationController {
                     Double averageRating = destinationReviewService.getAverageRating(destination.getId());
                     Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
                     Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
-                    return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount);
+                    Integer likeCount = destinationLikeService.getDestinationLikeCount(destination.getId());
+                    return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMine, reviewCount, wishCount, likeCount);
                 })
                 .toList();
 
@@ -260,11 +270,11 @@ public class DestinationController {
         Destination savedDestination = destinationService.save(request);
 
         Double averageRating = destinationReviewService.getAverageRating(savedDestination.getId());
-
         List<TagResponseDto> tags = tagService.findAllByDestinationId(savedDestination.getId());
         Integer reviewCount = destinationReviewService.getReviewCount(savedDestination.getId());
         Integer wishCount = destinationWishService.getDestinationWishCount(savedDestination.getId());
-        DestinationDto response = DestinationDto.toDto(savedDestination, tags, request.getIsApiData(), averageRating, true, reviewCount, wishCount);
+        Integer likeCount = destinationLikeService.getDestinationLikeCount(savedDestination.getId());
+        DestinationDto response = DestinationDto.toDto(savedDestination, tags, request.getIsApiData(), averageRating, true, reviewCount, wishCount, likeCount);
 
         return ResponseEntity.created(URI.create("/v1/destination/" + savedDestination.getId())).body(response);
     }
@@ -395,7 +405,8 @@ public class DestinationController {
         Double averageRating = destinationReviewService.getAverageRating(updatedDestination.getId());
         Integer reviewCount = destinationReviewService.getReviewCount(updatedDestination.getId());
         Integer wishCount = destinationWishService.getDestinationWishCount(updatedDestination.getId());
-        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, request.getIsApiData(), averageRating, true, reviewCount, wishCount);
+        Integer likeCount = destinationLikeService.getDestinationLikeCount(updatedDestination.getId());
+        DestinationDto updatedDto = DestinationDto.toDto(updatedDestination, updatedTags, request.getIsApiData(), averageRating, true, reviewCount, wishCount, likeCount);
         return ResponseEntity.ok(updatedDto);
     }
 

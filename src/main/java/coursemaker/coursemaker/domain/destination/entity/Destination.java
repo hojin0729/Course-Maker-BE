@@ -68,6 +68,9 @@ public class Destination extends BaseEntity {
     @Column(name = "reviewCount")
     private Integer reviewCount;
 
+    @Column(name = "likeCount")
+    private Integer likeCount;
+
     public void incrementViews() {
         this.views += 1;
     }

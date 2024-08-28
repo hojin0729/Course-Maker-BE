@@ -50,13 +50,18 @@ public class TravelCourseResponse {
     @Schema(description = "코스의 평균 평점", example = "4.5")
     private final Double averageRating;
 
-    @Schema(description = "코스 찜 갯수", example = "50")
+    @Schema(description = "코스 찜 갯수", example = "70")
     private final Integer wishCount;
 
-    @Schema(description = "코스 리뷰 갯수", example = "70")
+    @Schema(description = "코스 리뷰 갯수", example = "60")
     private final Integer reviewCount;
 
-    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses, List<TagResponseDto> tags, boolean isMine, Double averageRating, Integer reviewCount, Integer wishCount) {
+    @Schema(description = "코스 좋아요 갯수", example = "50")
+    private final Integer likeCount;
+
+    public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses,
+                                List<TagResponseDto> tags, boolean isMine, Double averageRating, Integer reviewCount,
+                                Integer wishCount, Integer likeCount) {
         this.id = travelCourse.getId();
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
@@ -72,6 +77,7 @@ public class TravelCourseResponse {
         this.averageRating = averageRating;
         this.wishCount = wishCount;
         this.reviewCount = reviewCount;
+        this.likeCount = likeCount;
         // TODO: 코스태그 - 코스간에 연관관계를 잘 공부해보세여
 
         // 코스태그 - 코스간에 연관관계
