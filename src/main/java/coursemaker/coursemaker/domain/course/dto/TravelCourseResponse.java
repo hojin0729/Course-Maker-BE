@@ -62,9 +62,14 @@ public class TravelCourseResponse {
     @Schema(description = "해당 코스의 찜이 로그인 한 사용자가 찜한 코스인지 여부")
     private final Boolean isMyWishCourse;
 
+    @Schema(description = "해당 코스의 좋아요가 로그인 한 사용자가 좋아요한 코스인지 여부")
+    private final Boolean isMyLikeCourse;
+
+
+
     public TravelCourseResponse(TravelCourse travelCourse, List<CourseDestinationResponse> courseDestinationResponses,
                                 List<TagResponseDto> tags, Boolean isMyCourse, Double averageRating, Integer reviewCount,
-                                Integer wishCount, Integer likeCount, Boolean isMyWishCourse) {
+                                Integer wishCount, Integer likeCount, Boolean isMyWishCourse, Boolean isMyLikeCourse) {
         this.id = travelCourse.getId();
         this.title = travelCourse.getTitle();
         this.content = travelCourse.getContent();
@@ -82,6 +87,7 @@ public class TravelCourseResponse {
         this.reviewCount = reviewCount;
         this.likeCount = likeCount;
         this.isMyWishCourse = isMyWishCourse;
+        this.isMyLikeCourse = isMyLikeCourse;
 
         // 코스태그 - 코스간에 연관관계
 
