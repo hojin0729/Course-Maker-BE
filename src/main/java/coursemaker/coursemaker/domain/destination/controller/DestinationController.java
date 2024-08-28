@@ -456,9 +456,9 @@ public class DestinationController {
         }
         // 해당 ID의 여행지가 존재하는지 확인합니다.
         Destination destination = destinationService.findById(id);
-        if (destination == null) {
-            return ResponseEntity.notFound().build();
-        }
+//        if (destination == null) {
+//            return ResponseEntity.notFound().build();
+//        }
         // 해당 여행지가 로그인한 사용자에게 속하는지 확인
         if (!destination.getMember().getNickname().equals(nickname)) {
             throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");

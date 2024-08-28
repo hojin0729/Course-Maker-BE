@@ -527,7 +527,7 @@ public class TourApiServiceImpl implements TourApiService {
             }
 
             // Destination 테이블에 이미 해당 TourApi의 contentid가 있는지 확인
-            Optional<Destination> existingDestination = destinationRepository.findByContentId(tourApi.getContentid());
+            Optional<Destination> existingDestination = destinationRepository.findByContentIdAndDeletedAtIsNull(tourApi.getContentid());
             if (existingDestination.isEmpty()) {
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
                 RequestDto dto = new RequestDto();
