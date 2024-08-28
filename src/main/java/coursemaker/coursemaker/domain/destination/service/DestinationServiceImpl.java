@@ -45,7 +45,7 @@ public class DestinationServiceImpl implements DestinationService {
     public Destination save(@Valid RequestDto requestDto) {
         Member member = memberService.findByNickname(requestDto.getNickname());
 
-        if (destinationRepository.existsByName(requestDto.getName())) {
+        if (destinationRepository.existsByNameAndDeletedAtIsNull(requestDto.getName())) {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
@@ -69,11 +69,11 @@ public class DestinationServiceImpl implements DestinationService {
     public Destination update(Long id, @Valid RequestDto requestDto) {
 
         // 기존 여행지 엔티티를 찾고 없으면 예외 처리
-        Destination destination = destinationRepository.findById(id)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
 
         // 여행지 이름 중복 확인 (본인 제외)
-        if (destinationRepository.existsByNameAndIdNot(requestDto.getName(), id)) {
+        if (destinationRepository.existsByNameAndIdNotAndDeletedAtIsNull(requestDto.getName(), id)) {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
@@ -106,7 +106,7 @@ public class DestinationServiceImpl implements DestinationService {
     @Override
     public Destination findById(Long id) {
         // ID로 여행지를 찾고, 없으면 예외처리
-        Destination destination = destinationRepository.findById(id)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
 
         incrementViews(destination.getId());
@@ -118,7 +118,7 @@ public class DestinationServiceImpl implements DestinationService {
     @Override
     public List<Destination> findAll() {
         // 저장된 모든 여행지를 리스트로 반환
-        return destinationRepository.findAll();
+        return destinationRepository.findAllByDeletedAtIsNull();
     }
 
     @Override
@@ -137,7 +137,7 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public CourseMakerPagination<Destination> findAll(Pageable pageable) {
-        Page<Destination> page = destinationRepository.findAll(pageable);
+        Page<Destination> page = destinationRepository.findAllByDeletedAtIsNull(pageable);
         long total = tagService.findAllDestinationByTagIds(null,pageable,OrderBy.NEWEST).getTotalContents();
         CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);
         return courseMakerPagination;
@@ -146,11 +146,14 @@ public class DestinationServiceImpl implements DestinationService {
     @Override
     public void deleteById(Long id) {
         // ID의 여행지를 삭제
-        destinationRepository.deleteById(id);
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+        destination.softDelete();
+        destinationRepository.save(destination);
     }
     @Override
     public void incrementViews(Long destinationId) {
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationId));
 
         destination.incrementViews();
@@ -160,7 +163,7 @@ public class DestinationServiceImpl implements DestinationService {
     // 여행지 id에 대한 대표사진을 추가하는 메서드
     @Override
     public void addPictureLink(Long destinationId, String pictureLink) {
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
         destination.setPictureLink(pictureLink);
         destinationRepository.save(destination);
@@ -169,7 +172,7 @@ public class DestinationServiceImpl implements DestinationService {
     // 여행지 id로 여행지의 대표사진 URL을 조회하는 메서드
     @Override
     public String getPictureLink(Long destinationId) {
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
         String pictureLink = destination.getPictureLink();
         if (pictureLink.isEmpty()) {
@@ -181,7 +184,7 @@ public class DestinationServiceImpl implements DestinationService {
     // 기존 여행지의 대표사진 URL을 변경하는 메서드.
     @Override
     public void updatePictureLink(Long destinationId, String newPictureLink) {
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
         destination.setPictureLink(newPictureLink);
         destinationRepository.save(destination);
@@ -190,7 +193,7 @@ public class DestinationServiceImpl implements DestinationService {
     // 특정 여행지의 대표사진 링크를 삭제하는 메서드.
     @Override
     public void deletePictureLink(Long destinationId) {
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
         if (destination.getPictureLink().isEmpty()) {
             throw new PictureNotFoundException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination id: " + destinationId);
@@ -203,7 +206,7 @@ public class DestinationServiceImpl implements DestinationService {
     @Override
     public Destination getLocation(Long destinationId, LocationDto locationDto) {
         // 여행지 id를 이용해서 dto내용들 위치, 경도, 위도 설정
-        Destination destination = destinationRepository.findById(destinationId)
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을 수 없습니다: " + destinationId, "Destination id: " + destinationId));
 
         destination.setLocation(locationDto.getAddress());
