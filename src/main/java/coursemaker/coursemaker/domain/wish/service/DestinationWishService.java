@@ -22,4 +22,6 @@ public interface DestinationWishService {
 
     /* 목적지별 찜된 수 조회 */
     Integer getDestinationWishCount(Long destinationId);
+
+    Boolean isDestinationWishedByUser(Long destinationId, String nickname);
 }

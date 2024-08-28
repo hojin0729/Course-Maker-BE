@@ -52,13 +52,13 @@ public class DestinationDto {
     private Double averageRating; // 평균 평점
 
     @Schema(description = "해당 여행지가 로그인 한 사용자가 작성한 여행지인지 여부", nullable = true)
-    private boolean isMine;
+    private Boolean isMyDestination;
 
     @Schema(description = "무장애 여행지 여부", nullable = true, hidden = true)
     private Boolean disabled;
 
     @Schema(description = "공공데이터 여부", example = "false", defaultValue = "false", nullable = true)
-    private boolean isApiData;
+    private Boolean isApiData;
 
     @Schema(description = "여행지 찜 갯수", example = "70")
     private Integer wishCount;
@@ -69,11 +69,13 @@ public class DestinationDto {
     @Schema(description = "여행지 좋아요 갯수", example = "50")
     private Integer likeCount;
 
+    @Schema(description = "해당 여행지 찜이 로그인 한 사용자가 찜한 여행지인지 여부", nullable = true)
+    private Boolean isMyWishDestination;
 
     // Destination 엔티티를 DestinationDto로 변환하는 메서드
     public static DestinationDto toDto(Destination destination, List<TagResponseDto> tagDtos,
-                                       boolean isApiData, Double averageRating, boolean isMine, Integer reviewCount,
-                                       Integer wishCount, Integer likeCount) {
+                                       Boolean isApiData, Double averageRating, Boolean isMyDestination, Integer reviewCount,
+                                       Integer wishCount, Integer likeCount, Boolean isMyWishDestination) {
         DestinationDto dto = new DestinationDto();
         dto.setId(destination.getId());
         dto.setNickname(destination.getMember().getNickname()); // 누가 만들었는지 설정
@@ -90,11 +92,12 @@ public class DestinationDto {
         );
         dto.setLocation(location);
         dto.setAverageRating(averageRating);
-        dto.setMine(isMine);
-        dto.setApiData(isApiData);
+        dto.setIsMyDestination(isMyDestination);
+        dto.setIsApiData(isApiData);
         dto.setReviewCount(reviewCount);
         dto.setWishCount(wishCount);
         dto.setLikeCount(likeCount);
+        dto.setIsMyWishDestination(isMyWishDestination);
         return dto;
     }
 }
