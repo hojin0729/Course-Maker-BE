@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -74,4 +75,14 @@ public class Destination extends BaseEntity {
     public void incrementViews() {
         this.views += 1;
     }
+
+    // Soft delete 처리
+    public void softDelete() {
+        this.setDeletedAt(LocalDateTime.now());
+    }
+
+    // Soft delete 상태 확인
+//    public boolean isDeleted() {
+//        return this.getDeletedAt() != null;
+//    }
 }

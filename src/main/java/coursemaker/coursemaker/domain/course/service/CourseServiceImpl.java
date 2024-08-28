@@ -149,7 +149,7 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname) {
 
-        String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();
+        String existingCourseNickname = travelCourseRepository.findByIdAndDeletedAtIsNull(id).get().getMember().getNickname();
         if (!existingCourseNickname.equals(nickname)) {
             throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
@@ -211,12 +211,12 @@ public class CourseServiceImpl implements CourseService{
     @Override
     public void delete(Long id, String nickname) {
 
-        String existingCourseNickname = travelCourseRepository.findById(id).get().getMember().getNickname();
+        String existingCourseNickname = travelCourseRepository.findByIdAndDeletedAtIsNull(id).get().getMember().getNickname();
         if (!existingCourseNickname.equals(nickname)) {
             throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
 
-        TravelCourse travelCourse = travelCourseRepository.findById(id)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id));
 
         if (travelCourse.getDeletedAt() != null) {

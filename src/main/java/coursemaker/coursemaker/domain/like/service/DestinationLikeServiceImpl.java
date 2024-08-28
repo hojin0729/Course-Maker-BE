@@ -74,7 +74,7 @@ public class DestinationLikeServiceImpl implements DestinationLikeService {
     @Transactional
     public DestinationLikeResponseDto addDestinationLike(DestinationLikeRequestDto requestDto) {
 
-        Destination destination = destinationRepository.findById(requestDto.getDestinationId())
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(requestDto.getDestinationId())
                 .orElseThrow(() -> new DestinationNotFoundException("해당 목적지를 찾을 수 없습니다.", "DestinationId:" + requestDto.getDestinationId()));
 
         Member member = memberRepository.findByNickname(requestDto.getNickname())
@@ -134,11 +134,23 @@ public class DestinationLikeServiceImpl implements DestinationLikeService {
     @Override
     public Integer getDestinationLikeCount(Long destinationId) {
         // 목적지가 존재하는지 확인
-        destinationRepository.findById(destinationId)
+        destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
                 .orElseThrow(() -> new DestinationNotFoundException("해당 목적지를 찾을 수 없습니다.", "DestinationId: " + destinationId));
 
         // 목적지에 대한 좋아요 수 반환
         return destinationLikeRepository.countByDestinationId(destinationId);
     }
 
+    @Override
+    public Boolean isDestinationLikedByUser(Long destinationId, String nickname) {
+        // 코스가 존재하는지 확인
+        Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
+                .orElseThrow(() -> new DestinationNotFoundException("해당 여행지를 찾을 수 없습니다.", "DestinationId: " + destinationId));
+
+        // 사용자가 존재하는지 확인
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
+
+        return destinationLikeRepository.existsByDestinationIdAndMemberId(destinationId, member.getId());
+    }
 }
