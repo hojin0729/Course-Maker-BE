@@ -11,6 +11,7 @@ import coursemaker.coursemaker.domain.wish.dto.CourseWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
 import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
+import coursemaker.coursemaker.domain.wish.exception.DuplicateWishException;
 import coursemaker.coursemaker.domain.wish.repository.CourseWishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,6 @@ public class CourseWishServiceImpl implements CourseWishService {
 
         return wishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(
-                        courseWish.getId(),
                         courseWish.getTravelCourse().getId(),
                         courseWish.getTravelCourse().getTitle(),
                         courseWish.getMember().getNickname()))
@@ -64,7 +64,6 @@ public class CourseWishServiceImpl implements CourseWishService {
         }
         return courseWishes.stream()
                 .map(courseWish -> new CourseWishResponseDto(
-                        courseWish.getId(),
                         courseWish.getTravelCourse().getId(),
                         courseWish.getTravelCourse().getTitle(),
                         courseWish.getMember().getNickname()))
@@ -75,6 +74,7 @@ public class CourseWishServiceImpl implements CourseWishService {
     @Override
     @Transactional
     public CourseWishResponseDto addCourseWish(CourseWishRequestDto requestDto) {
+        //dto로 로그인한 유저의 nickname 및 courseId 들어온다
 
         TravelCourse travelCourse = travelCourseRepository.findById(requestDto.getCourseId())
                 .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + requestDto.getCourseId()));
@@ -82,13 +82,18 @@ public class CourseWishServiceImpl implements CourseWishService {
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 멤버를 찾을 수 없습니다.", "Nickname: " + requestDto.getNickname()));
 
+        // 중복 체크 로직 추가
+        boolean exists = courseWishRepository.existsByTravelCourseIdAndMemberId(travelCourse.getId(), member.getId());
+        if (exists) {
+            throw new DuplicateWishException("이미 이 코스를 찜했습니다.", "CourseId: " + travelCourse.getId() + ", Nickname: " + member.getNickname());
+        }
+
         CourseWish courseWish = new CourseWish();
         courseWish.setTravelCourse(travelCourse);
         courseWish.setMember(member);
 
         CourseWish savedWish = courseWishRepository.save(courseWish);
         return new CourseWishResponseDto(
-                savedWish.getId(),
                 savedWish.getTravelCourse().getId(),
                 savedWish.getTravelCourse().getTitle(),
                 savedWish.getMember().getNickname());
@@ -112,5 +117,43 @@ public class CourseWishServiceImpl implements CourseWishService {
         courseWishRepository.delete(courseWish);
     }
 
+    /* 특정 코스에 대한 찜 목록 조회 */
+    @Override
+    public List<CourseWishResponseDto> getWishesByCourseId(Long courseId) {
+        List<CourseWish> courseWishes = courseWishRepository.findByTravelCourseId(courseId);
+        if (courseWishes.isEmpty()) {
+            throw new CourseWishNotFoundException("해당 코스에 대한 찜이 존재하지 않습니다.", "CourseId: " + courseId);
+        }
+        return courseWishes.stream()
+                .map(courseWish -> new CourseWishResponseDto(
+                        courseWish.getTravelCourse().getId(),
+                        courseWish.getTravelCourse().getTitle(),
+                        courseWish.getMember().getNickname()))
+                .collect(Collectors.toList());
+    }
 
+
+    /* 코스별 찜된 수 조회 */
+    @Override
+    public Integer getCourseWishCount(Long courseId) {
+        // 코스가 존재하는지 확인
+        travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
+
+        return courseWishRepository.countByTravelCourseId(courseId);
+    }
+
+    @Override
+    public Boolean isCourseWishedByUser(Long courseId, String nickname) {
+        // 코스가 존재하는지 확인
+        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
+
+        // 사용자가 존재하는지 확인
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
+
+        // 사용자가 해당 코스를 찜했는지 여부를 반환
+        return courseWishRepository.existsByTravelCourseIdAndMemberId(travelCourse.getId(), member.getId());
+    }
 }

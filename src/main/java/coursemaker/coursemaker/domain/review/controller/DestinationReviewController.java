@@ -1,13 +1,16 @@
 package coursemaker.coursemaker.domain.review.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.review.dto.RequestDestinationDto;
+import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.review.dto.ResponseDestinationDto;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
+import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,8 +46,14 @@ public class DestinationReviewController {
     @GetMapping("/{id}")
     @Operation(summary = "리뷰 ID로 목적지 리뷰 가져오기", description = "리뷰 ID를 사용하여 특정 목적지 리뷰를 가져옵니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
-            @ApiResponse(responseCode = "404", description = "해당 ID에 맞는 리뷰를 찾을 수 없음", content = @Content)
+            @ApiResponse(responseCode = "200", description = "해당 ID에 맞는 리뷰 조회 성공", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID에 맞는 리뷰를 찾지 못할 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 리뷰가 없습니다.\"}"
+                    )
+            ))
     })
     @Parameter(name = "id", description = "리뷰 ID", required = true, example = "1")
     public ResponseEntity<ResponseDestinationDto> getDestinationReviewById(@PathVariable("id") Long id) {
@@ -57,13 +66,39 @@ public class DestinationReviewController {
     @PostMapping
     @Operation(summary = "새 목적지 리뷰 작성", description = "새 목적지 리뷰를 작성합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "리뷰 생성 성공", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
-            @ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content)
+            @ApiResponse(responseCode = "201", description = "리뷰가 성공적으로 생성되었습니다. 헤더의 Location 필드에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
+            @ApiResponse(responseCode = "400", description = "생성하려는 리뷰의 인자값이 올바르지 않을 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"리뷰 제목은 공백 혹은 빈 문자는 허용하지 않습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                    )
+            ))
     })
     @Parameter(name = "destinationId", description = "리뷰를 작성할 여행지의 ID", required = true, example = "1")
     public ResponseEntity<ResponseDestinationDto> createDestinationReview(@RequestBody @Valid RequestDestinationDto requestDestinationDto,
                                                                           @RequestParam(name = "destinationId") Long destinationId,
                                                                           @AuthenticationPrincipal LoginedInfo logined) {
+
+        /*로그인 여부 확인*/
+        if(logined==null){
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        }
+
         // 로그인한 사용자 닉네임 가져오기
         String nickname = logined.getNickname();
         requestDestinationDto.setNickname(nickname);
@@ -77,14 +112,45 @@ public class DestinationReviewController {
     @PutMapping("/{id}")
     @Operation(summary = "목적지 리뷰 업데이트", description = "기존 목적지 리뷰를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 업데이트 성공", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
-            @ApiResponse(responseCode = "400", description = "유효성 검증 실패", content = @Content),
-            @ApiResponse(responseCode = "403", description = "접근 권한 없음", content = @Content)
+            @ApiResponse(responseCode = "200", description = "ID에 해당하는 리뷰 수정 성공", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
+            @ApiResponse(responseCode = "400", description = "수정하려는 리뷰의 인자값이 올바르지 않을 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"리뷰 제목은 공백 혹은 빈 문자는 허용하지 않습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "403", description = "접근 권한이 없을 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"접근 권한이 없습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "수정하려는 리뷰의 ID를 찾지 못할 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 리뷰가 없습니다.\"}"
+                    )
+            ))
     })
     @Parameter(name = "id", description = "리뷰 ID", required = true, example = "1")
     public ResponseEntity<ResponseDestinationDto> updateDestinationReview(@RequestBody @Valid RequestDestinationDto requestDestinationDto,
                                                                           @RequestParam(name = "destinationId") Long destinationId,
                                                                           @AuthenticationPrincipal LoginedInfo logined) {
+        /*로그인 여부 확인*/
+        if(logined==null){
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        }
+
         // 로그인한 사용자 닉네임 가져오기
         String nickname = logined.getNickname();
         requestDestinationDto.setNickname(nickname);
@@ -98,12 +164,36 @@ public class DestinationReviewController {
     @DeleteMapping("/{id}")
     @Operation(summary = "목적지 리뷰 삭제", description = "특정 목적지 리뷰를 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리뷰 삭제 성공", content = @Content),
-            @ApiResponse(responseCode = "403", description = "접근 권한 없음", content = @Content),
-            @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음", content = @Content)
+            @ApiResponse(responseCode = "200", description = "ID에 해당하는 리뷰 삭제 성공", content = @Content),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "403", description = "접근 권한이 없을 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"접근 권한이 없습니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "삭제하려는 리뷰의 ID를 찾지 못할 때 반환합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 리뷰가 없습니다.\"}"
+                    )
+            ))
     })
     @Parameter(name = "id", description = "리뷰 ID", required = true, example = "1")
     public ResponseEntity<Long> deleteDestinationReview(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+        /*로그인 여부 확인*/
+        if(logined==null){
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 삭제 실패");
+        }
+
         // 해당 ID의 리뷰가 존재하는지 확인합니다.
         DestinationReview destinationReview = destinationReviewService.findById(id);
         if (destinationReview == null) {
@@ -114,7 +204,7 @@ public class DestinationReviewController {
         String nickname = logined.getNickname();
         // 해당 리뷰가 로그인한 사용자에게 속하는지 확인합니다.
         if (!destinationReview.getMember().getNickname().equals(nickname)) {
-            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
+            throw new ForbiddenException("작성자와 정보가 일치하지 않습니다.", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         // 리뷰를 삭제합니다.
         destinationReviewService.delete(id);

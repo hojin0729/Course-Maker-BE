@@ -12,4 +12,10 @@ public interface CourseWishRepository extends JpaRepository<CourseWish, Long> {
     List<CourseWish> findByMemberNickname(String nickname);
 
     Optional<CourseWish> findByTravelCourseIdAndMemberId(Long courseId, Long memberId);
+
+    boolean existsByTravelCourseIdAndMemberId(Long id, Long id1);
+
+    List<CourseWish> findByTravelCourseId(Long courseId);
+
+    Integer countByTravelCourseId(Long courseId);
 }

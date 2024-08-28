@@ -9,7 +9,7 @@ public class WishForbiddenException extends RootException {
     String message;
 
     public WishForbiddenException(String message, String logMessage) {
-        super(ErrorCode.WISH_FORBIDDEN, logMessage, message);
+        super(ErrorCode.FORBIDDEN_WISH, logMessage, message);
 
         this.message = message;
     }

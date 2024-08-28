@@ -78,7 +78,9 @@ public class CourseServiceImpl implements CourseService{
                 .travelType(request.getTravelType())
                 .pictureLink(request.getPictureLink())
                 .member(member)
+                .averageRating(request.getAverageRating() != null ? request.getAverageRating() : 0)
                 .build();
+
         travelCourse = travelCourseRepository.save(travelCourse);
 
         /*destination 설정*/

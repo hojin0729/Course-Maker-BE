@@ -44,6 +44,18 @@ public class TravelCourse extends BaseEntity {
     @JoinColumn(name = "memberId")
     private Member member;
 
+    @Column(name = "averageRating", nullable = false)
+    private Double averageRating;
+
+    @Column(name = "wishCount")
+    private Integer wishCount;
+
+    @Column(name = "reviewCount")
+    private Integer reviewCount;
+
+    @Column(name = "likeCount")
+    private Integer likeCount;
+
 //    @OneToMany(mappedBy = "travelCourse", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<CourseDestination> courseDestinations = new ArrayList<>();
 
@@ -54,7 +66,7 @@ public class TravelCourse extends BaseEntity {
 //    private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
-    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member) {
+    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member, Double averageRating) {
         this.title = title;
         this.content = content;
         this.views = 0;
@@ -63,6 +75,7 @@ public class TravelCourse extends BaseEntity {
         this.travelType = travelType;
         this.pictureLink = pictureLink;
         this.member = member;
+        this.averageRating = averageRating;
     }
 
     public void update(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {

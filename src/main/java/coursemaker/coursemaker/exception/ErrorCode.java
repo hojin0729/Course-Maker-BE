@@ -40,6 +40,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token", "토큰 형식이 잘못되었습니다.", "AUTH-002"),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Access 토큰이 만료됬습니다.", "AUTH-003"),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Expired token", "Refresh 토큰이 만료됬습니다.", "AUTH-004"),
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, "login required", "로그인 후 이용이 가능합니다.", "AUTH-005"),
 
     MISMATCH_EMAIL(HttpStatus.NOT_FOUND, "Invalid item", "이메일 전송 기록이 없습니다.", "AUTH-005"),
     MISMATCH_CODE(HttpStatus.BAD_REQUEST, "Mismatch code", "검증 코드가 일치하지 않습니다.", "AUTH-006"),
@@ -53,8 +54,16 @@ public enum ErrorCode {
 
     /* Wish 찜하기 도매인 예외*/
     INVALID_WISH(HttpStatus.NOT_FOUND, "Invalid wish", "해당하는 찜이 없습니다.", "WISH-001"),
-    WISH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-002"),
-    WISH_FORBIDDEN(HttpStatus.FORBIDDEN, "Forbidden", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-003");
+    UNAUTHORIZED_WISH(HttpStatus.UNAUTHORIZED, "Unauthorized", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-002"),
+    FORBIDDEN_WISH(HttpStatus.CONFLICT, "Forbidden", "찜하기 기능에 접근할 권한이 없습니다.", "WISH-003"),
+    DUPLICATED_WISH(HttpStatus.CONFLICT, "Duplicated wish", "이미 찜한 소스입니다.", "WISH-004"),
+
+    /* Like 찜하기 도매인 예외*/
+    INVALID_LIKE(HttpStatus.NOT_FOUND, "Invalid like", "해당하는 좋아요가 없습니다.", "LIKE-001"),
+    UNAUTHORIZED_LIKE(HttpStatus.UNAUTHORIZED, "Unauthorized", "좋아요 기능에 접근할 권한이 없습니다.", "LIKE-002"),
+    FORBIDDEN_LIKE(HttpStatus.CONFLICT, "Forbidden", "좋아요 기능에 접근할 권한이 없습니다.", "LIKE-003"),
+    DUPLICATED_LIKE(HttpStatus.CONFLICT, "Duplicated like", "이미 좋아요한 소스입니다.", "LIKE-004");
+
 
 
 

@@ -1,20 +1,16 @@
 package coursemaker.coursemaker.domain.tag.service;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.sun.jdi.request.DuplicateRequestException;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.destination.entity.QDestination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.dto.TagUpdateDto;
 import coursemaker.coursemaker.domain.tag.entity.CourseTag;
 import coursemaker.coursemaker.domain.tag.entity.DestinationTag;
-import coursemaker.coursemaker.domain.tag.entity.QDestinationTag;
 import coursemaker.coursemaker.domain.tag.entity.Tag;
 import coursemaker.coursemaker.domain.tag.exception.IllegalTagArgumentException;
 import coursemaker.coursemaker.domain.tag.exception.TagDuplicatedException;
@@ -22,10 +18,10 @@ import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.repository.CourseTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.DestinationTagRepository;
 import coursemaker.coursemaker.domain.tag.repository.TagRepository;
-import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -40,9 +36,9 @@ import static coursemaker.coursemaker.domain.course.entity.QTravelCourse.travelC
 import static coursemaker.coursemaker.domain.destination.entity.QDestination.destination;
 import static coursemaker.coursemaker.domain.tag.entity.QCourseTag.courseTag;
 import static coursemaker.coursemaker.domain.tag.entity.QDestinationTag.destinationTag;
-import static coursemaker.coursemaker.domain.tag.entity.QTag.tag;
 
 // TODO: 삭제 연산 soft delete로 전환
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -69,6 +65,8 @@ public class TagServiceImpl implements TagService{
         Tag created = tag.toEntity();
 
         created = tagRepository.save(created);
+
+        log.info("[Tag] 태그 추가. id: {}", created.getId());
 
         TagResponseDto response = created.toResponseDto();
 
@@ -102,9 +100,9 @@ public class TagServiceImpl implements TagService{
 
         /*업데이트할 엔티티 생성*/
         Tag updatedTag = new Tag();
-        tag.setId(tag.getId());
-        tag.setName(tag.getName());
-        tag.setDescription(tag.getDescription());
+        updatedTag.setId(tag.getId());
+        updatedTag.setName(tag.getName());
+        updatedTag.setDescription(tag.getDescription());
 
         /*변경할 타겟 태그를 못찾음.*/
         tagRepository.findById(updatedTag.getId()).orElseThrow(() ->
@@ -138,6 +136,8 @@ public class TagServiceImpl implements TagService{
 
         /*태그 삭제*/
         tagRepository.deleteById(id);
+
+        log.info("[Tag] 태그 삭제. id: {}", id);
     }
 
     /******태그-코스 ******/
@@ -148,43 +148,6 @@ public class TagServiceImpl implements TagService{
         if(tagIds == null || tagIds.isEmpty()){
             throw new IllegalTagArgumentException("코스에 추가할 태그가 없습니다.", "course id: " + courseId );
         }
-
-        // TODO: 쿼리 최적화
-//        /*태그 유효성 검사*/
-//        List <Tag> tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.notIn(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagNotFoundException("추가할 태그가 존재하지 않습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//
-//        /*코스에 태그가 이미 포함되있는지 확인*/
-//        tags = queryFactory
-//                .select(tag)
-//                .from(courseTag)
-//                .where(courseTag.course.id.eq(courseId), courseTag.tag.id.in(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagDuplicatedException("코스에 이미 추가된 태그가 있습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//        /*추가할 태그 찾아서 추가*/
-//        tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.in(tagIds))
-//                .fetch();
-//        TravelCourse course = courseService.findById(courseId);
-//        for(Tag insertTag : tags){
-//            queryFactory
-//                    .insert(courseTag)
-//                    .set(courseTag.course, course)
-//                    .set(courseTag.tag, insertTag)
-//                    .execute();
-//        }
-
-
 
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
@@ -199,6 +162,8 @@ public class TagServiceImpl implements TagService{
                 courseTagRepository.save(courseTag);
             }
         }
+
+        log.info("[Tag] 코스 태그 추가. 코스 id: {}, 태그 id: {}",courseId, tagIds);
     }
 
 
@@ -219,6 +184,7 @@ public class TagServiceImpl implements TagService{
     @Override
     public CourseMakerPagination<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
+        System.out.println("*******태그 쿼리*********");
         /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
         if(tagIds == null || tagIds.isEmpty()){
             tagIds = tagRepository.findAll()
@@ -230,7 +196,6 @@ public class TagServiceImpl implements TagService{
 
         OrderSpecifier<?> orderBySpecifier = null;
 
-        // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
         switch(orderBy) {
             case VIEWS:
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
@@ -239,13 +204,18 @@ public class TagServiceImpl implements TagService{
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.createdAt);
                 break;
             case POPULAR:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.wishCount);
                 break;
             case RATING:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.averageRating);
+                break;
+            case LIKE:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.likeCount);
                 break;
         }
 
+        System.out.println("*******코스 쿼리*********");
+        /*TODO: N+1 문제 해결*/
         List<TravelCourse> courses = queryFactory
                 .select(courseTag, courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
@@ -261,8 +231,8 @@ public class TagServiceImpl implements TagService{
                 .map(n -> n.get(courseTag).getCourse())
                 .collect(Collectors.toList());
 
-        // TODO: 쿼리 최적화
 
+        System.out.println("*******카운트 쿼리*********");
         long total = queryFactory
                 .select(courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
@@ -275,14 +245,12 @@ public class TagServiceImpl implements TagService{
                 .stream()
                 .toList().get(0);
 
-        // TODO: 페이지네이션 전체 요소 수 오류 수정
         Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
 
-//        System.out.println("coursePage.getTotalPages() = " + coursePage.getTotalPages());
-//        System.out.println("coursePage.getNumber() = " + coursePage.getNumber());
-//        System.out.println("coursePage.getSize() = " + coursePage.getSize());
 
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage, total);
+
+        System.out.println("*******쿼리 끝*********");
 
         return courseMakerPagination;
     }
@@ -306,11 +274,15 @@ public class TagServiceImpl implements TagService{
                 .delete(courseTag)
                 .where(courseTag.course.id.eq(courseId), courseTag.tag.in(tagEntitys))
                 .execute();
+
+        log.info("[Tag] 코스 태그 삭제. 코스 id: {}, 태그: {}",courseId, tags);
     }
 
     @Override
     public void deleteAllTagByCourse(Long courseId){
         courseTagRepository.deleteAllByCourseId(courseId);
+
+        log.info("[Tag] 모든 코스 태그 삭제. 코스 id: {}",courseId);
     }
 
 
@@ -324,42 +296,6 @@ public class TagServiceImpl implements TagService{
             throw new IllegalTagArgumentException("여행지에 추가할 태그가 없습니다.", "destination id: " + destinationId );
         }
 
-        // TODO: 쿼리 최적화
-
-//        /*태그 유효성 검사*/
-//        List <Tag> tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.notIn(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagNotFoundException("추가할 태그가 존재하지 않습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//        /*여행지에 태그가 이미 포함되있는지 확인*/
-//        tags = queryFactory
-//                .select(tag)
-//                .from(destinationTag)
-//                .where(destinationTag.destination.id.eq(destinationId), destinationTag.tag.id.in(tagIds))
-//                .fetch();
-//        for(Tag tag : tags){
-//            throw new TagDuplicatedException("여행지에 이미 추가된 태그가 있습니다.", "tag id: " + tag.getId() );
-//        }
-//
-//        /*추가할 태그 찾아서 추가*/
-//        tags = queryFactory
-//                .selectFrom(tag)
-//                .where(tag.id.in(tagIds))
-//                .fetch();
-//        Destination course = destinationService.findById(destinationId);
-//        for(Tag insertTag : tags){
-//            queryFactory
-//                    .insert(destinationTag)
-//                    .set(destinationTag.destination, destination)
-//                    .set(destinationTag.tag, insertTag)
-//                    .execute();
-//        }
-
-
         // 중복된 태그를 제외하고 추가함
         for (Long tagId : tagIds) {
             DestinationTag destinationTag = new DestinationTag();
@@ -371,6 +307,8 @@ public class TagServiceImpl implements TagService{
                 destinationTagRepository.save(destinationTag);
             }
         }
+
+        log.info("[Tag] 여행지 태그 추가. 여행지 id: {}, 태그: {}",destinationId, tagIds);
     }
 
     @Override
@@ -402,7 +340,7 @@ public class TagServiceImpl implements TagService{
 
         OrderSpecifier<?> orderBySpecifier = null;
 
-        // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
+
         switch(orderBy) {
             case VIEWS:
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
@@ -411,14 +349,18 @@ public class TagServiceImpl implements TagService{
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.createdAt);
                 break;
             case POPULAR:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.wishCount);
                 break;
             case RATING:
-                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.averageRating);
+                break;
+            case LIKE:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.likeCount);
                 break;
         }
 
 
+        /*TODO: N+1 문제 해결*/
         List<Destination> destinations = queryFactory
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
@@ -434,7 +376,6 @@ public class TagServiceImpl implements TagService{
                 .map(n -> n.get(destinationTag).getDestination())// 여행지태그 -> 여행지 변환
                 .collect(Collectors.toList());
 
-        // TODO: 쿼리 최적화
         long total = queryFactory
                 .select(destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(코스에는 FK가 없음)
@@ -472,11 +413,14 @@ public class TagServiceImpl implements TagService{
                 .where(destinationTag.destination.id.eq(destinationId), destinationTag.tag.in(tagsEntitys))
                 .execute();
 
+        log.info("[Tag] 여행지 태그 삭제. 여행지 id: {}, 태그: {}",destinationId, tags);
     }
 
     @Override
     public void deleteAllTagByDestination(Long destinationId){
         destinationTagRepository.deleteAllByDestinationId(destinationId);
+
+        log.info("[Tag] 모든 여행지 태그 삭제. 여행지 id: {}",destinationId);
     }
 
 }

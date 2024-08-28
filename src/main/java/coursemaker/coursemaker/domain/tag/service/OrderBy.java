@@ -4,6 +4,7 @@ public enum OrderBy {
     VIEWS,
     NEWEST,
     POPULAR,
-    RATING
+    RATING,
+    LIKE
 
 }

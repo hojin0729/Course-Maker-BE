@@ -10,12 +10,14 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 
+import coursemaker.coursemaker.domain.like.service.CourseLikeService;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
 
 import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 
 import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.domain.wish.service.CourseWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +56,8 @@ public class CourseApiController {
     private final TagService tagService;
     private final CourseReviewService courseReviewService;
     private final CourseDestinationService courseDestinationService;
+    private final CourseWishService courseWishService;
+    private final CourseLikeService courseLikeService;
 
     // POST
     /*********스웨거 어노테이션**********/
@@ -144,7 +148,8 @@ public class CourseApiController {
         List<TravelCourse> travelCourses = travelCoursePage.getContents();
 
         for (TravelCourse travelCourse : travelCourses) {
-            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -152,10 +157,12 @@ public class CourseApiController {
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
-
             Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+            Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -187,7 +194,8 @@ public class CourseApiController {
 
         // 로그인 한 사용자의 닉네임과 코스를 작성한 사용자의 닉네임을 비교
         // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
-        boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+        Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+        Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
@@ -199,10 +207,12 @@ public class CourseApiController {
 //        List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId())
 //                .stream().map(Tag::toResponseDto).toList();
         List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
-
         Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+        Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+        Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+        Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
     }
 
     // GET - Search by title
@@ -233,7 +243,8 @@ public class CourseApiController {
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
             // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
-            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -242,7 +253,11 @@ public class CourseApiController {
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
             Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+            Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -278,8 +293,8 @@ public class CourseApiController {
         List<TravelCourseResponse> contents = new ArrayList<>();
         for (TravelCourse travelCourse : travelCoursePage.getContents()) {
             // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
-            boolean isMine = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
-
+            Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
+            Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -287,10 +302,12 @@ public class CourseApiController {
                     .toList();
 
             List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
-
             Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+            Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMine, averageRating));
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -362,7 +379,8 @@ public class CourseApiController {
         TravelCourse updatedTravelCourse = courseService.update(id, request, nickname);
 
         // 코스 작성자와 현재 로그인한 사용자가 동일한지 여부를 확인
-        boolean isMine = nickname.equals(updatedTravelCourse.getMember().getNickname());
+        Boolean isMyCourse = nickname.equals(updatedTravelCourse.getMember().getNickname());
+        Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(updatedTravelCourse.getId(), loginedInfo.getNickname());
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(updatedTravelCourse)
@@ -374,10 +392,12 @@ public class CourseApiController {
 //        List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId())
 //                .stream().map(Tag::toResponseDto).toList();
         List<TagResponseDto> tags = tagService.findAllByCourseId(updatedTravelCourse.getId());
-
         Double averageRating = courseReviewService.getAverageRating(updatedTravelCourse.getId());
+        Integer reviewCount = courseReviewService.getReviewCount(updatedTravelCourse.getId());
+        Integer wishCount = courseWishService.getCourseWishCount(updatedTravelCourse.getId());
+        Integer likeCount = courseLikeService.getCourseLikeCount(updatedTravelCourse.getId());
 
-        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMine, averageRating);
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse);
 
         return (updatedTravelCourse != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :

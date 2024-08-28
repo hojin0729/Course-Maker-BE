@@ -7,9 +7,11 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.repository.CourseDestinationRepository;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.service.TagService;
+import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
@@ -23,25 +25,36 @@ public class CourseDestinationService {
     private final TagService tagService;
     private final CourseDestinationRepository courseDestinationRepository;
     private final DestinationReviewService destinationReviewService;
+    private final DestinationWishService destinationWishService;
+    private final DestinationLikeService destinationLikeService;
 
     public CourseDestinationService(@Lazy TagService tagService,
                                     CourseDestinationRepository courseDestinationRepository,
-                                    DestinationReviewService destinationReviewService) {
+                                    DestinationReviewService destinationReviewService,
+                                    DestinationWishService destinationWishService,
+                                    DestinationLikeService destinationLikeService) {
         this.tagService = tagService;
         this.courseDestinationRepository = courseDestinationRepository;
         this.destinationReviewService = destinationReviewService;
+        this.destinationWishService = destinationWishService;
+        this.destinationLikeService = destinationLikeService;
     }
 
     public CourseDestinationResponse toResponse(CourseDestination courseDestination, @AuthenticationPrincipal LoginedInfo loginedInfo) {
         List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId());
         Double averageRating = destinationReviewService.getAverageRating(courseDestination.getDestination().getId());
         Destination destination = courseDestination.getDestination();
-        boolean isApiData = destination.getIsApiData();
+        Boolean isApiData = destination.getIsApiData();
+        Integer reviewCount = destinationReviewService.getReviewCount(courseDestination.getDestination().getId());
+        Integer wishCount = destinationWishService.getDestinationWishCount(courseDestination.getDestination().getId());
+        Integer likeCount = destinationLikeService.getDestinationLikeCount(courseDestination.getDestination().getId());
 
-        boolean isMine = loginedInfo != null &&
+
+        Boolean isMyCourseDestination = loginedInfo != null &&
                 loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
+        Boolean isMyWishDestination = loginedInfo != null && destinationWishService.isDestinationWishedByUser(courseDestination.getDestination().getId(), loginedInfo.getNickname());
 
-        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMine);
+        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMyCourseDestination, reviewCount, wishCount, likeCount, isMyWishDestination);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }
 

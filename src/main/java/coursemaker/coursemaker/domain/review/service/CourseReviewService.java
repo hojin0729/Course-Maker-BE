@@ -5,7 +5,6 @@ import coursemaker.coursemaker.domain.review.entity.CourseReview;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface CourseReviewService {
     // 코스 리뷰 등록
@@ -20,5 +19,7 @@ public interface CourseReviewService {
     CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable);
     // 코스 평균 평점 계산
     Double getAverageRating(Long courseId);
- }
+
+    Integer getReviewCount(Long courseId);
+}
 

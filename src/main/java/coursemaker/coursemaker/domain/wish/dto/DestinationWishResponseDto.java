@@ -8,8 +8,6 @@ import lombok.Setter;
 @Setter
 public class DestinationWishResponseDto {
 
-    @Schema(description = "목적지찜의 ID", example = "1")
-    private Long id;
 
     @Schema(description = "목적지의 ID", example = "1")
     private Long destinationId;
@@ -18,18 +16,12 @@ public class DestinationWishResponseDto {
     private String destinationName;
 
 
-    @Schema(description = "사용자의 닉네임", example = "Nickname")
+    @Schema(hidden = true)
     private String memberNickname;
 
-    public DestinationWishResponseDto(Long id, Long destinationId, String destinationName, String memberNickname) {
-        this.id = id;
+    public DestinationWishResponseDto(Long destinationId, String destinationName, String memberNickname) {
         this.destinationId = destinationId;
         this.destinationName = destinationName;
         this.memberNickname = memberNickname;
-    }
-
-    // 닉네임 숨기기 위한 메서드
-    public void hideMemberNickname() {
-        this.memberNickname = null;
     }
 }

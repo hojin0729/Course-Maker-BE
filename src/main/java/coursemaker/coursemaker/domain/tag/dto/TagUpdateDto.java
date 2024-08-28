@@ -7,8 +7,7 @@ import lombok.Data;
 
 @Data
 public class TagUpdateDto {
-    @Schema(description = "수정하려는 태그의 Id", example = "1")
-    @NotNull(message = "태그 ID를 입력해주세요.")
+    @Schema(description = "수정하려는 태그의 Id", example = "1", hidden = true)
     private Long id;
 
     @Schema(description = "수정된 태그 이름", example = "연인")

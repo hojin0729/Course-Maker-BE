@@ -1,14 +1,13 @@
 package coursemaker.coursemaker.domain.wish.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishRequestDto;
 import coursemaker.coursemaker.domain.wish.dto.DestinationWishResponseDto;
 import coursemaker.coursemaker.domain.wish.exception.WishForbiddenException;
-import coursemaker.coursemaker.domain.wish.exception.WishUnauthorizedException;
 import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -51,6 +50,13 @@ public class DestinationWishController {
                     examples = @ExampleObject(
                             value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
                     )
+            )),
+            @ApiResponse(responseCode = "409", description = "이미 찜한 목적지입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 409, \"errorType\": \"Duplicated wish\", \"message\": \"이미 찜한 목적지입니다.\"}"
+                    )
             ))
     })
     @PostMapping
@@ -60,16 +66,13 @@ public class DestinationWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationWish] addDestinationWish");
         }
 
         // 요청 DTO에 로그인된 사용자의 닉네임 설정
         requestDto.setNickname(logined.getNickname());
 
         DestinationWishResponseDto responseDto = destinationWishService.addDestinationWish(requestDto);
-
-        // 닉네임을 숨김
-        responseDto.hideMemberNickname();
 
         return ResponseEntity.ok(responseDto);
     }
@@ -111,7 +114,7 @@ public class DestinationWishController {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationWish] cancelDestinationWish");
         }
 
         // 현재 로그인된 사용자의 닉네임을 가져와서 서비스에 전달
@@ -133,7 +136,7 @@ public class DestinationWishController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "다른 사용자의 코스찜을 조회할 수 없습니다.", content = @Content(
+            @ApiResponse(responseCode = "403", description = "다른 사용자의 목적지찜을 조회할 수 없습니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
@@ -141,13 +144,12 @@ public class DestinationWishController {
                     )
             ))
     })
-    @Parameter(name = "nickname", description = "목적지찜한 사용자의 닉네임", required = true)
-    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable String nickname,
+    public ResponseEntity<List<DestinationWishResponseDto>> getDestinationWishesByNickname(@PathVariable("nickname") String nickname,
                                                                                            @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인된 사용자인지 확인
         if (logined == null) {
-            throw new WishUnauthorizedException("사용자가 이 자원에 접근할 권한이 없습니다.", "Unauthorized");
+            throw new LoginRequiredException("로그인 후 이용이 가능합니다.", "[DestinationWish] getDestinationWishesByNickname");
         }
 
         // 로그인된 사용자의 닉네임과 요청된 닉네임이 일치하는지 확인
@@ -170,12 +172,35 @@ public class DestinationWishController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 여행지입니다.\"}"
                     )
             ))
     })
     public ResponseEntity<List<DestinationWishResponseDto>> getAllDestinationWishes() {
         List<DestinationWishResponseDto> destinationWishes = destinationWishService.getAllDestinationWishes();
         return ResponseEntity.ok(destinationWishes);
+    }
+
+    /**
+     * 코스별 찜된 수 조회
+     */
+    @GetMapping("/count/{destinationId}")
+    @Operation(summary = "목적지별 찜된 수 조회", description = "특정 목적지에 찜된 수를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "목적지 찜 수가 성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 목적지입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"존재하지 않는 목적지입니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<Integer> getDestinationWishCount(@PathVariable("destinationId") Long destinationId) {
+
+        Integer wishCount = destinationWishService.getDestinationWishCount(destinationId);
+
+        return ResponseEntity.ok(wishCount);
+
     }
 }

@@ -7,13 +7,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 public class ResponseDestinationDto {
     @Schema(description = "여행지 ID", example = "1")
     @NotNull(message = "여행지 ID를 입력하세요.")
     private Long destinationId;
+
+    @Schema(description = "리뷰의 고유 id", example = "1")
+    private Long reviewId;
 
     @Schema(description = "리뷰 작성자 닉네임", example = "traveler123")
     private String nickname;
@@ -45,6 +46,7 @@ public class ResponseDestinationDto {
         dto.setDescription(destinationReview.getDescription());
         dto.setPicture(destinationReview.getPicture());
         dto.setRating(destinationReview.getRating());
+        dto.setReviewId(destinationReview.getId());
         return dto;
     }
 }

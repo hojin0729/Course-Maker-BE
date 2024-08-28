@@ -92,7 +92,7 @@ public class TagController {
     @PatchMapping("/{id}")
     public ResponseEntity<TagResponseDto> updateTag(@PathVariable(name = "id") Long id
                                                     ,@Valid @RequestBody TagUpdateDto request) {
-
+        request.setId(id);
         TagResponseDto response = tagService.updateTag(request);
 
         return ResponseEntity.ok().body(response);

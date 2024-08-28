@@ -16,4 +16,12 @@ public interface DestinationWishService {
     DestinationWishResponseDto addDestinationWish(DestinationWishRequestDto requestDto);
 
     void cancelDestinationWish(Long destinationId, String nickname);
+
+    /* 특정 목적지에 대한 찜 목록 조회 */
+    List<DestinationWishResponseDto> getWishesByDestinationId(Long destinationId);
+
+    /* 목적지별 찜된 수 조회 */
+    Integer getDestinationWishCount(Long destinationId);
+
+    Boolean isDestinationWishedByUser(Long destinationId, String nickname);
 }
