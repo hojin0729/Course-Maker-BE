@@ -150,6 +150,7 @@ public class CourseApiController {
         for (TravelCourse travelCourse : travelCourses) {
             Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
             Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
+            Boolean isMyLikeCourse = loginedInfo != null && courseLikeService.isCourseLikedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -162,7 +163,7 @@ public class CourseApiController {
             Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
             Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -196,6 +197,7 @@ public class CourseApiController {
         // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
         Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
         Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
+        Boolean isMyLikeCourse = loginedInfo != null && courseLikeService.isCourseLikedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
@@ -212,7 +214,7 @@ public class CourseApiController {
         Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
         Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
+        return ResponseEntity.ok(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
     }
 
     // GET - Search by title
@@ -245,6 +247,7 @@ public class CourseApiController {
             // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
             Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
             Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
+            Boolean isMyLikeCourse = loginedInfo != null && courseLikeService.isCourseLikedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -257,7 +260,7 @@ public class CourseApiController {
             Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
             Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -295,6 +298,7 @@ public class CourseApiController {
             // 로그인 정보가 없으면 isMine을 false로 설정, 있으면 기존 로직대로 설정
             Boolean isMyCourse = loginedInfo != null && loginedInfo.getNickname().equals(travelCourse.getMember().getNickname());
             Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(travelCourse.getId(), loginedInfo.getNickname());
+            Boolean isMyLikeCourse = loginedInfo != null && courseLikeService.isCourseLikedByUser(travelCourse.getId(), loginedInfo.getNickname());
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
@@ -307,7 +311,7 @@ public class CourseApiController {
             Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
             Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
 
-            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse));
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
         }
 
         Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
@@ -381,6 +385,7 @@ public class CourseApiController {
         // 코스 작성자와 현재 로그인한 사용자가 동일한지 여부를 확인
         Boolean isMyCourse = nickname.equals(updatedTravelCourse.getMember().getNickname());
         Boolean isMyWishCourse = loginedInfo != null && courseWishService.isCourseWishedByUser(updatedTravelCourse.getId(), loginedInfo.getNickname());
+        Boolean isMyLikeCourse = loginedInfo != null && courseLikeService.isCourseLikedByUser(updatedTravelCourse.getId(), loginedInfo.getNickname());
 
         /*TODO: ROW MAPPER로 DTO-entity 변환*/
         List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(updatedTravelCourse)
@@ -397,7 +402,7 @@ public class CourseApiController {
         Integer wishCount = courseWishService.getCourseWishCount(updatedTravelCourse.getId());
         Integer likeCount = courseLikeService.getCourseLikeCount(updatedTravelCourse.getId());
 
-        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse);
+        TravelCourseResponse response = new TravelCourseResponse(updatedTravelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse);
 
         return (updatedTravelCourse != null) ?
                 ResponseEntity.status(HttpStatus.OK).body(response) :

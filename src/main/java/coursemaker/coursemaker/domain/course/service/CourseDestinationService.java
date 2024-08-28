@@ -45,16 +45,16 @@ public class CourseDestinationService {
         Double averageRating = destinationReviewService.getAverageRating(courseDestination.getDestination().getId());
         Destination destination = courseDestination.getDestination();
         Boolean isApiData = destination.getIsApiData();
-        Integer reviewCount = destinationReviewService.getReviewCount(courseDestination.getDestination().getId());
-        Integer wishCount = destinationWishService.getDestinationWishCount(courseDestination.getDestination().getId());
-        Integer likeCount = destinationLikeService.getDestinationLikeCount(courseDestination.getDestination().getId());
+        Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
+        Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
+        Integer likeCount = destinationLikeService.getDestinationLikeCount(destination.getId());
 
 
-        Boolean isMyCourseDestination = loginedInfo != null &&
-                loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
-        Boolean isMyWishDestination = loginedInfo != null && destinationWishService.isDestinationWishedByUser(courseDestination.getDestination().getId(), loginedInfo.getNickname());
+        Boolean isMyCourseDestination = loginedInfo != null && loginedInfo.getNickname().equals(destination.getMember().getNickname());
+        Boolean isMyWishDestination = loginedInfo != null && destinationWishService.isDestinationWishedByUser(destination.getId(), loginedInfo.getNickname());
+        Boolean isMyLikeDestination = loginedInfo != null && destinationLikeService.isDestinationLikedByUser(destination.getId(), loginedInfo.getNickname());
 
-        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMyCourseDestination, reviewCount, wishCount, likeCount, isMyWishDestination);
+        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMyCourseDestination, reviewCount, wishCount, likeCount, isMyWishDestination, isMyLikeDestination);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }
 
