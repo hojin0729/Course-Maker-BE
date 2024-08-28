@@ -21,4 +21,5 @@ public interface CourseWishService {
 
     Integer getCourseWishCount(Long courseId);
 
+    Boolean isCourseWishedByUser(Long courseId, String nickname);
 }

@@ -143,4 +143,17 @@ public class CourseWishServiceImpl implements CourseWishService {
         return courseWishRepository.countByTravelCourseId(courseId);
     }
 
+    @Override
+    public Boolean isCourseWishedByUser(Long courseId, String nickname) {
+        // 코스가 존재하는지 확인
+        TravelCourse travelCourse = travelCourseRepository.findById(courseId)
+                .orElseThrow(() -> new TravelCourseNotFoundException("해당 코스를 찾을 수 없습니다.", "CourseId: " + courseId));
+
+        // 사용자가 존재하는지 확인
+        Member member = memberRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + nickname));
+
+        // 사용자가 해당 코스를 찜했는지 여부를 반환
+        return courseWishRepository.existsByTravelCourseIdAndMemberId(travelCourse.getId(), member.getId());
+    }
 }
