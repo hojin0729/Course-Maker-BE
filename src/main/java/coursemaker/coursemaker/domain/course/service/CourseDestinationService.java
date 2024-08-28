@@ -44,16 +44,17 @@ public class CourseDestinationService {
         List<TagResponseDto> tags = tagService.findAllByDestinationId(courseDestination.getDestination().getId());
         Double averageRating = destinationReviewService.getAverageRating(courseDestination.getDestination().getId());
         Destination destination = courseDestination.getDestination();
-        boolean isApiData = destination.getIsApiData();
+        Boolean isApiData = destination.getIsApiData();
         Integer reviewCount = destinationReviewService.getReviewCount(courseDestination.getDestination().getId());
         Integer wishCount = destinationWishService.getDestinationWishCount(courseDestination.getDestination().getId());
         Integer likeCount = destinationLikeService.getDestinationLikeCount(courseDestination.getDestination().getId());
 
 
-        boolean isMine = loginedInfo != null &&
+        Boolean isMyCourseDestination = loginedInfo != null &&
                 loginedInfo.getNickname().equals(courseDestination.getDestination().getMember().getNickname());
+        Boolean isMyWishDestination = loginedInfo != null && destinationWishService.isDestinationWishedByUser(courseDestination.getDestination().getId(), loginedInfo.getNickname());
 
-        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMine, reviewCount, wishCount, likeCount);
+        DestinationDto destinationDto = DestinationDto.toDto(courseDestination.getDestination(), tags, isApiData, averageRating, isMyCourseDestination, reviewCount, wishCount, likeCount, isMyWishDestination);
         return new CourseDestinationResponse(courseDestination, destinationDto);
     }
 
