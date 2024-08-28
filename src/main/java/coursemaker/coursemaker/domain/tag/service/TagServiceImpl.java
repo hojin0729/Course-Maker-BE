@@ -21,6 +21,7 @@ import coursemaker.coursemaker.domain.tag.repository.TagRepository;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,7 @@ import static coursemaker.coursemaker.domain.tag.entity.QCourseTag.courseTag;
 import static coursemaker.coursemaker.domain.tag.entity.QDestinationTag.destinationTag;
 
 // TODO: 삭제 연산 soft delete로 전환
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -63,6 +65,8 @@ public class TagServiceImpl implements TagService{
         Tag created = tag.toEntity();
 
         created = tagRepository.save(created);
+
+        log.info("[Tag] 태그 추가. id: {}", created.getId());
 
         TagResponseDto response = created.toResponseDto();
 
@@ -96,9 +100,9 @@ public class TagServiceImpl implements TagService{
 
         /*업데이트할 엔티티 생성*/
         Tag updatedTag = new Tag();
-        tag.setId(tag.getId());
-        tag.setName(tag.getName());
-        tag.setDescription(tag.getDescription());
+        updatedTag.setId(tag.getId());
+        updatedTag.setName(tag.getName());
+        updatedTag.setDescription(tag.getDescription());
 
         /*변경할 타겟 태그를 못찾음.*/
         tagRepository.findById(updatedTag.getId()).orElseThrow(() ->
@@ -132,6 +136,8 @@ public class TagServiceImpl implements TagService{
 
         /*태그 삭제*/
         tagRepository.deleteById(id);
+
+        log.info("[Tag] 태그 삭제. id: {}", id);
     }
 
     /******태그-코스 ******/
@@ -156,6 +162,8 @@ public class TagServiceImpl implements TagService{
                 courseTagRepository.save(courseTag);
             }
         }
+
+        log.info("[Tag] 코스 태그 추가. 코스 id: {}, 태그 id: {}",courseId, tagIds);
     }
 
 
@@ -176,6 +184,7 @@ public class TagServiceImpl implements TagService{
     @Override
     public CourseMakerPagination<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
+        System.out.println("*******태그 쿼리*********");
         /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
         if(tagIds == null || tagIds.isEmpty()){
             tagIds = tagRepository.findAll()
@@ -200,8 +209,13 @@ public class TagServiceImpl implements TagService{
             case RATING:
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.averageRating);
                 break;
+            case LIKE:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, travelCourse.likeCount);
+                break;
         }
 
+        System.out.println("*******코스 쿼리*********");
+        /*TODO: N+1 문제 해결*/
         List<TravelCourse> courses = queryFactory
                 .select(courseTag, courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
@@ -217,8 +231,8 @@ public class TagServiceImpl implements TagService{
                 .map(n -> n.get(courseTag).getCourse())
                 .collect(Collectors.toList());
 
-        // TODO: 쿼리 최적화
 
+        System.out.println("*******카운트 쿼리*********");
         long total = queryFactory
                 .select(courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
@@ -235,6 +249,8 @@ public class TagServiceImpl implements TagService{
 
 
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage, total);
+
+        System.out.println("*******쿼리 끝*********");
 
         return courseMakerPagination;
     }
@@ -258,11 +274,15 @@ public class TagServiceImpl implements TagService{
                 .delete(courseTag)
                 .where(courseTag.course.id.eq(courseId), courseTag.tag.in(tagEntitys))
                 .execute();
+
+        log.info("[Tag] 코스 태그 삭제. 코스 id: {}, 태그: {}",courseId, tags);
     }
 
     @Override
     public void deleteAllTagByCourse(Long courseId){
         courseTagRepository.deleteAllByCourseId(courseId);
+
+        log.info("[Tag] 모든 코스 태그 삭제. 코스 id: {}",courseId);
     }
 
 
@@ -287,6 +307,8 @@ public class TagServiceImpl implements TagService{
                 destinationTagRepository.save(destinationTag);
             }
         }
+
+        log.info("[Tag] 여행지 태그 추가. 여행지 id: {}, 태그: {}",destinationId, tagIds);
     }
 
     @Override
@@ -318,7 +340,7 @@ public class TagServiceImpl implements TagService{
 
         OrderSpecifier<?> orderBySpecifier = null;
 
-        // TODO: 인기순 정렬 로직 설정, 평균별점 로직 설정(고도화)
+
         switch(orderBy) {
             case VIEWS:
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.views);
@@ -332,9 +354,13 @@ public class TagServiceImpl implements TagService{
             case RATING:
                 orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.averageRating);
                 break;
+            case LIKE:
+                orderBySpecifier = new OrderSpecifier<>(Order.DESC, destination.likeCount);
+                break;
         }
 
 
+        /*TODO: N+1 문제 해결*/
         List<Destination> destinations = queryFactory
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
@@ -350,7 +376,6 @@ public class TagServiceImpl implements TagService{
                 .map(n -> n.get(destinationTag).getDestination())// 여행지태그 -> 여행지 변환
                 .collect(Collectors.toList());
 
-        // TODO: 쿼리 최적화
         long total = queryFactory
                 .select(destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(코스에는 FK가 없음)
@@ -388,11 +413,14 @@ public class TagServiceImpl implements TagService{
                 .where(destinationTag.destination.id.eq(destinationId), destinationTag.tag.in(tagsEntitys))
                 .execute();
 
+        log.info("[Tag] 여행지 태그 삭제. 여행지 id: {}, 태그: {}",destinationId, tags);
     }
 
     @Override
     public void deleteAllTagByDestination(Long destinationId){
         destinationTagRepository.deleteAllByDestinationId(destinationId);
+
+        log.info("[Tag] 모든 여행지 태그 삭제. 여행지 id: {}",destinationId);
     }
 
 }
