@@ -6,9 +6,9 @@ import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginResponseDTO;
 import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
+import coursemaker.coursemaker.domain.member.entity.Role;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -81,13 +81,16 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
         String accessToken = jwtProvider.createAccessToken(member.getUsername(), role);
         String refreshToken = jwtProvider.createRefreshToken(member.getUsername(), role);
         log.info("[JWT] JWT 발급 완료");
+        System.out.println(role);
 
         /*토큰을 반환 객체에 담아서 반환*/
         LoginResponseDTO responseDto = new LoginResponseDTO();
         responseDto.setAccessToken(accessToken);
         responseDto.setRefreshToken(refreshToken);
+        responseDto.setRole(Role.toKor(role));
 
         String result = objectMapper.writeValueAsString(responseDto);
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(result);
     }
     
