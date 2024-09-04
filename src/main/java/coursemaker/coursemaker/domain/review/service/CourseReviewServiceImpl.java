@@ -14,6 +14,7 @@ import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,13 +42,22 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     public CourseReview save(@Valid RequestCourseDto requestCourseDto, Long courseId) {
         Member member = memberService.findByNickname(requestCourseDto.getNickname());
         TravelCourse travelCourse = courseService.findById(courseId);
-        if (courseReviewRepository.findByMemberAndTravelCourse(member, travelCourse).isPresent()) {
-            throw new DuplicatedReviewException("해당 코스에 이미 리뷰를 남겼습니다.",
-                    "[CourseReview] nickname: "+ member.getNickname() + " course id: " + courseId);
-        }
+
+        // 중복 체크 로직 제거 (데이터베이스 유니크 제약 조건에 의해 처리됨)
+//        if (courseReviewRepository.findByMemberAndTravelCourse(member, travelCourse).isPresent()) {
+//            throw new DuplicatedReviewException("해당 코스에 이미 리뷰를 남겼습니다.",
+//                    "[CourseReview] nickname: "+ member.getNickname() + " course id: " + courseId);
+//        }
         CourseReview courseReview = requestCourseDto.toEntity(member);
         courseReview.setTravelCourse(travelCourse);
-        return courseReviewRepository.save(courseReview);
+        try {
+            return courseReviewRepository.save(courseReview);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicatedReviewException("해당 코스에 이미 리뷰를 남겼습니다.",
+                    "[CourseReview] nickname: " + courseReview.getMember().getNickname() +
+                            ", course id: " + courseReview.getTravelCourse().getId());
+        }
+
     }
 
     @Override

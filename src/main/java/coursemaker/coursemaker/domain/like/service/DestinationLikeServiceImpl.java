@@ -12,6 +12,7 @@ import coursemaker.coursemaker.domain.like.repository.DestinationLikeRepository;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.exception.UserNotFoundException;
 import coursemaker.coursemaker.domain.member.repository.MemberRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,21 +81,27 @@ public class DestinationLikeServiceImpl implements DestinationLikeService {
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + requestDto.getNickname()));
 
-        // 중복 체크 로직 추가
-        boolean exists = destinationLikeRepository.existsByDestinationIdAndMemberId(destination.getId(), member.getId());
-        if (exists) {
-            throw new DuplicateLikeException("이미 이 목적지를 좋아요했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
-        }
+        // 중복 체크 로직 제거 (데이터베이스 유니크 제약 조건에 의해 처리됨)
+//        boolean exists = destinationLikeRepository.existsByDestinationIdAndMemberId(destination.getId(), member.getId());
+//        if (exists) {
+//            throw new DuplicateLikeException("이미 이 목적지를 좋아요했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
+//        }
 
         DestinationLike destinationLike = new DestinationLike();
         destinationLike.setDestination(destination);
         destinationLike.setMember(member);
 
-        DestinationLike savedLike = destinationLikeRepository.save(destinationLike);
-        return new DestinationLikeResponseDto(
-                savedLike.getDestination().getId(),
-                savedLike.getDestination().getName(),
-                savedLike.getMember().getNickname());
+        try {
+            DestinationLike savedLike = destinationLikeRepository.save(destinationLike);
+            return new DestinationLikeResponseDto(
+                    savedLike.getDestination().getId(),
+                    savedLike.getDestination().getName(),
+                    savedLike.getMember().getNickname());
+        } catch (DataIntegrityViolationException e) {
+            // 유니크 제약 조건 위반 시 사용자 정의 예외 던지기
+            throw new DuplicateLikeException("이미 이 목적지를 좋아요했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
+        }
+
     }
 
 

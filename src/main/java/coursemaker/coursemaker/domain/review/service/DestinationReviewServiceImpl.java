@@ -13,6 +13,7 @@ import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,17 +39,24 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
     public DestinationReview save(@Valid RequestDestinationDto requestDestinationDto, Long destinationId) {
         Member member = memberService.findByNickname(requestDestinationDto.getNickname());
         Destination destination = destinationService.findById(destinationId);
-        if (destinationReviewRepository.findByMemberAndDestination(member, destination).isPresent()) {
-            throw new DuplicatedReviewException("해당 여행지에 이미 리뷰를 남겼습니다.",
-                    "[DestinationReview] nickname: "+ member.getNickname() + " destination id: " + destinationId);
-        }
+
+        // 중복 체크 로직 제거 (데이터베이스 유니크 제약 조건에 의해 처리됨)
+//        if (destinationReviewRepository.findByMemberAndDestination(member, destination).isPresent()) {
+//            throw new DuplicatedReviewException("해당 여행지에 이미 리뷰를 남겼습니다.",
+//                    "[DestinationReview] nickname: "+ member.getNickname() + " destination id: " + destinationId);
+//        }
         DestinationReview destinationReview = requestDestinationDto.toEntity(member);
         destinationReview.setDestination(destination);
 
-        // 디버깅: 저장 전 리뷰 평점 출력
-        log.debug("Debug: Saving Review with Rating = " + destinationReview.getRating());
-
-        return destinationReviewRepository.save(destinationReview);
+        try {
+            // 디버깅: 저장 전 리뷰 평점 출력
+            log.debug("Debug: Saving Review with Rating = " + destinationReview.getRating());
+            return destinationReviewRepository.save(destinationReview);
+        } catch (DataIntegrityViolationException e) {
+            // 유니크 제약 조건 위반 시 사용자 정의 예외 던지기
+            throw new DuplicatedReviewException("해당 여행지에 이미 리뷰를 남겼습니다.",
+                    "[DestinationReview] nickname: " + member.getNickname() + ", destination id: " + destinationId);
+        }
     }
 
 

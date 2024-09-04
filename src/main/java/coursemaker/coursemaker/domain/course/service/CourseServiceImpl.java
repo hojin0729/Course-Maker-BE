@@ -23,6 +23,7 @@ import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Slf4j
 public class CourseServiceImpl implements CourseService{
 
     private final CourseDestinationRepository courseDestinationRepository;
@@ -60,8 +62,10 @@ public class CourseServiceImpl implements CourseService{
 
     @Override
     public TravelCourse save(AddTravelCourseRequest request) {
+        log.info("새로운 여행 코스 저장 요청: {}", request);
 
         if (request.getTitle().length() > 50) {
+            log.warn("코스 제목 길이 초과: {}", request.getTitle().length());
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
 
@@ -70,6 +74,8 @@ public class CourseServiceImpl implements CourseService{
 
         /*travel course 설정*/
         Member member = memberService.findByNickname(request.getNickname());
+        log.debug("멤버 찾기 결과: {}", member);
+
         TravelCourse travelCourse = TravelCourse.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
@@ -82,6 +88,7 @@ public class CourseServiceImpl implements CourseService{
                 .build();
 
         travelCourse = travelCourseRepository.save(travelCourse);
+        log.info("여행 코스 저장 완료: {}", travelCourse);
 
         /*destination 설정*/
         for (AddCourseDestinationRequest courseDestination : request.getCourseDestinations()) {
@@ -93,6 +100,7 @@ public class CourseServiceImpl implements CourseService{
             courseDestinationEntity.setTravelCourse(travelCourse);
 
             Destination destination = destinationService.findById(courseDestination.getDestination().getId());
+            log.debug("목적지 찾기 결과: {}", destination);
 
             courseDestinationEntity.setDestination(destination);
             courseDestinationRepository.save(courseDestinationEntity);
@@ -104,60 +112,77 @@ public class CourseServiceImpl implements CourseService{
                 .map(TagResponseDto::getId)
                 .collect(Collectors.toList());
         tagService.addTagsByCourse(travelCourse.getId(), tagIds);
-
+        log.info("태그 설정 완료: {}", tagIds);
 
         return travelCourse;
     }
 
     @Override
     public CourseMakerPagination<TravelCourse> findAll(Pageable pageable) {
+        log.info("모든 여행 코스 조회 요청: pageable={}", pageable);
         Page<TravelCourse> page = travelCourseRepository.findAllByDeletedAtIsNull(pageable);// db에서 페이지 단위로 가져옴
         long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);// 페이지네이션 객체 변환
+        log.info("모든 여행 코스 조회 완료: total={}", total);
         return courseMakerPagination;
     }
 
     @Override
     public CourseMakerPagination<TravelCourse> getAllOrderByViewsDesc(Pageable pageable) {
+        log.info("조회수 기준 모든 여행 코스 조회 요청: pageable={}", pageable);
         Page<TravelCourse> page = travelCourseRepository.findAllByDeletedAtIsNullOrderByViewsDesc(pageable);// db에서 페이지 단위로 가져옴
         long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);// 페이지네이션 객체 변환
+        log.info("조회수 기준 모든 여행 코스 조회 완료: total={}", total);
         return courseMakerPagination;
     }
 
     @Override
     public TravelCourse findById(Long id) {
-        return travelCourseRepository.findByIdAndDeletedAtIsNull(id)
+        log.info("ID로 여행 코스 조회 요청: ID={}", id);
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new TravelCourseNotFoundException("존재하지 않는 코스입니다.", "Course ID: " + id));
+        log.info("ID로 여행 코스 조회 완료: {}", travelCourse);
+        return travelCourse;
     }
 
     @Override
     public CourseMakerPagination<TravelCourse> findByTitleContaining(String title, Pageable pageable) {
+        log.info("제목 포함 여행 코스 조회 요청: title={}, pageable={}", title, pageable);
         Page<TravelCourse> page = travelCourseRepository.findByTitleContainingAndDeletedAtIsNull(title, pageable);
         long total = tagService.findAllCourseByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);
+        log.info("제목 포함 여행 코스 조회 완료: total={}", total);
         return courseMakerPagination;
     }
 
     @Override
     public CourseMakerPagination<TravelCourse> findByMemberNickname(String nickname, Pageable pageable) {
+        log.info("멤버 닉네임으로 여행 코스 조회 요청: nickname={}, pageable={}", nickname, pageable);
         Page<TravelCourse> page = travelCourseRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
         long total = page.getTotalElements();
+        log.info("멤버 닉네임으로 여행 코스 조회 완료: total={}", total);
         return new CourseMakerPagination<>(pageable, page, total);
     }
 
     @Override
     public TravelCourse update(Long id, UpdateTravelCourseRequest request, String nickname) {
+        log.info("여행 코스 업데이트 요청: ID={}, 닉네임={}", id, nickname);
 
         String existingCourseNickname = travelCourseRepository.findByIdAndDeletedAtIsNull(id).get().getMember().getNickname();
         if (!existingCourseNickname.equals(nickname)) {
+            log.error("권한이 없는 사용자 접근 시도: ID={}, 닉네임={}", id, nickname);
             throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
 
         travelCourseRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스 수정 시도: ID={}", id);
+                    return new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id);
+                });
 
         if (request.getTitle().length() > 50) {
+            log.warn("코스 제목 길이 초과: {}", request.getTitle().length());
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
 
@@ -167,6 +192,8 @@ public class CourseServiceImpl implements CourseService{
         /*travel course 설정*/
         /*TODO: 멤버 닉네임을 기반으로 객체 가져오는부분 연결하기!*/
         Member member = memberService.findByNickname(request.getNickname());
+        log.debug("멤버 찾기 결과: {}", member);
+
         TravelCourse travelCourse = TravelCourse.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
@@ -178,11 +205,14 @@ public class CourseServiceImpl implements CourseService{
                 .build();
         travelCourse.setId(id);// id가 있으면 update함
         travelCourse = travelCourseRepository.save(travelCourse);
+        log.info("여행 코스 업데이트 완료: {}", travelCourse);
 
 
         /****TODO: ROW MAPPER로 엔티티 - DTO 매핑****/
         /*destination 설정*/
         courseDestinationRepository.deleteAllByTravelCourseId(id);// 여행지 초기화
+        log.debug("기존 목적지 삭제 완료");
+
         for (UpdateCourseDestinationRequest courseDestination : request.getCourseDestinations()) {
 
             CourseDestination courseDestinationEntity = CourseDestination.builder()
@@ -192,88 +222,122 @@ public class CourseServiceImpl implements CourseService{
             courseDestinationEntity.setTravelCourse(travelCourse);
 
             Destination destination = destinationService.findById(courseDestination.getDestination().getId());
+            log.debug("목적지 찾기 결과: {}", destination);
 
             courseDestinationEntity.setDestination(destination);
             courseDestinationRepository.save(courseDestinationEntity);
         }
+        log.info("목적지 업데이트 완료");
 
 
         /*태그 설정*/
         tagService.deleteAllTagByCourse(id);// 태그 초기화
+        log.debug("기존 태그 삭제 완료");
         List<Long> tagIds = request.getTags().stream()
                 .map(TagResponseDto::getId)
                 .collect(Collectors.toList());
         tagService.addTagsByCourse(id, tagIds);
+        log.info("태그 업데이트 완료: {}", tagIds);
 
         return travelCourseRepository.save(travelCourse);
     }
 
     @Override
     public void delete(Long id, String nickname) {
+        log.info("여행 코스 삭제 요청: ID={}, 닉네임={}", id, nickname);
 
         String existingCourseNickname = travelCourseRepository.findByIdAndDeletedAtIsNull(id).get().getMember().getNickname();
         if (!existingCourseNickname.equals(nickname)) {
+            log.error("권한이 없는 사용자 접근 시도: ID={}, 닉네임={}", id, nickname);
             throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
 
         TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스 삭제 시도: ID={}", id);
+                    return new TravelCourseNotFoundException("삭제할 코스가 존재하지 않습니다.", "Course ID: " + id);
+                });
 
         if (travelCourse.getDeletedAt() != null) {
+            log.warn("이미 삭제된 코스 삭제 시도: ID={}", id);
             throw new TravelCourseAlreadyDeletedException("해당 코스는 이미 삭제되었습니다.", "Course ID: " + id);
         }
 
         travelCourse.setDeletedAt(LocalDateTime.now());
         travelCourseRepository.save(travelCourse);
+        log.info("여행 코스 삭제 완료: ID={}", id);
     }
 
     @Override
     public TravelCourse incrementViews(Long id) {
+        log.info("여행 코스 조회수 증가 요청: ID={}", id);
         TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new TravelCourseNotFoundException("코스가 존재하지 않습니다.", "Course ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스 조회 시도: ID={}", id);
+                    return new TravelCourseNotFoundException("코스가 존재하지 않습니다.", "Course ID: " + id);
+                });
         travelCourse.incrementViews();
+        log.info("여행 코스 조회수 증가 완료: ID={}, 조회수={}", id, travelCourse.getViews());
         return travelCourseRepository.save(travelCourse);
     }
 
     @Override
     public void addPictureLink(Long courseId, String pictureLink) {
+        log.info("여행 코스에 대표사진 링크 추가 요청: courseId={}, pictureLink={}", courseId, pictureLink);
         TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
-                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스에 대표사진 링크 추가 시도: courseId={}", courseId);
+                    return new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId);
+                });
         travelCourse.setPictureLink(pictureLink);
         travelCourseRepository.save(travelCourse);
+        log.info("대표사진 링크 추가 완료: courseId={}", courseId);
     }
 
-    // 코스 id로 여행지의 대표사진 URL을 조회하는 메서드
     @Override
     public String getPictureLink(Long courseId) {
+        log.info("코스의 대표사진 URL 조회 요청: courseId={}", courseId);
         TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
-                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스의 대표사진 URL 조회 시도: courseId={}", courseId);
+                    return new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId);
+                });
         String pictureLink = travelCourse.getPictureLink();
         if (pictureLink.isEmpty()) {
+            log.error("대표사진이 없는 코스의 대표사진 URL 조회 시도: courseId={}", courseId);
             throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Course id: " + courseId);
         }
+        log.info("코스의 대표사진 URL 조회 완료: courseId={}, pictureLink={}", courseId, pictureLink);
         return pictureLink;
     }
 
-    // 기존 코스의 대표사진 URL을 변경하는 메서드.
     @Override
     public void updatePictureLink(Long courseId, String newPictureLink) {
+        log.info("코스의 대표사진 URL 변경 요청: courseId={}, newPictureLink={}", courseId, newPictureLink);
         TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
-                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스의 대표사진 URL 변경 시도: courseId={}", courseId);
+                    return new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId);
+                });
         travelCourse.setPictureLink(newPictureLink);
         travelCourseRepository.save(travelCourse);
+        log.info("코스의 대표사진 URL 변경 완료: courseId={}", courseId);
     }
 
-    // 특정 코스의 대표사진 링크를 삭제하는 메서드.
     @Override
     public void deletePictureLink(Long courseId) {
+        log.info("코스의 대표사진 링크 삭제 요청: courseId={}", courseId);
         TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(courseId)
-                .orElseThrow(() -> new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId));
+                .orElseThrow(() -> {
+                    log.error("존재하지 않는 코스의 대표사진 링크 삭제 시도: courseId={}", courseId);
+                    return new TravelCourseNotFoundException("해당하는 코스를 찾을수 없습니다: " + courseId, "Course id: " + courseId);
+                });
         if (travelCourse.getPictureLink().isEmpty()) {
+            log.error("대표사진이 없는 코스의 대표사진 링크 삭제 시도: courseId={}", courseId);
             throw new PictureNotFoundException(ErrorCode.PICTURE_NOT_FOUND, "Course id: " + courseId);
         }
-        // 대표사진 링크만 삭제
         travelCourse.setPictureLink(null);
         travelCourseRepository.save(travelCourse);
+        log.info("코스의 대표사진 링크 삭제 완료: courseId={}", courseId);
     }
 }
