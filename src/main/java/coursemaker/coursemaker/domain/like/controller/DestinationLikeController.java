@@ -109,7 +109,7 @@ public class DestinationLikeController {
     })
     @DeleteMapping("/{destinationId}")
     public ResponseEntity<Void> cancelDestinationLike(
-            @PathVariable Long destinationId,
+            @PathVariable("destinationId") Long destinationId,
             @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인된 사용자인지 확인
