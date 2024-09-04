@@ -14,6 +14,7 @@ import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 import coursemaker.coursemaker.domain.wish.exception.DestinationWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.exception.DuplicateWishException;
 import coursemaker.coursemaker.domain.wish.repository.DestinationWishRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,21 +83,25 @@ public class DestinationWishServiceImpl implements DestinationWishService {
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 닉네임을 가진 사용자가 존재하지 않습니다.", "Nickname: " + requestDto.getNickname()));
 
-        // 중복 체크 로직 추가
-        boolean exists = destinationWishRepository.existsByDestinationIdAndMemberId(destination.getId(), member.getId());
-        if (exists) {
-            throw new DuplicateWishException("이미 이 목적지를 찜했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
-        }
+        // 중복 체크 로직 제거 (데이터베이스 유니크 제약 조건에 의해 처리됨)
+//        boolean exists = destinationWishRepository.existsByDestinationIdAndMemberId(destination.getId(), member.getId());
+//        if (exists) {
+//            throw new DuplicateWishException("이미 이 목적지를 찜했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
+//        }
 
         DestinationWish destinationWish = new DestinationWish();
         destinationWish.setDestination(destination);
         destinationWish.setMember(member);
 
-        DestinationWish savedWish = destinationWishRepository.save(destinationWish);
-        return new DestinationWishResponseDto(
-                savedWish.getDestination().getId(),
-                savedWish.getDestination().getName(),
-                savedWish.getMember().getNickname());
+        try {
+            DestinationWish savedWish = destinationWishRepository.save(destinationWish);
+            return new DestinationWishResponseDto(
+                    savedWish.getDestination().getId(),
+                    savedWish.getDestination().getName(),
+                    savedWish.getMember().getNickname());
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateWishException("이미 이 목적지를 찜했습니다.", "DestinationId: " + destination.getId() + ", Nickname: " + member.getNickname());
+        }
     }
 
 
