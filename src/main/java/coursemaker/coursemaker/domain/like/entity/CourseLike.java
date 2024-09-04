@@ -9,6 +9,9 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
+@Table(name = "course_like", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"courseId", "memberId"}) // 유니크 제약 조건 추가
+})
 public class CourseLike {
 
     @Id

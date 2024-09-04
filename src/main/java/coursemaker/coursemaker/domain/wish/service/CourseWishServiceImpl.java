@@ -13,6 +13,7 @@ import coursemaker.coursemaker.domain.wish.entity.CourseWish;
 import coursemaker.coursemaker.domain.wish.exception.CourseWishNotFoundException;
 import coursemaker.coursemaker.domain.wish.exception.DuplicateWishException;
 import coursemaker.coursemaker.domain.wish.repository.CourseWishRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,21 +83,25 @@ public class CourseWishServiceImpl implements CourseWishService {
         Member member = memberRepository.findByNickname(requestDto.getNickname())
                 .orElseThrow(() -> new UserNotFoundException("해당 멤버를 찾을 수 없습니다.", "Nickname: " + requestDto.getNickname()));
 
-        // 중복 체크 로직 추가
-        boolean exists = courseWishRepository.existsByTravelCourseIdAndMemberId(travelCourse.getId(), member.getId());
-        if (exists) {
-            throw new DuplicateWishException("이미 이 코스를 찜했습니다.", "CourseId: " + travelCourse.getId() + ", Nickname: " + member.getNickname());
-        }
+        // 중복 체크 로직 제거 (데이터베이스 유니크 제약 조건에 의해 처리됨)
+//        boolean exists = courseWishRepository.existsByTravelCourseIdAndMemberId(travelCourse.getId(), member.getId());
+//        if (exists) {
+//            throw new DuplicateWishException("이미 이 코스를 찜했습니다.", "CourseId: " + travelCourse.getId() + ", Nickname: " + member.getNickname());
+//        }
 
         CourseWish courseWish = new CourseWish();
         courseWish.setTravelCourse(travelCourse);
         courseWish.setMember(member);
 
-        CourseWish savedWish = courseWishRepository.save(courseWish);
-        return new CourseWishResponseDto(
-                savedWish.getTravelCourse().getId(),
-                savedWish.getTravelCourse().getTitle(),
-                savedWish.getMember().getNickname());
+        try {
+            CourseWish savedWish = courseWishRepository.save(courseWish);
+            return new CourseWishResponseDto(
+                    savedWish.getTravelCourse().getId(),
+                    savedWish.getTravelCourse().getTitle(),
+                    savedWish.getMember().getNickname());
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateWishException("이미 이 코스를 찜했습니다.", "CourseId: " + travelCourse.getId() + ", Nickname: " + member.getNickname());
+        }
     }
 
     /* 찜하기 취소 */
