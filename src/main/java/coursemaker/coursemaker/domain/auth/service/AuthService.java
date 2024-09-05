@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.auth.service;
 
+import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinResponseDTO;
 import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueRequestDTO;
@@ -22,6 +23,7 @@ import coursemaker.coursemaker.util.email.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +41,27 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final EmailService emailService;
     private final EmailCodeRepository emailCodeRepository;
+    
+    /*현재 로그인 한 사용자 정보 가져오기*/
+    public LoginedInfo getLoginInfo(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication();
+
+        if(principal == null){// 인증 전
+            return null;
+        }
+        else{
+            if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoginedInfo){
+                System.out.println("principal = " + principal);
+                return (LoginedInfo)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            }
+        }
+
+        return null;
+    }
 
     /*회원가입*/
     public JoinResponseDTO join(JoinRequestDTO request){
         JoinResponseDTO response = new JoinResponseDTO();
-        Member member = new Member();
 
         /*닉네임 중복 검증*/
         memberRepository.findByNickname(request.getNickname()).ifPresent(m -> {
@@ -55,14 +73,16 @@ public class AuthService {
             throw new UserDuplicatedException("이미 존재하는 이메일입니다.", "email: " + request.getEmail());
         });
 
-
         /*DTO -> entity*/
-        member.setEmail(request.getEmail());
-        member.setName(request.getName());
-        member.setNickname(request.getNickname());
-        member.setPassword(passwordEncoder.encode(request.getPassword()) );
-        member.setPhoneNumber(request.getPhoneNumber());
-        member.setRoles(Role.BEGINNER_TRAVELER);
+        Member member = new Member(
+                request.getNickname(),
+                request.getEmail(),
+                request.getName(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getPhoneNumber(),
+                Member.LoginType.BASIC,
+                Role.BEGINNER_TRAVELER
+        );
 
         /*DB에 회원정보 저장*/
         member = memberRepository.save(member);
