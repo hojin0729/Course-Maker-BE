@@ -37,6 +37,7 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
     @Override
     public DestinationReview save(@Valid RequestDestinationDto requestDestinationDto, Long destinationId) {
+        log.info("[DestinationReview] 리뷰 저장 시작 - 여행지 ID: {}", destinationId);
         Member member = memberService.findByNickname(requestDestinationDto.getNickname());
         Destination destination = destinationService.findById(destinationId);
 
@@ -49,11 +50,12 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         destinationReview.setDestination(destination);
 
         try {
-            // 디버깅: 저장 전 리뷰 평점 출력
-            log.debug("Debug: Saving Review with Rating = " + destinationReview.getRating());
-            return destinationReviewRepository.save(destinationReview);
+            log.debug("Debug: 저장 전 리뷰 평점 = {}", destinationReview.getRating());
+            DestinationReview savedReview = destinationReviewRepository.save(destinationReview);
+            log.info("[DestinationReview] 리뷰 저장 완료 - 리뷰 ID: {}, 여행지 ID: {}", savedReview.getId(), destinationId);
+            return savedReview;
         } catch (DataIntegrityViolationException e) {
-            // 유니크 제약 조건 위반 시 사용자 정의 예외 던지기
+            log.error("[DestinationReview] 중복 리뷰 오류 - 닉네임: {}, 여행지 ID: {}", member.getNickname(), destinationId);
             throw new DuplicatedReviewException("해당 여행지에 이미 리뷰를 남겼습니다.",
                     "[DestinationReview] nickname: " + member.getNickname() + ", destination id: " + destinationId);
         }
@@ -62,50 +64,67 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
     @Override
     public DestinationReview update(Long destinationId, @Valid RequestDestinationDto requestDestinationDto, String nickname) {
+        log.info("[DestinationReview] 리뷰 업데이트 시작 - 여행지 ID: {}, 닉네임: {}", destinationId, nickname);
+
         Member member = memberService.findByNickname(nickname);
         Destination destination = destinationService.findById(destinationId);
 
         DestinationReview existingReview = destinationReviewRepository.findByMemberAndDestination(member, destination)
-                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] nickname: " + nickname));
+                .orElseThrow(() -> {
+                    log.error("[DestinationReview] 리뷰 찾기 실패 - 닉네임: {}, 여행지 ID: {}", nickname, destinationId);
+                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] nickname: " + nickname);
+                });
 
         existingReview.setTitle(requestDestinationDto.getTitle());
         existingReview.setDescription(requestDestinationDto.getDescription());
         existingReview.setPicture(requestDestinationDto.getPicture());
         existingReview.setRating(requestDestinationDto.getRating());
 
-        return destinationReviewRepository.save(existingReview);
+        DestinationReview updatedReview = destinationReviewRepository.save(existingReview);
+        log.info("[DestinationReview] 리뷰 업데이트 완료 - 리뷰 ID: {}, 여행지 ID: {}", updatedReview.getId(), destinationId);
+
+        return updatedReview;
     }
 
     @Override
     public void delete(Long id) {
-        destinationReviewRepository.findById(id).orElseThrow(() ->
-                new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] delete id: "+ id)
-        );
+        log.info("[DestinationReview] 리뷰 삭제 시작 - 리뷰 ID: {}", id);
+        destinationReviewRepository.findById(id).orElseThrow(() -> {
+            log.error("[DestinationReview] 리뷰 찾기 실패 - 리뷰 ID: {}", id);
+            return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] delete id: " + id);
+        });
         destinationReviewRepository.deleteById(id);
+        log.info("[DestinationReview] 리뷰 삭제 완료 - 리뷰 ID: {}", id);
     }
 
     @Override
     public DestinationReview findById(Long id) {
+        log.info("[DestinationReview] 리뷰 조회 시작 - 리뷰 ID: {}", id);
         return destinationReviewRepository.findById(id)
-                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] id: "+ id));
+                .orElseThrow(() -> {
+                    log.error("[DestinationReview] 리뷰 찾기 실패 - 리뷰 ID: {}", id);
+                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] id: " + id);
+                });
     }
-
 
     @Override
     public CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable) {
+        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 시작 - 여행지 ID: {}", destinationId);
         Destination destination = destinationService.findById(destinationId);
         Page<DestinationReview> page = destinationReviewRepository.findByDestination(destination, pageable);
+        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 완료 - 여행지 ID: {}, 총 리뷰 수: {}", destinationId, page.getTotalElements());
         return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
     }
 
     @Override
     public Double getAverageRating(Long destinationId) {
+        log.info("[DestinationReviewService] 여행지 평균 평점 계산 시작 - 여행지 ID: {}", destinationId);
         List<DestinationReview> reviews = destinationReviewRepository.findByDestinationId(destinationId);
 
-        log.debug("Debug: Number of reviews found = " + reviews.size());
+        log.debug("Debug: 리뷰 수 = {}", reviews.size());
 
         for (DestinationReview review : reviews) {
-            log.debug("Debug: Review ID = " + review.getId() + ", Rating = " + review.getRating());
+            log.debug("Debug: 리뷰 ID = {}, 평점 = {}", review.getId(), review.getRating());
         }
 
         double averageRating = reviews.stream().mapToDouble(DestinationReview::getRating).average().orElse(0.0);
@@ -113,14 +132,17 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         DecimalFormat df = new DecimalFormat("#.#");
         double formattedAverageRating = Double.parseDouble(df.format(averageRating));
 
-        log.debug("Debug: Calculated formatted averageRating = " + formattedAverageRating);
+        log.info("[DestinationReview] 여행지 평균 평점 계산 완료 - 여행지 ID: {}, 평균 평점: {}", destinationId, formattedAverageRating);
 
         return formattedAverageRating;
     }
 
 
     @Override
-    public Integer getReviewCount(Long destinationId){
-        return destinationReviewRepository.countByDestinationId(destinationId);
+    public Integer getReviewCount(Long destinationId) {
+        log.info("[DestinationReview] 여행지 리뷰 개수 조회 시작 - 여행지 ID: {}", destinationId);
+        int reviewCount = destinationReviewRepository.countByDestinationId(destinationId);
+        log.info("[DestinationReview] 여행지 리뷰 개수 조회 완료 - 여행지 ID: {}, 리뷰 개수: {}", destinationId, reviewCount);
+        return reviewCount;
     }
 }

@@ -16,22 +16,23 @@ import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.exception.ErrorCode;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
+@Slf4j
 @Service
 public class DestinationServiceImpl implements DestinationService {
     private final DestinationRepository destinationRepository;
     private final TagService tagService;
     private final MemberService memberService;
     private final DestinationReviewService destinationReviewService;
-
 
     @Autowired
     public DestinationServiceImpl(DestinationRepository destinationRepository, @Lazy TagService tagService, MemberService memberService, @Lazy DestinationReviewService destinationReviewService) {
@@ -41,43 +42,45 @@ public class DestinationServiceImpl implements DestinationService {
         this.destinationReviewService = destinationReviewService;
     }
 
+    @Transactional
     @Override
     public Destination save(@Valid RequestDto requestDto) {
+        log.info("[Destination] 여행지 저장 시작 - 이름: {}, 저장한 사람: {}", requestDto.getName(), requestDto.getNickname());
         Member member = memberService.findByNickname(requestDto.getNickname());
 
         if (destinationRepository.existsByNameAndDeletedAtIsNull(requestDto.getName())) {
+            log.error("[Destination] 여행지 중복 오류 - 이름: {}, 저장한 사람: {}", requestDto.getName(), requestDto.getNickname());
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
         Destination destination = requestDto.toEntity(member);
-
-        // 명시적으로 averageRating을 설정하는지 확인
         destination.setAverageRating(requestDto.getAverageRating() != null ? requestDto.getAverageRating() : 0.0);
-
-        // 디버깅을 위해 설정된 평균 평점 출력
-        System.out.println("Debug: Set averageRating = " + destination.getAverageRating());
+        log.debug("[Destination] 여행지 평균 평점 설정 - 평점: {}", destination.getAverageRating());
 
         Destination savedDestination = destinationRepository.save(destination);
+        log.info("[Destination] 여행지 저장 완료 - ID: {}, 이름: {}, 저장한 사람: {}", savedDestination.getId(), savedDestination.getName(), requestDto.getNickname());
 
         tagService.addTagsByDestination(savedDestination.getId(), getTagIds(requestDto));
 
         return savedDestination;
     }
 
-
+    @Transactional
     @Override
     public Destination update(Long id, @Valid RequestDto requestDto) {
+        log.info("[Destination] 여행지 업데이트 시작 - ID: {}, 업데이트한 사람: {}", id, requestDto.getNickname());
 
-        // 기존 여행지 엔티티를 찾고 없으면 예외 처리
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", id);
+                    return new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id);
+                });
 
-        // 여행지 이름 중복 확인 (본인 제외)
         if (destinationRepository.existsByNameAndIdNotAndDeletedAtIsNull(requestDto.getName(), id)) {
+            log.error("[Destination] 여행지 이름 중복 오류 - 이름: {}, 업데이트한 사람: {}", requestDto.getName(), requestDto.getNickname());
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
-        // 멤버 정보는 유지하고, 업데이트할 정보를 다시 설정
         destination.setName(requestDto.getName());
         destination.setPictureLink(requestDto.getPictureLink());
         destination.setContent(requestDto.getContent());
@@ -85,9 +88,12 @@ public class DestinationServiceImpl implements DestinationService {
         destination.setLongitude(requestDto.getLocation().getLongitude());
         destination.setLatitude(requestDto.getLocation().getLatitude());
 
-        // 태그 삭제하고 다시 추가
+        log.debug("[Destination] 여행지 업데이트 - 이름: {}, 업데이트한 사람: {}", requestDto.getName(), requestDto.getNickname());
+
         tagService.deleteAllTagByDestination(destination.getId());
         tagService.addTagsByDestination(destination.getId(), getTagIds(requestDto));
+
+        log.info("[Destination] 여행지 업데이트 완료 - ID: {}, 업데이트한 사람: {}", destination.getId(), requestDto.getNickname());
 
         return destinationRepository.save(destination);
     }
@@ -105,24 +111,29 @@ public class DestinationServiceImpl implements DestinationService {
     }
     @Override
     public Destination findById(Long id) {
-        // ID로 여행지를 찾고, 없으면 예외처리
+        log.info("[Destination] 여행지 조회 시작 - ID: {}", id);
+
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", id);
+                    return new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id);
+                });
 
         incrementViews(destination.getId());
-        destinationRepository.save(destination);
+        log.info("[Destination] 여행지 조회 완료 - ID: {}, 이름: {}", destination.getId(), destination.getName());
 
         return destination;
     }
 
     @Override
     public List<Destination> findAll() {
-        // 저장된 모든 여행지를 리스트로 반환
+        log.info("[Destination] 모든 여행지 조회");
         return destinationRepository.findAllByDeletedAtIsNull();
     }
 
     @Override
     public CourseMakerPagination<Destination> findByNameContaining(String name, Pageable pageable) {
+        log.info("[Destination] 여행지 이름으로 검색 - 이름: {}", name);
         Page<Destination> page = destinationRepository.findByNameContainingAndDeletedAtIsNull(name, pageable);
         long total = tagService.findAllDestinationByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
         return new CourseMakerPagination<>(pageable, page, total);
@@ -130,6 +141,7 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public CourseMakerPagination<Destination> findByMemberNickname(String nickname, Pageable pageable) {
+        log.info("[Destination] 멤버 닉네임으로 여행지 조회 - 닉네임: {}", nickname);
         Page<Destination> page = destinationRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
         long total = page.getTotalElements();
         return new CourseMakerPagination<>(pageable, page, total);
@@ -137,85 +149,127 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public CourseMakerPagination<Destination> findAll(Pageable pageable) {
+        log.info("[Destination] 모든 여행지 페이지 조회");
         Page<Destination> page = destinationRepository.findAllByDeletedAtIsNull(pageable);
-        long total = tagService.findAllDestinationByTagIds(null,pageable,OrderBy.NEWEST).getTotalContents();
-        CourseMakerPagination<Destination> courseMakerPagination = new CourseMakerPagination<>(pageable, page, total);
-        return courseMakerPagination;
+        long total = tagService.findAllDestinationByTagIds(null, pageable, OrderBy.NEWEST).getTotalContents();
+        return new CourseMakerPagination<>(pageable, page, total);
     }
 
+    @Transactional
     @Override
     public void deleteById(Long id) {
-        // ID의 여행지를 삭제
+        log.info("[Destination] 여행지 삭제 - ID: {}", id);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", id);
+                    return new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + id);
+                });
         destination.softDelete();
         destinationRepository.save(destination);
+        log.info("[Destination] 여행지 삭제 완료 - ID: {}", id);
     }
+
+    @Transactional
     @Override
     public void incrementViews(Long destinationId) {
+        log.info("[Destination] 여행지 조회수 증가 - ID: {}", destinationId);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationId));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", destinationId);
+                    return new DestinationNotFoundException("해당하는 여행지가 없습니다.", "Destination id: " + destinationId);
+                });
 
         destination.incrementViews();
         destinationRepository.save(destination);
+        log.info("[Destination] 여행지 조회수 증가 완료 - ID: {}, 조회수: {}", destination.getId(), destination.getViews());
     }
 
-    // 여행지 id에 대한 대표사진을 추가하는 메서드
+    @Transactional
     @Override
     public void addPictureLink(Long destinationId, String pictureLink) {
+        log.info("[Destination] 여행지 대표사진 추가 - ID: {}", destinationId);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", destinationId);
+                    return new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId);
+                });
         destination.setPictureLink(pictureLink);
         destinationRepository.save(destination);
+        log.info("[Destination] 여행지 대표사진 추가 완료 - ID: {}, 링크: {}", destinationId, pictureLink);
     }
 
-    // 여행지 id로 여행지의 대표사진 URL을 조회하는 메서드
     @Override
     public String getPictureLink(Long destinationId) {
+        log.info("[Destination] 여행지 대표사진 조회 - ID: {}", destinationId);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", destinationId);
+                    return new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId);
+                });
         String pictureLink = destination.getPictureLink();
         if (pictureLink.isEmpty()) {
+            log.error("[Destination] 대표사진 없음 - ID: {}", destinationId);
             throw new PictureNotFoundException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination id: " + destinationId);
         }
+        log.info("[Destination] 여행지 대표사진 조회 완료 - ID: {}, 링크: {}", destinationId, pictureLink);
         return pictureLink;
     }
 
-    // 기존 여행지의 대표사진 URL을 변경하는 메서드.
+    @Transactional
     @Override
     public void updatePictureLink(Long destinationId, String newPictureLink) {
+        log.info("[Destination] 여행지 대표사진 업데이트 - ID: {}", destinationId);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", destinationId);
+                    return new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId);
+                });
         destination.setPictureLink(newPictureLink);
         destinationRepository.save(destination);
+        log.info("[Destination] 여행지 대표사진 업데이트 완료 - ID: {}, 새로운 링크: {}", destinationId, newPictureLink);
     }
 
-    // 특정 여행지의 대표사진 링크를 삭제하는 메서드.
+    @Transactional
     @Override
     public void deletePictureLink(Long destinationId) {
+        log.info("[Destination] 여행지 대표사진 삭제 - ID: {}", destinationId);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", destinationId);
+                    return new DestinationNotFoundException("해당하는 여행지를 찾을수 없습니다: " + destinationId, "Destination id: " + destinationId);
+                });
         if (destination.getPictureLink().isEmpty()) {
+            log.error("[Destination] 대표사진 없음 - ID: {}", destinationId);
             throw new PictureNotFoundException(ErrorCode.ILLEGAL_DESTINATION_ARGUMENT, "Destination id: " + destinationId);
         }
-        // 대표사진 링크만 삭제
         destination.setPictureLink(null);
         destinationRepository.save(destination);
+        log.info("[Destination] 여행지 대표사진 삭제 완료 - ID: {}", destinationId);
     }
 
+    @Transactional
     @Override
     public Destination getLocation(Long destinationId, LocationDto locationDto) {
-        // 여행지 id를 이용해서 dto내용들 위치, 경도, 위도 설정
+        log.info("[Destination] 여행지 위치 업데이트 - ID: {}", destinationId);
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException("해당하는 여행지를 찾을 수 없습니다: " + destinationId, "Destination id: " + destinationId));
+                .orElseThrow(() -> {
+                    log.error("[Destination] 여행지 찾기 실패 - ID: {}", destinationId);
+                    return new DestinationNotFoundException("해당하는 여행지를 찾을 수 없습니다: " + destinationId, "Destination id: " + destinationId);
+                });
 
         destination.setLocation(locationDto.getAddress());
         destination.setLatitude(locationDto.getLatitude());
         destination.setLongitude(locationDto.getLongitude());
+        log.info("[Destination] 여행지 위치 업데이트 완료 - ID: {}, 주소: {}", destinationId, locationDto.getAddress());
+
         return destinationRepository.save(destination);
     }
+
     @Override
     public Double getAverageRating(Long destinationId) {
-        return destinationReviewService.getAverageRating(destinationId);
+        log.info("[Destination] 여행지 평균 평점 조회 - ID: {}", destinationId);
+        Double averageRating = destinationReviewService.getAverageRating(destinationId);
+        log.info("[Destination] 여행지 평균 평점 조회 완료 - ID: {}, 평점: {}", destinationId, averageRating);
+        return averageRating;
     }
 }
