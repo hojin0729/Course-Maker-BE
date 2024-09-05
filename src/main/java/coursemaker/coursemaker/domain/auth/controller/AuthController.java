@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.auth.controller;
 
+import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinResponseDTO;
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.WithdrawalRequestDTO;
@@ -14,7 +15,6 @@ import coursemaker.coursemaker.domain.auth.dto.validate.ValidateEmailRequestDTO;
 import coursemaker.coursemaker.domain.auth.jwt.JwtProvider;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
 import coursemaker.coursemaker.domain.auth.service.NicknameValidate;
-import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.exception.UserDuplicatedException;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -122,11 +122,11 @@ public class AuthController {
     @ApiResponse(
             responseCode = "200", description = "정상적으로 로그아웃되었습니다."
     )
-    @PostMapping("/withdrawal")
-    public ResponseEntity<Void> withdrawal(@AuthenticationPrincipal Member member,
+    @DeleteMapping("/withdrawal")
+    public ResponseEntity<Void> withdrawal(@AuthenticationPrincipal LoginedInfo loginedInfo,
                                            @RequestBody WithdrawalRequestDTO withdrawalRequestDto) {
         jwtProvider.expireRefreshToken(withdrawalRequestDto.getRefreshToken());
-        authService.withdrawal(member.getNickname());
+        authService.withdrawal(loginedInfo.getNickname());
         return ResponseEntity.ok().build();
     }
 

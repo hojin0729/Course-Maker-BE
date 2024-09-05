@@ -6,17 +6,12 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 
 @Entity
 @SQLRestriction("deleted_at IS NULL")
 @SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id = ?")
 @Getter
-@Setter
 @ToString
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +20,6 @@ public class Member extends BaseEntity {
     @Column(name = "login_type", columnDefinition = "VARCHAR(255) DEFAULT 'BASIC'")
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
-
-    @Column(nullable = true)
-    private String username; // 회원 id
 
     @Column(name = "name", columnDefinition = "VARCHAR(20)")
     private String name; // 회원 이름
@@ -44,35 +36,29 @@ public class Member extends BaseEntity {
     @Column(name = "password", columnDefinition = "VARCHAR(255)")
     private String password; // 회원 비밀번호
 
+    public void setRoles(Role roles) {
+        this.roles = roles;
+    }
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role roles; // 회원 등급
 
-    @Column(name = "profile_img_url", columnDefinition = "VARCHAR(255)")
-    private String profileImgUrl;
+    public Member(String nickname, String email, String name, String password, String phoneNumber, LoginType loginType, Role roles) {
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
+        this.email = email;
+        this.name = name;
+        this.loginType = loginType;
+        this.roles = roles;
+    }
 
-    @Column(name = "profile_description", columnDefinition = "VARCHAR(255)")
-    private String profileDescription;
-
-    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
-    private LocalDateTime deletedAt;
+    protected Member() {}
 
 
     public enum LoginType {
         BASIC,
         KAKAO
-    }
-
-    @Builder(builderMethodName = "addMemberBuilder")
-    public Member(String email, LoginType loginType, String name, String nickname, String password, String phoneNumber, String profileImgUrl, String profileDescription, String roles) {
-        this.email = email;
-        this.loginType = loginType;
-        this.name = name;
-        this.nickname = nickname;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.profileImgUrl = profileImgUrl;
-        this.profileDescription = profileDescription;
-//        this.roles = roles != null ? roles : Role.USER.getRole();
     }
 }
