@@ -40,70 +40,86 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
     @Override
     public CourseReview save(@Valid RequestCourseDto requestCourseDto, Long courseId) {
+        log.info("[CourseReview] 리뷰 저장 시작 - 코스 ID: {}", courseId);
         Member member = memberService.findByNickname(requestCourseDto.getNickname());
         TravelCourse travelCourse = courseService.findById(courseId);
 
-        // 중복 체크 로직 제거 (데이터베이스 유니크 제약 조건에 의해 처리됨)
-//        if (courseReviewRepository.findByMemberAndTravelCourse(member, travelCourse).isPresent()) {
-//            throw new DuplicatedReviewException("해당 코스에 이미 리뷰를 남겼습니다.",
-//                    "[CourseReview] nickname: "+ member.getNickname() + " course id: " + courseId);
-//        }
         CourseReview courseReview = requestCourseDto.toEntity(member);
         courseReview.setTravelCourse(travelCourse);
+
         try {
-            return courseReviewRepository.save(courseReview);
+            CourseReview savedReview = courseReviewRepository.save(courseReview);
+            log.info("[CourseReview] 리뷰 저장 완료 - 리뷰 ID: {}, 코스 ID: {}", savedReview.getId(), courseId);
+            return savedReview;
         } catch (DataIntegrityViolationException e) {
+            log.error("[CourseReview] 중복 리뷰 오류 - 닉네임: {}, 코스 ID: {}", courseReview.getMember().getNickname(), courseId);
             throw new DuplicatedReviewException("해당 코스에 이미 리뷰를 남겼습니다.",
                     "[CourseReview] nickname: " + courseReview.getMember().getNickname() +
                             ", course id: " + courseReview.getTravelCourse().getId());
         }
-
     }
 
     @Override
     public CourseReview update(Long courseId, @Valid RequestCourseDto requestCourseDto, String nickname) {
+        log.info("[CourseReview] 리뷰 업데이트 시작 - 코스 ID: {}, 닉네임: {}", courseId, nickname);
+
         Member member = memberService.findByNickname(nickname);
         TravelCourse travelCourse = courseService.findById(courseId);
 
         CourseReview existingReview = courseReviewRepository.findByMemberAndTravelCourse(member, travelCourse)
-                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] nickname: " + nickname));
+                .orElseThrow(() -> {
+                    log.error("[CourseReview] 리뷰 찾기 실패 - 닉네임: {}, 코스 ID: {}", nickname, courseId);
+                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] nickname: " + nickname);
+                });
 
         existingReview.setTitle(requestCourseDto.getTitle());
         existingReview.setDescription(requestCourseDto.getDescription());
         existingReview.setPicture(requestCourseDto.getPicture());
         existingReview.setRating(requestCourseDto.getRating());
 
-        return courseReviewRepository.save(existingReview);
+        CourseReview updatedReview = courseReviewRepository.save(existingReview);
+        log.info("[CourseReview] 리뷰 업데이트 완료 - 리뷰 ID: {}, 코스 ID: {}", updatedReview.getId(), courseId);
+
+        return updatedReview;
     }
 
     @Override
     public void delete(Long id) {
-        courseReviewRepository.findById(id).orElseThrow(() ->
-                new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] delete id: "+ id)
-        );
+        log.info("[CourseReview] 리뷰 삭제 시작 - 리뷰 ID: {}", id);
+        courseReviewRepository.findById(id).orElseThrow(() -> {
+            log.error("[CourseReview] 리뷰 찾기 실패 - 리뷰 ID: {}", id);
+            return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] delete id: " + id);
+        });
         courseReviewRepository.deleteById(id);
+        log.info("[CourseReview] 리뷰 삭제 완료 - 리뷰 ID: {}", id);
     }
 
     @Override
     public CourseReview findById(Long id) {
+        log.info("[CourseReview] 리뷰 조회 시작 - 리뷰 ID: {}", id);
         return courseReviewRepository.findById(id)
-                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] id: "+ id));
+                .orElseThrow(() -> {
+                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] id: " + id);
+                });
     }
 
     @Override
     public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable) {
+        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 시작 - 코스 ID: {}", courseId);
         Page<CourseReview> page = courseReviewRepository.findByTravelCourseId(courseId, pageable);
+        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, page.getTotalElements());
         return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
     }
 
     @Override
     public Double getAverageRating(Long courseId) {
+        log.info("[CourseReview] 코스 평균 평점 계산 시작 - 코스 ID: {}", courseId);
         List<CourseReview> reviews = courseReviewRepository.findByTravelCourseId(courseId);
 
-        log.debug("Debug: Number of reviews found = " + reviews.size());
+        log.debug("Debug: 리뷰 수 = {}", reviews.size());
 
         for (CourseReview review : reviews) {
-            log.debug("Debug: Review ID = " + review.getId() + ", Rating = " + review.getRating());
+            log.debug("Debug: 리뷰 ID = {}, 평점 = {}", review.getId(), review.getRating());
         }
 
         // 평균 평점 계산
@@ -113,14 +129,17 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         DecimalFormat df = new DecimalFormat("#.#");
         double formattedAverageRating = Double.parseDouble(df.format(averageRating));
 
-        log.debug("Debug: Calculated formatted averageRating = " + formattedAverageRating);
+        log.info("[CourseReview] 코스 평균 평점 계산 완료 - 코스 ID: {}, 평균 평점: {}", courseId, formattedAverageRating);
 
         return formattedAverageRating;
     }
 
     @Override
-    public Integer getReviewCount(Long courseId){
-        return courseReviewRepository.countByTravelCourseId(courseId);
+    public Integer getReviewCount(Long courseId) {
+        log.info("[CourseReview] 코스 리뷰 개수 조회 시작 - 코스 ID: {}", courseId);
+        int reviewCount = courseReviewRepository.countByTravelCourseId(courseId);
+        log.info("[CourseReview] 코스 리뷰 개수 조회 완료 - 코스 ID: {}, 리뷰 개수: {}", courseId, reviewCount);
+        return reviewCount;
     }
 }
 
