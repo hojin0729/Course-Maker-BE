@@ -109,7 +109,7 @@ public class DestinationWishController {
     })
     @DeleteMapping("/{destinationId}")
     public ResponseEntity<Void> cancelDestinationWish(
-            @PathVariable Long destinationId,
+            @PathVariable("destinationId") Long destinationId,
             @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인된 사용자인지 확인

@@ -12,6 +12,9 @@ import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Getter @Setter
+@Table(name = "course_review", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"memberId", "courseId"})
+})
 public class CourseReview extends BaseEntity {
 
     @Id

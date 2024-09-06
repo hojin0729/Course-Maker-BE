@@ -9,6 +9,9 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
+@Table(name = "destination_wish", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"destinationId", "memberId"})
+})
 public class DestinationWish {
 
     @Id

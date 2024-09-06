@@ -14,10 +14,4 @@ public class CourseMemberResponse {
     public CourseMemberResponse(Member member) {
         this.nickname = member.getNickname();
     }
-
-    public Member toEntity() {
-        return Member.builder()
-                .nickname(nickname)
-                .build();
-    }
 }

@@ -83,7 +83,7 @@ public class DestinationController {
 
         List<DestinationDto> destinationDtos = new ArrayList<>();
         CourseMakerPagination<Destination> destinations = tagService.findAllDestinationByTagIds(tagIds, pageable, orderBy);
-        int totalPage = destinations.getTotalPage();
+        long totalPage = destinations.getTotalContents();
         List<Destination> destinationList = destinations.getContents();
 
         for (Destination destination : destinationList) {

@@ -15,7 +15,7 @@ public class LoginResponseDTO {
     @Schema(description = "리프레시 토큰", example = "refresh_token_example")
     String refreshToken;
 
-//    @Schema(description = "유저 닉네임", example = "nickname12")
-//    String nickname;
+    @Schema(description = "유저 등급", example = "초보 여행가")
+    String role;
 }
 

@@ -108,7 +108,7 @@ public class CourseWishController {
                     )
             ))
     })
-    public ResponseEntity<Void> cancelCourseWish(@PathVariable Long courseId,
+    public ResponseEntity<Void> cancelCourseWish(@PathVariable("courseId") Long courseId,
                                                  @AuthenticationPrincipal LoginedInfo logined
                                                  ) {
 
