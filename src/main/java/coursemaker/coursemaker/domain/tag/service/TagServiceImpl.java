@@ -75,6 +75,8 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public TagResponseDto findById(Long id){
+        log.debug("[Tag] 태그 조회. id: {}", id);
+
         return tagRepository.findById(id)
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag id: " + id ))
                 .toResponseDto();
@@ -82,6 +84,8 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public TagResponseDto findByTagName(String name){
+        log.debug("[Tag] 태그 조회. 태그명: {}", name);
+
         return tagRepository.findByname(name)
                 .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "tag name: " + name ))
                 .toResponseDto();
@@ -89,6 +93,8 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public List<TagResponseDto> findAllTags(){
+        log.debug("[Tag] 전체 태그 조회");
+
         return tagRepository.findAll()
                 .stream()
                 .map(Tag::toResponseDto)
@@ -117,6 +123,7 @@ public class TagServiceImpl implements TagService{
             throw new TagDuplicatedException("이미 존재하는 태그 이름입니다.", "tag name: " + updatedTag.getName() );
         }
 
+        log.info("[Tag] 태그 업데이트. id: {}", updatedTag.getId());
         updatedTag  = tagRepository.save(updatedTag);
 
 
@@ -169,6 +176,9 @@ public class TagServiceImpl implements TagService{
 
     @Override
     public List<TagResponseDto> findAllByCourseId(Long courseId){
+
+        log.debug("[Tag] 코스에 해당하는 태그 조회. 코스 id: {}", courseId);
+
         List<CourseTag> courseTags = courseTagRepository.findAllByCourseId(courseId);
 
         // CourseTag에서 태그 추출
@@ -184,7 +194,8 @@ public class TagServiceImpl implements TagService{
     @Override
     public CourseMakerPagination<TravelCourse> findAllCourseByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy){
 
-        System.out.println("*******태그 쿼리*********");
+        log.debug("[Tag] 태그 해당하는 코스 조회. 태그 id: {}", tagIds);
+
         /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
         if(tagIds == null || tagIds.isEmpty()){
             tagIds = tagRepository.findAll()
@@ -214,13 +225,12 @@ public class TagServiceImpl implements TagService{
                 break;
         }
 
-        System.out.println("*******코스 쿼리*********");
         /*TODO: N+1 문제 해결*/
         List<TravelCourse> courses = queryFactory
                 .select(courseTag, courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
-                .where(courseTag.tag.id.in(tagIds).and(travelCourse.deletedAt.isNull()))// 다중태그 및 삭제되지 않은 코스 필터링
+                .where(courseTag.tag.id.in(tagIds).and(travelCourse.deletedAt.isNull())).fetchJoin()// 다중태그 및 삭제되지 않은 코스 필터링
                 .groupBy(courseTag.course)// 코스로 묶어서
 //                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
@@ -232,8 +242,7 @@ public class TagServiceImpl implements TagService{
                 .collect(Collectors.toList());
 
 
-        System.out.println("*******카운트 쿼리*********");
-        long total = queryFactory
+        Long total = queryFactory
                 .select(courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
                 .leftJoin(courseTag.course, travelCourse)// 코스-코스태그 조인
@@ -243,14 +252,15 @@ public class TagServiceImpl implements TagService{
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .fetch()
                 .stream()
-                .toList().get(0);
+                .count();
+
+        System.out.println("total = " + total);
 
         Page<TravelCourse> coursePage = new PageImpl<>(courses, pageable, total);
 
 
         CourseMakerPagination<TravelCourse> courseMakerPagination = new CourseMakerPagination<>(pageable, coursePage, total);
 
-        System.out.println("*******쿼리 끝*********");
 
         return courseMakerPagination;
     }
@@ -330,6 +340,8 @@ public class TagServiceImpl implements TagService{
     @Override
     public CourseMakerPagination<Destination> findAllDestinationByTagIds(List<Long> tagIds, Pageable pageable, OrderBy orderBy) {
 
+        log.debug("[Tag] 태그 해당하는 여행지 조회. 태그 id: {}", tagIds);
+
         /*검색할때 아무 태그도 선택 안했을 경우 = 모든 태그를 기준으로 검색*/
         if(tagIds == null || tagIds.isEmpty()){
             tagIds = tagRepository.findAll()
@@ -365,7 +377,7 @@ public class TagServiceImpl implements TagService{
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
                 .leftJoin(destinationTag.destination, destination)// 여행지-여행지태그 조인
-                .where(destinationTag.tag.id.in(tagIds).and(destination.deletedAt.isNull()))// 다중태그 조건 검색
+                .where(destinationTag.tag.id.in(tagIds).and(destination.deletedAt.isNull())).fetchJoin()// 다중태그 조건 검색
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
 //                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
@@ -386,7 +398,8 @@ public class TagServiceImpl implements TagService{
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
                 .fetch()
                 .stream()
-                .toList().get(0);
+                .count();
+        System.out.println("total = " + total);
 
         Page<Destination> destinationPage = new PageImpl<>(destinations, pageable, total);
 
