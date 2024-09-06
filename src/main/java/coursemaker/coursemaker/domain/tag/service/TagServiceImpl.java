@@ -225,7 +225,6 @@ public class TagServiceImpl implements TagService{
                 break;
         }
 
-        /*TODO: N+1 문제 해결*/
         List<TravelCourse> courses = queryFactory
                 .select(courseTag, courseTag.course.count())
                 .from(courseTag)// 코스태그에서 선택(코스에는 FK가 없음)
@@ -372,7 +371,6 @@ public class TagServiceImpl implements TagService{
         }
 
 
-        /*TODO: N+1 문제 해결*/
         List<Destination> destinations = queryFactory
                 .select(destinationTag, destinationTag.destination.count())
                 .from(destinationTag)// 여행지 태그에서 선택(여행지에는 FK가 없음)
