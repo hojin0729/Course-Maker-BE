@@ -160,7 +160,7 @@ public class AuthService {
         );
 
         EmailCode emailCode = new EmailCode(dto.getEmail(), validateCode, LocalDateTime.now().plusMinutes(3L));
-        log.info("이메일 시간: {}", LocalDateTime.now().plusMinutes(3L));
+        log.info("[Auth] 인증용 이메일 전송. 시간: {}", LocalDateTime.now().plusMinutes(3L));
 
         emailCodeRepository.save(emailCode);
 
@@ -185,6 +185,7 @@ public class AuthService {
 
 
         /*검증 끝났으면 삭제함.*/
+        log.info("[Auth] 이메일 인증 완료. 사용자: {}", dto.getEmail());
         emailCodeRepository.delete(code);
     }
 
