@@ -15,7 +15,7 @@ public class LoginResponseDTO {
     @Schema(description = "리프레시 토큰", example = "refresh_token_example")
     String refreshToken;
 
-    @Schema(description = "유저 등급", example = "초보 여행가")
+    @Schema(description = "유저 등급. 유저 등급은 '초보 여행가' , '중급 여행가', '프로 여행가', '관리자' 로 분류됩니다.", example = "초보 여행가")
     String role;
 }
 
