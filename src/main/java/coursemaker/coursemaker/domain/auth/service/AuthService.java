@@ -64,12 +64,12 @@ public class AuthService {
         JoinResponseDTO response = new JoinResponseDTO();
 
         /*닉네임 중복 검증*/
-        memberRepository.findByNickname(request.getNickname()).ifPresent(m -> {
+        memberRepository.findByNicknameAndDeletedAtIsNull(request.getNickname()).ifPresent(m -> {
             throw new UserDuplicatedException("이미 존재하는 닉네임입니다.", "Nickname: " + request.getNickname());
         });
 
         /*이메일 중복 검증*/
-        memberRepository.findByEmail(request.getEmail()).ifPresent(m -> {
+        memberRepository.findByEmailAndDeletedAtIsNull(request.getEmail()).ifPresent(m -> {
             throw new UserDuplicatedException("이미 존재하는 이메일입니다.", "email: " + request.getEmail());
         });
 
@@ -110,11 +110,13 @@ public class AuthService {
             throw new IllegalArgumentException("로그인 상태를 확인해주세요.");
         }
 
-        Member member = memberRepository.findByNickname(nickname).orElseThrow(() ->
+        Member member = memberRepository.findByNicknameAndDeletedAtIsNull(nickname).orElseThrow(() ->
                 new UserNotFoundException("존재하지 않는 회원입니다.", "Nickname: " + nickname)
         );
 
-        memberRepository.delete(member);
+        member.setDeletedAt(LocalDateTime.now());
+
+        memberRepository.save(member);
 
         log.info("[Auth] 회원 탈퇴. 닉네임: {}", member.getNickname());
     }
@@ -130,7 +132,7 @@ public class AuthService {
         }
 
         /*닉네임 존재 여부 판별*/
-        boolean isExist = memberRepository.findByNickname(nickname).isPresent();
+        boolean isExist = memberRepository.findByNicknameAndDeletedAtIsNull(nickname).isPresent();
         if(!isExist) {
             return NicknameValidate.IS_NOT_EXIST;
         } else{
@@ -141,7 +143,7 @@ public class AuthService {
     /*이메일 인증 코드 전송*/
     public String sendValidationCode(SendValidateCodeRequestDTO dto) {
 
-        memberRepository.findByEmail(dto.getEmail()).ifPresent(m -> {
+        memberRepository.findByEmailAndDeletedAtIsNull(dto.getEmail()).ifPresent(m -> {
             throw new UserDuplicatedException("이미 존재하는 이메일 입니다.", "duplicate email validate: "+ dto.getEmail());
         });
 
@@ -160,7 +162,7 @@ public class AuthService {
         );
 
         EmailCode emailCode = new EmailCode(dto.getEmail(), validateCode, LocalDateTime.now().plusMinutes(3L));
-        log.info("이메일 시간: {}", LocalDateTime.now().plusMinutes(3L));
+        log.info("[Auth] 인증용 이메일 전송. 시간: {}", LocalDateTime.now().plusMinutes(3L));
 
         emailCodeRepository.save(emailCode);
 
@@ -185,12 +187,13 @@ public class AuthService {
 
 
         /*검증 끝났으면 삭제함.*/
+        log.info("[Auth] 이메일 인증 완료. 사용자: {}", dto.getEmail());
         emailCodeRepository.delete(code);
     }
 
     /*사용자 권한 업데이트*/
     public void updateRole(RoleUpdateDTO dto){
-        Member member = memberRepository.findByNickname(dto.getNickname()).orElseThrow(() ->
+        Member member = memberRepository.findByNicknameAndDeletedAtIsNull(dto.getNickname()).orElseThrow(() ->
                 new UserNotFoundException(
                         "사용자를 찾을 수 없습니다.",
                         "[AUTH] 권한 업데이트 실패: nickname: " + dto.getNickname()

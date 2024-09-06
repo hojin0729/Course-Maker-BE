@@ -3,13 +3,11 @@ package coursemaker.coursemaker.domain.member.entity;
 import coursemaker.coursemaker.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 
 @Entity
-@SQLRestriction("deleted_at IS NULL")
-@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id = ?")
+//@SQLRestriction("deleted_at IS NULL")
+//@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id = ?")
 @Getter
 @ToString
 public class Member extends BaseEntity {
