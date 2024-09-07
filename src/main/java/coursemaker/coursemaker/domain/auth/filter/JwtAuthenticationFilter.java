@@ -55,10 +55,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String nickname = jwtProvider.getNickname(token);
         Role roles = Role.valueOf(jwtProvider.getRoles(token));
         LoginedInfo loginedInfo = new LoginedInfo();
-        Member member = new Member();
-
-        member.setNickname(nickname);
-        member.setRoles(roles);
+        Member member = new Member(
+                nickname,
+                null,
+                null,
+                null,
+                null,
+                null,
+                roles
+        );
 
         loginedInfo.setNickname(nickname);
         loginedInfo.setRole(roles);
