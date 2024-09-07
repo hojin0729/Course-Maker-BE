@@ -60,12 +60,11 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable);
 
         //Cors
-        http.cors(AbstractHttpConfigurer::disable);// disable 해야 cors 안터짐
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
 
             CorsConfiguration configuration = new CorsConfiguration();
             // 모든 출처에서 요청 허용 (http://localhost:3000와 같이 주소로 허용가능)
-            configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173")); // http://localhost:3000와 같이 주소로 허용가능
+            configuration.setAllowedOrigins(Collections.singletonList("http://course-maker.net")); // http://localhost:3000와 같이 주소로 허용가능
             // HTTP 메소드(GET, POST 등 모든요청)의 요청을 허용합니다.
             configuration.setAllowedMethods(Collections.singletonList("*"));
             // 인증 정보(쿠키, 인증 토큰 등)의 전송을 허용합니다.
