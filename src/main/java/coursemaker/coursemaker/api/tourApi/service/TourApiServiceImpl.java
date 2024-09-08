@@ -51,8 +51,8 @@ public class TourApiServiceImpl implements TourApiService {
     @Value("${tourapi.disableUpdateUrl}")
     private String disableUpdateUrl;
 
-    @Value("${tourapi.withPetUrl}")
-    private String withPetUrl;
+//    @Value("${tourapi.withPetUrl}")
+//    private String withPetUrl;
 
     private final MemberRepository memberRepository;
 
@@ -70,7 +70,7 @@ public class TourApiServiceImpl implements TourApiService {
 
     @Override
     public TourApiResponse updateAndGetTour() {
-        log.info("투어 API 업데이트 시작");
+        log.info("[TourApi] 투어 API 업데이트 시작");
         CompletableFuture<TourApiResponse> initialUpdateFuture = CompletableFuture.supplyAsync(this::initialUpdate, executorService);
 
         CompletableFuture<BusanApiResponse> busanApiUpdateFuture = CompletableFuture.supplyAsync(busanApiService::initialUpdate, executorService);
@@ -79,7 +79,7 @@ public class TourApiServiceImpl implements TourApiService {
                 .thenComposeAsync(response -> updateDisabledTours()
                         .thenRunAsync(this::handleMissingDisabledData, executorService)
                         .thenComposeAsync(aVoid -> {
-                            log.info("공통 데이터 업데이트 시작");
+                            log.info("[TourApi] 상세 데이터 업데이트 시작");
                             List<CompletableFuture<Void>> updateFutures = tourApiRepository.findAll().stream()
                                     .map(tour -> CompletableFuture.runAsync(() -> updateCommonData(tour.getId()), executorService))
                                     .collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class TourApiServiceImpl implements TourApiService {
                 .thenRunAsync(busanApiService::busanConvertAndSaveToDestination, executorService)
                 .join();
 
-        log.info("투어 API 업데이트 완료");
+        log.info("[TourApi] 투어 API 업데이트 완료");
         return initialUpdateFuture.join();
     }
 
@@ -156,17 +156,17 @@ public class TourApiServiceImpl implements TourApiService {
                 .build(true)
                 .toUri();
 
-        log.debug("투어 API 초기 데이터 요청: {}", uri);
+        log.debug("[TourApi] 투어 API 초기 데이터 요청: {}", uri);
 
         try {
             TourApiResponse response = webClientBuilder.build().get()
                     .uri(uri)
                     .retrieve()
                     .onStatus(status -> status.value() >= 400, clientResponse -> {
-                        log.error("API 오류 응답 코드: {}", clientResponse.statusCode().value());
+                        log.error("[TourApi] API 오류 응답 코드: {}", clientResponse.statusCode().value());
                         return clientResponse.bodyToMono(String.class)
                                 .flatMap(errorBody -> {
-                                    log.error("API 오류 응답 본문: {}", errorBody);
+                                    log.error("[TourApi] API 오류 응답 본문: {}", errorBody);
                                     return Mono.error(new RuntimeException("API 오류 응답: " + clientResponse.statusCode().value() + " " + errorBody));
                                 });
                     })
@@ -174,7 +174,7 @@ public class TourApiServiceImpl implements TourApiService {
                     .block();
 
             if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                log.info("투어 API 초기 데이터 응답 수신: {} 개 항목", response.getResponse().getBody().getItems().getItem().size());
+                log.info("[TourApi] 투어 API 초기 데이터 응답 수신: {} 개 항목", response.getResponse().getBody().getItems().getItem().size());
                 List<TourApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
                         .filter(item -> !isExcludedCat1(item.getCat1())) // cat1 필터링
                         .filter(item -> !isExcludedCat3(item.getCat3())) // cat3 필터링
@@ -187,7 +187,7 @@ public class TourApiServiceImpl implements TourApiService {
             }
             return response;
         } catch (Exception e) {
-            log.error("투어 업데이트 중 예외 발생: ", e);
+            log.error("[TourApi] 투어 업데이트 중 예외 발생: ", e);
             throw new RuntimeException("투어 업데이트 실패", e);
         }
     }
@@ -218,7 +218,7 @@ public class TourApiServiceImpl implements TourApiService {
     }
 
     private CompletableFuture<Void> updateDisabledTours() {
-        log.info("무장애 투어 정보 업데이트 시작");
+        log.info("[TourApi] 무장애 투어 정보 업데이트 시작");
         return CompletableFuture.runAsync(() -> {
             URI uri = UriComponentsBuilder.fromHttpUrl(disableTourUrl)
                     .queryParam("numOfRows", 2300)
@@ -231,7 +231,7 @@ public class TourApiServiceImpl implements TourApiService {
                     .build(true)
                     .toUri();
 
-            log.debug("무장애 투어 정보 데이터 요청: {}", uri);
+            log.debug("[TourApi] 무장애 투어 정보 데이터 요청: {}", uri);
 
             try {
                 TourApiResponse response = webClientBuilder.build().get()
@@ -243,7 +243,7 @@ public class TourApiServiceImpl implements TourApiService {
                         .block();
 
                 if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                    log.info("무장애 투어 정보 데이터 수신: {} 개 항목", response.getResponse().getBody().getItems().getItem().size());
+                    log.info("[TourApi] 무장애 투어 정보 데이터 수신: {} 개 항목", response.getResponse().getBody().getItems().getItem().size());
                     List<Long> disabledContentIds = response.getResponse().getBody().getItems().getItem().stream()
                             .map(TourApiResponse.Item::getContentid)
                             .collect(Collectors.toList());
@@ -259,17 +259,17 @@ public class TourApiServiceImpl implements TourApiService {
                     });
                 }
             } catch (Exception e) {
-                log.error("무장애 투어 정보 업데이트 중 오류 발생: ", e);
+                log.error("[TourApi] 무장애 투어 정보 업데이트 중 오류 발생: ", e);
             }
         }, executorService);
     }
 
     private void handleMissingDisabledData() {
-        log.info("누락된 무장애 투어 정보 데이터 처리 시작");
+        log.info("[TourApi] 누락된 무장애 투어 정보 데이터 처리 시작");
         List<TourApi> allTours = tourApiRepository.findAll();
         for (TourApi tour : allTours) {
             if (tour.getDisabled() == null) {
-                log.debug("누락된 누락된 무장애 투어 데이터 재시도: contentId={}", tour.getContentid());
+                log.debug("[TourApi] 누락된 누락된 무장애 투어 데이터 재시도: contentId={}", tour.getContentid());
                 retryUpdateDisabledData(tour.getContentid());
             }
         }
@@ -297,7 +297,7 @@ public class TourApiServiceImpl implements TourApiService {
                     .block();
 
             if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                log.debug("무장애 투어 데이터 재시도 응답 수신: contentId={}", contentId);
+                log.debug("[TourApi] 무장애 투어 데이터 재시도 응답 수신: contentId={}", contentId);
                 response.getResponse().getBody().getItems().getItem().forEach(item -> {
                     Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
                     tourApiOptional.ifPresent(tourApi -> {
@@ -308,10 +308,10 @@ public class TourApiServiceImpl implements TourApiService {
                     });
                 });
             } else {
-                log.error("유효하지 않은 응답: contentId={}", contentId);
+                log.error("[TourApi] 유효하지 않은 응답: contentId={}", contentId);
             }
         } catch (Exception e) {
-            log.error("무장애 투어 데이터 재시도 중 예외 발생: contentId={}", contentId, e);
+            log.error("[TourApi] 무장애 투어 데이터 재시도 중 예외 발생: contentId={}", contentId, e);
         }
     }
 
@@ -322,7 +322,7 @@ public class TourApiServiceImpl implements TourApiService {
             int pageNo = 1;
             boolean moreData = true;
 
-            log.info("상세 정보 데이터 업데이트 시작: contentId={}", contentId);
+            log.info("[TourApi] 상세 데이터 업데이트 시작: contentId={}", contentId);
 
             while (moreData) {
                 URI uri = UriComponentsBuilder.fromHttpUrl(detailCommonUrl)
@@ -343,7 +343,7 @@ public class TourApiServiceImpl implements TourApiService {
                             .uri(uri)
                             .retrieve()
                             .onStatus(status -> status.value() >= 400, clientResponse -> {
-                                log.error("API 오류 응답 코드: {}", clientResponse.statusCode().value());
+                                log.error("[TourApi] API 오류 응답 코드: {}", clientResponse.statusCode().value());
                                 return clientResponse.bodyToMono(String.class)
                                         .flatMap(errorBody -> Mono.error(new RuntimeException("API 오류 응답: " + clientResponse.statusCode().value() + " " + errorBody)));
                             })
@@ -353,7 +353,7 @@ public class TourApiServiceImpl implements TourApiService {
                             .block();
 
                     if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                        log.debug("상세 데이터 응답 수신: contentId={}", contentId);
+                        log.debug("[TourApi] 상세 데이터 응답 수신: contentId={}", contentId);
                         List<TourApiResponse.Item> items = response.getResponse().getBody().getItems().getItem();
                         items.forEach(item -> {
                             Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
@@ -375,7 +375,7 @@ public class TourApiServiceImpl implements TourApiService {
                         moreData = false; // 응답이 없거나 유효하지 않으면 루프 종료
                     }
                 } catch (Exception e) {
-                    log.error("상세 데이터 업데이트 중 오류 발생: contentId={}", contentId, e);
+                    log.error("[TourApi] 상세 데이터 업데이트 중 오류 발생: contentId={}", contentId, e);
                     moreData = false; // 예외 발생 시 루프 종료
                 }
             }
@@ -383,13 +383,13 @@ public class TourApiServiceImpl implements TourApiService {
     }
 
     private void updateMissingData() {
-        log.info("누락된 데이터 업데이트 시작");
+        log.info("[TourApi] 누락된 상세 데이터 업데이트 시작");
         List<TourApi> missingDataTours = tourApiRepository.findAll().stream()
                 .filter(tour -> tour.getOverview() == null)
                 .collect(Collectors.toList());
 
         for (TourApi tour : missingDataTours) {
-            log.debug("누락된 공통 데이터 재시도: contentId={}", tour.getContentid());
+            log.debug("[TourApi] 누락된 상세 데이터 재시도: contentId={}", tour.getContentid());
             retryUpdateCommonData(tour.getContentid());
         }
     }
@@ -418,7 +418,7 @@ public class TourApiServiceImpl implements TourApiService {
                     .block();
 
             if (response != null && response.getResponse().getBody().getItems().getItem() != null) {
-                log.debug("상세 데이터 재시도 응답 수신: contentId={}", contentId);
+                log.debug("[TourApi] 상세 데이터 재시도 응답 수신: contentId={}", contentId);
                 response.getResponse().getBody().getItems().getItem().forEach(item -> {
                     Optional<TourApi> tourApiOptional = tourApiRepository.findByContentid(item.getContentid());
                     tourApiOptional.ifPresent(tourApi -> {
@@ -430,10 +430,10 @@ public class TourApiServiceImpl implements TourApiService {
                     });
                 });
             } else {
-                log.error("유효하지 않은 응답: contentId={}", contentId);
+                log.error("[TourApi] 유효하지 않은 응답: contentId={}", contentId);
             }
         } catch (Exception e) {
-            log.error("공통 데이터 재시도 중 예외 발생: contentId={}", contentId, e);
+            log.error("[TourApi] 상세 데이터 재시도 중 예외 발생: contentId={}", contentId, e);
         }
     }
 
@@ -531,30 +531,30 @@ public class TourApiServiceImpl implements TourApiService {
 
     @Override
     public List<TourApi> getAllTours() {
-        log.info("모든 투어 데이터 조회 요청");
+        log.debug("[TourApi] 모든 투어 데이터 조회 요청");
         return tourApiRepository.findAll();
     }
 
     @Override
     public Optional<TourApi> getTourById(Long id) {
-        log.info("ID로 투어 데이터 조회 요청: ID={}", id);
+        log.debug("[TourApi] ID로 투어 데이터 조회 요청: ID={}", id);
         return tourApiRepository.findById(id);
     }
 
     private void convertAndSaveToDestination() {
-        log.info("투어 데이터를 Destination으로 변환 및 저장 시작");
+        log.info("[TourApi] 투어 데이터를 Destination으로 변환 및 저장 시작");
         List<TourApi> tourApis = tourApiRepository.findAll();
         for (TourApi tourApi : tourApis) {
             // title의 길이가 30자 초과인 경우 저장하지 않음
             if (tourApi.getTitle().length() > 30) {
-                log.debug("제목이 30자를 초과하여 저장하지 않음: title={}", tourApi.getTitle());
+                log.debug("[TourApi] 제목이 30자를 초과하여 저장하지 않음: title={}", tourApi.getTitle());
                 continue;
             }
 
             // Destination 테이블에 이미 해당 TourApi의 contentid가 있는지 확인
             Optional<Destination> existingDestination = destinationRepository.findByContentIdAndDeletedAtIsNull(tourApi.getContentid());
             if (existingDestination.isEmpty()) {
-                log.info("새로운 Destination 저장: contentId={}", tourApi.getContentid());
+                log.info("[TourApi] 새로운 Destination 저장: contentId={}", tourApi.getContentid());
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
                 RequestDto dto = new RequestDto();
                 LocationDto locationDto = new LocationDto(tourApi.getAddr1(), tourApi.getMapy(), tourApi.getMapx());
@@ -761,7 +761,7 @@ public class TourApiServiceImpl implements TourApiService {
     private synchronized void saveOrUpdateTour(TourApi tourApi) {
         Optional<TourApi> existingTour = tourApiRepository.findByContentid(tourApi.getContentid());
         if (existingTour.isPresent()) {
-            log.debug("기존 투어 업데이트: contentId={}", tourApi.getContentid());
+            log.info("[TourApi] 기존 투어 업데이트: contentId={}", tourApi.getContentid());
             TourApi existing = existingTour.get();
             existing.setTitle(tourApi.getTitle());
             existing.setTel(tourApi.getTel());
@@ -784,7 +784,7 @@ public class TourApiServiceImpl implements TourApiService {
             existing.setDisabled(tourApi.getDisabled());
             tourApiRepository.save(existing);
         } else {
-            log.info("새로운 투어 저장: contentId={}", tourApi.getContentid());
+            log.info("[TourApi] 새로운 투어 저장: contentId={}", tourApi.getContentid());
             tourApiRepository.save(tourApi);
         }
     }
