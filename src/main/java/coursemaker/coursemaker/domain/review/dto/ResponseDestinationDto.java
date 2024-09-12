@@ -38,7 +38,11 @@ public class ResponseDestinationDto {
     @NotNull(message = "평점을 입력하세요.")
     private Double rating;
 
-    public static ResponseDestinationDto toDto(Destination destination, DestinationReview destinationReview) {
+    @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
+    private Boolean isMyDestinationReview;
+
+
+    public static ResponseDestinationDto toDto(Destination destination, DestinationReview destinationReview, Boolean isMyDestinationReview) {
         ResponseDestinationDto dto = new ResponseDestinationDto();
         dto.setDestinationId(destination.getId());
         dto.setNickname(destinationReview.getMember().getNickname());
@@ -47,6 +51,7 @@ public class ResponseDestinationDto {
         dto.setPicture(destinationReview.getPicture());
         dto.setRating(destinationReview.getRating());
         dto.setReviewId(destinationReview.getId());
+        dto.setIsMyDestinationReview(isMyDestinationReview);
         return dto;
     }
 }

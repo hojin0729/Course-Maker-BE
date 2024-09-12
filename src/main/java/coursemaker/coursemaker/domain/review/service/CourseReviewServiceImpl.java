@@ -141,5 +141,13 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         log.info("[CourseReview] 코스 리뷰 개수 조회 완료 - 코스 ID: {}, 리뷰 개수: {}", courseId, reviewCount);
         return reviewCount;
     }
+
+    @Override
+    public CourseMakerPagination<CourseReview> findByMemberNickname(String nickname, Pageable pageable) {
+        log.info("[CourseReview] 멤버 닉네임으로 코스 리뷰 조회 - 닉네임: {}", nickname);
+        Page<CourseReview> page = courseReviewRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
+        long total = page.getTotalElements();
+        return new CourseMakerPagination<>(pageable, page, total);
+    }
 }
 

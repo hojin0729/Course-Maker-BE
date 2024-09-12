@@ -21,5 +21,7 @@ public interface CourseReviewService {
     Double getAverageRating(Long courseId);
 
     Integer getReviewCount(Long courseId);
+
+    CourseMakerPagination<CourseReview> findByMemberNickname(String nickname, Pageable pageable);
 }
 
