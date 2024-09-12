@@ -18,4 +18,6 @@ public interface DestinationReviewRepository extends JpaRepository<DestinationRe
     List<DestinationReview> findByDestinationId(Long destinationId);
 
     Integer countByDestinationId(Long destinationId);
+
+    Page<DestinationReview> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
 }

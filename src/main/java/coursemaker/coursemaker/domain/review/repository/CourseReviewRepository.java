@@ -18,4 +18,6 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
     List<CourseReview> findByTravelCourseId(Long courseId);
 
     Integer countByTravelCourseId(Long courseId);
+
+    Page<CourseReview> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
 }

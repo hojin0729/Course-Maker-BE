@@ -21,4 +21,6 @@ public interface DestinationReviewService {
     Double getAverageRating(Long destinationId);
 
     Integer getReviewCount(Long destinationId);
+
+    CourseMakerPagination<DestinationReview> findByMemberNickname(String nickname, Pageable pageable);
 }
