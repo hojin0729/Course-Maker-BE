@@ -145,4 +145,12 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         log.info("[DestinationReview] 여행지 리뷰 개수 조회 완료 - 여행지 ID: {}, 리뷰 개수: {}", destinationId, reviewCount);
         return reviewCount;
     }
+
+    @Override
+    public CourseMakerPagination<DestinationReview> findByMemberNickname(String nickname, Pageable pageable) {
+        log.info("[DestinationReview] 여행지 리뷰 멤버 닉네임으로 리뷰 조회 - 닉네임: {}", nickname);
+        Page<DestinationReview> page = destinationReviewRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
+        long total = page.getTotalElements();
+        return new CourseMakerPagination<>(pageable, page, total);
+    }
 }
