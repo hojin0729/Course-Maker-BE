@@ -55,10 +55,12 @@ public class CourseReviewController {
     })
     @Parameter(name = "id", description = "리뷰 ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseCourseDto> getCourseReviewById(@PathVariable("id") Long id) {
+    public ResponseEntity<ResponseCourseDto> getCourseReviewById(@PathVariable("id") Long id,
+                                                                 @AuthenticationPrincipal LoginedInfo logined) {
         CourseReview courseReview = courseReviewService.findById(id);
+        Boolean isMyCourseReview = logined != null && logined.getNickname().equals(courseReview.getMember().getNickname());
         TravelCourse travelCourse = courseService.findById(courseReview.getTravelCourse().getId());
-        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, courseReview);
+        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview);
         return ResponseEntity.ok(responseCourseDto);
     }
 
@@ -100,8 +102,10 @@ public class CourseReviewController {
         requestCourseDto.setNickname(nickname);
 
         CourseReview savedCourseReview = courseReviewService.save(requestCourseDto, courseId);
+        // 로그인한 사용자와 리뷰 작성자가 같은지 여부를 확인
+        Boolean isMyCourseReview = logined.getNickname().equals(savedCourseReview.getMember().getNickname());
         TravelCourse travelCourse = courseService.findById(courseId);
-        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, savedCourseReview);
+        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, savedCourseReview, isMyCourseReview);
         return ResponseEntity.created(URI.create("/v1/coursereview/" + savedCourseReview.getId())).body(responseCourseDto);
     }
 
@@ -154,7 +158,8 @@ public class CourseReviewController {
 
         CourseReview updatedCourseReview = courseReviewService.update(courseId, requestCourseDto, nickname);
         TravelCourse travelCourse = courseService.findById(courseId);
-        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, updatedCourseReview);
+        Boolean isMyCourseReview = logined.getNickname().equals(updatedCourseReview.getMember().getNickname());
+        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, updatedCourseReview, isMyCourseReview);
         return ResponseEntity.ok(responseCourseDto);
     }
 
@@ -213,7 +218,8 @@ public class CourseReviewController {
     public ResponseEntity<CourseMakerPagination<ResponseCourseDto>> getAllCourseReviewsByCourseId(
             @RequestParam(name = "courseId") Long courseId,
             @RequestParam(defaultValue = "20", name = "record") int record,
-            @RequestParam(defaultValue = "1", name = "page") int page) {
+            @RequestParam(defaultValue = "1", name = "page") int page,
+            @AuthenticationPrincipal LoginedInfo logined) {
 
         Pageable pageable = PageRequest.of(page - 1, record);
 
@@ -223,7 +229,8 @@ public class CourseReviewController {
         List<ResponseCourseDto> responseDtos = reviewList.stream()
                 .map(review -> {
                     TravelCourse travelCourse = courseService.findById(review.getTravelCourse().getId());
-                    return ResponseCourseDto.toDto(travelCourse, review);
+                    Boolean isMyCourseReview = logined != null && logined.getNickname().equals(review.getMember().getNickname());
+                    return ResponseCourseDto.toDto(travelCourse, review, isMyCourseReview);
                 })
                 .collect(Collectors.toList());
 
@@ -236,4 +243,46 @@ public class CourseReviewController {
         return ResponseEntity.ok(responseReviewPage);
     }
 
+    @Operation(summary = "닉네임으로 코스 리뷰 조회", description = "특정 사용자의 닉네임을 통해 해당 사용자가 작성한 코스 리뷰 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 닉네임으로 작성된 리뷰를 찾지 못할 때 반환", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 닉네임으로 작성된 리뷰가 없습니다.\"}"
+                    )
+            ))
+    })
+    @Parameter(name = "nickname", description = "리뷰를 조회할 사용자의 닉네임", required = true)
+    @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수", example = "20")
+    @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작)", example = "1")
+    @GetMapping("/nickname/{nickname}")
+    public ResponseEntity<CourseMakerPagination<ResponseCourseDto>> findCourseReviewByNickname(
+            @PathVariable("nickname") String nickname,
+            @RequestParam(defaultValue = "20", name = "record") Integer record,
+            @RequestParam(defaultValue = "1", name = "page") Integer page,
+            @AuthenticationPrincipal LoginedInfo logined) {
+
+        Pageable pageable = PageRequest.of(page - 1, record);
+        CourseMakerPagination<CourseReview> courseReviewPage = courseReviewService.findByMemberNickname(nickname, pageable);
+
+        List<ResponseCourseDto> contents = courseReviewPage.getContents().stream()
+                .map(courseReview -> {
+
+                    Boolean isMyCourseReview = logined != null && logined.getNickname().equals(courseReview.getMember().getNickname());
+
+                    TravelCourse travelCourse = courseService.findById(courseReview.getTravelCourse().getId());
+                    return ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview);
+                })
+                .collect(Collectors.toList());
+
+        CourseMakerPagination<ResponseCourseDto> responseReviewPage = new CourseMakerPagination<>(
+                pageable,
+                new PageImpl<>(contents, pageable, courseReviewPage.getTotalContents()),
+                courseReviewPage.getTotalContents()
+        );
+
+        return ResponseEntity.ok(responseReviewPage);
+    }
 }

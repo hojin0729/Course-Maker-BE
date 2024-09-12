@@ -41,7 +41,10 @@ public class ResponseCourseDto {
     @NotNull(message = "평점을 입력하세요.")
     private Double rating;
 
-    public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview) {
+    @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
+    private Boolean isMyCourseReview;
+
+    public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview) {
         ResponseCourseDto dto = new ResponseCourseDto();
         dto.setCourseId(travelCourse.getId());
         dto.setNickname(courseReview.getMember().getNickname());
@@ -50,6 +53,7 @@ public class ResponseCourseDto {
         dto.setPicture(courseReview.getPicture());
         dto.setRating(courseReview.getRating());
         dto.setReviewId(courseReview.getId());
+        dto.setIsMyCourseReview(isMyCourseReview);
         return dto;
     }
 }
