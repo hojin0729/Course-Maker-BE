@@ -9,6 +9,7 @@ import coursemaker.coursemaker.domain.review.dto.RequestCourseDto;
 import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.review.entity.CourseReview;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
+import coursemaker.coursemaker.domain.review.service.OrderBy;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
@@ -214,16 +215,18 @@ public class CourseReviewController {
     @Parameter(name = "courseId", description = "리뷰를 조회할 코스의 ID", required = true)
     @Parameter(name = "record", description = "페이지당 표시할 데이터 수")
     @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작합니다.)")
+    @Parameter(name = "orderBy", description = "정렬 기준 (NEWEST: 최신순, RECOMMEND: 추천순, RATING DOWN: 별점 낮은 순, RATING UP: 별점 높은 순 중 하나)", example = "NEWEST")
     @GetMapping
     public ResponseEntity<CourseMakerPagination<ResponseCourseDto>> getAllCourseReviewsByCourseId(
             @RequestParam(name = "courseId") Long courseId,
             @RequestParam(defaultValue = "20", name = "record") int record,
             @RequestParam(defaultValue = "1", name = "page") int page,
+            @RequestParam(name = "orderBy", defaultValue = "NEWEST") OrderBy orderBy,
             @AuthenticationPrincipal LoginedInfo logined) {
 
         Pageable pageable = PageRequest.of(page - 1, record);
 
-        CourseMakerPagination<CourseReview> reviewPage = courseReviewService.findAllByCourseId(courseId, pageable);
+        CourseMakerPagination<CourseReview> reviewPage = courseReviewService.findAllByCourseId(courseId, pageable, orderBy);
         List<CourseReview> reviewList = reviewPage.getContents();
 
         List<ResponseCourseDto> responseDtos = reviewList.stream()

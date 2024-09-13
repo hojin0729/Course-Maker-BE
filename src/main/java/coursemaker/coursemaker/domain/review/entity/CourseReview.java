@@ -41,4 +41,7 @@ public class CourseReview extends BaseEntity {
 
     @Column(name = "picture")
     private String picture;
+
+    @Column(name = "recommend_count")
+    private Integer recommendCount;
 }

@@ -104,12 +104,32 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     }
 
     @Override
-    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable) {
+    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable, OrderBy orderBy) {
         log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 시작 - 코스 ID: {}", courseId);
-        Page<CourseReview> page = courseReviewRepository.findByTravelCourseId(courseId, pageable);
-        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, page.getTotalElements());
-        return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
+
+        Page<CourseReview> reviews;
+        switch (orderBy) {
+            case RATING_UP:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRatingDesc(courseId, pageable); // 별점 높은 순
+                break;
+            case RATING_DOWN:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRatingAsc(courseId, pageable); // 별점 낮은 순
+                break;
+            case NEWEST:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByCreatedAtDesc(courseId, pageable); // 최신순
+                break;
+            case RECOMMEND:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRecommendCountDesc(courseId, pageable); // 추천순
+                break;
+            default:
+                reviews = courseReviewRepository.findByTravelCourseId(courseId, pageable); // 기본 정렬
+                break;
+        }
+
+        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, reviews.getTotalElements());
+        return new CourseMakerPagination<>(pageable, reviews, reviews.getTotalElements());
     }
+
 
     @Override
     public Double getAverageRating(Long courseId) {
