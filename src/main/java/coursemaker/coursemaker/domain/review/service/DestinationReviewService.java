@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.review.service;
 import coursemaker.coursemaker.domain.review.dto.RequestDestinationDto;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import coursemaker.coursemaker.util.CourseMakerPagination;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DestinationReviewService {
@@ -15,7 +16,8 @@ public interface DestinationReviewService {
     // id 기반으로 특정 여행지 리뷰 조회하는 메서드
     DestinationReview findById(Long id);
     // 여행지 리뷰 전체 보기
-    CourseMakerPagination<DestinationReview> findAllByDestinationId (Long destinationId, Pageable pageable);
+
+    CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable, OrderBy orderBy);
 
     // 특정 여행지의 평균 평점 조회
     Double getAverageRating(Long destinationId);

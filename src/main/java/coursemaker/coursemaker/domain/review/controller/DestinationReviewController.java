@@ -10,6 +10,8 @@ import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.review.dto.ResponseDestinationDto;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
+
+import coursemaker.coursemaker.domain.review.service.OrderBy;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
@@ -222,16 +224,18 @@ public class DestinationReviewController {
     @Parameter(name = "destinationId", description = "리뷰를 조회할 여행지의 ID", required = true, example = "1")
     @Parameter(name = "record", description = "페이지당 표시할 데이터 수", example = "20")
     @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작합니다.)", example = "1")
+    @Parameter(name = "orderBy", description = "정렬 기준 (NEWEST: 최신순, RECOMMEND: 추천순, RATING DOWN: 별점 낮은 순, RATING UP: 별점 높은 순 중 하나)", example = "NEWEST")
     @GetMapping
     public ResponseEntity<CourseMakerPagination<ResponseDestinationDto>> getAllDestinationReviews(
             @RequestParam(name = "destinationId") Long destinationId,
             @RequestParam(defaultValue = "20", name = "record") int record,
             @RequestParam(defaultValue = "1", name = "page") int page,
+            @RequestParam(name = "orderBy", defaultValue = "NEWEST") OrderBy orderBy,
             @AuthenticationPrincipal LoginedInfo logined) {
 
         Pageable pageable = PageRequest.of(page - 1, record);
 
-        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable);
+        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy);
         List<DestinationReview> reviewList = reviewPage.getContents();
 
         List<ResponseDestinationDto> responseDtos = reviewList.stream()

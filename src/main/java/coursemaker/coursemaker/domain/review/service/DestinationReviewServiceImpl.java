@@ -9,6 +9,7 @@ import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException;
 import coursemaker.coursemaker.domain.review.exception.ReviewNotFoundException;
 import coursemaker.coursemaker.domain.review.repository.DestinationReviewRepository;
+
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -107,13 +108,32 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
                 });
     }
 
+
     @Override
-    public CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable) {
+    public CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable, OrderBy orderBy) {
         log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 시작 - 여행지 ID: {}", destinationId);
-        Destination destination = destinationService.findById(destinationId);
-        Page<DestinationReview> page = destinationReviewRepository.findByDestination(destination, pageable);
-        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 완료 - 여행지 ID: {}, 총 리뷰 수: {}", destinationId, page.getTotalElements());
-        return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
+
+        Page<DestinationReview> reviews;
+        switch (orderBy) {
+            case RATING_UP:
+                reviews = destinationReviewRepository.findAllByDestinationIdOrderByRatingDesc(destinationId, pageable); // 별점 높은 순
+                break;
+            case RATING_DOWN:
+                reviews = destinationReviewRepository.findAllByDestinationIdOrderByRatingAsc(destinationId, pageable); // 별점 낮은 순
+                break;
+            case NEWEST:
+                reviews = destinationReviewRepository.findAllByDestinationIdOrderByCreatedAtDesc(destinationId, pageable); // 최신순
+                break;
+            case RECOMMEND:
+                reviews = destinationReviewRepository.findAllByDestinationIdOrderByRecommendCountDesc(destinationId, pageable); // 추천순
+                break;
+            default:
+                reviews = destinationReviewRepository.findAllByDestinationId(destinationId, pageable);
+                break;
+        }
+
+        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 완료 - 여행지 ID: {}, 총 리뷰 수: {}", destinationId, reviews.getTotalElements());
+        return new CourseMakerPagination<>(pageable, reviews, reviews.getTotalElements());
     }
 
     @Override

@@ -14,10 +14,17 @@ import java.util.Optional;
 @Repository
 public interface DestinationReviewRepository extends JpaRepository<DestinationReview, Long>{
     Optional<DestinationReview> findByMemberAndDestination(Member member, Destination destination);
-    Page<DestinationReview> findByDestination(Destination destination, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable);
     List<DestinationReview> findByDestinationId(Long destinationId);
 
     Integer countByDestinationId(Long destinationId);
 
     Page<DestinationReview> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationIdOrderByRatingDesc(Long destinationId, Pageable pageable); // 별점 높은 순
+
+    Page<DestinationReview> findAllByDestinationIdOrderByRatingAsc(Long destinationId, Pageable pageable);  // 별점 낮은 순
+
+    Page<DestinationReview> findAllByDestinationIdOrderByCreatedAtDesc(Long destinationId, Pageable pageable); // 최신순
+
+    Page<DestinationReview> findAllByDestinationIdOrderByRecommendCountDesc(Long destinationId, Pageable pageable); // 추천순
 }
