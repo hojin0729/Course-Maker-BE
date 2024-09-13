@@ -10,6 +10,8 @@ import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.review.dto.ResponseDestinationDto;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
+
+import coursemaker.coursemaker.domain.review.service.OrderBy;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
@@ -222,16 +224,18 @@ public class DestinationReviewController {
     @Parameter(name = "destinationId", description = "리뷰를 조회할 여행지의 ID", required = true, example = "1")
     @Parameter(name = "record", description = "페이지당 표시할 데이터 수", example = "20")
     @Parameter(name = "page", description = "조회할 페이지 번호 (페이지는 1부터 시작합니다.)", example = "1")
+    @Parameter(name = "orderBy", description = "정렬 기준 (NEWEST: 최신순, RECOMMEND: 추천순, RATING DOWN: 별점 낮은 순, RATING UP: 별점 높은 순 중 하나)", example = "NEWEST")
     @GetMapping
     public ResponseEntity<CourseMakerPagination<ResponseDestinationDto>> getAllDestinationReviews(
             @RequestParam(name = "destinationId") Long destinationId,
             @RequestParam(defaultValue = "20", name = "record") int record,
             @RequestParam(defaultValue = "1", name = "page") int page,
+            @RequestParam(name = "orderBy", defaultValue = "NEWEST") OrderBy orderBy,
             @AuthenticationPrincipal LoginedInfo logined) {
 
         Pageable pageable = PageRequest.of(page - 1, record);
 
-        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable);
+        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy);
         List<DestinationReview> reviewList = reviewPage.getContents();
 
         List<ResponseDestinationDto> responseDtos = reviewList.stream()
@@ -289,6 +293,73 @@ public class DestinationReviewController {
         );
 
         return ResponseEntity.ok(responseReviewPage);
+    }
+
+    @PostMapping("/{id}/recommend")
+    @Operation(summary = "리뷰 추천 추가", description = "리뷰에 대해 추천(좋아요)를 추가합니다. 로그인된 사용자만 이용 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추천이 성공적으로 추가되었습니다.", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
+            @ApiResponse(responseCode = "401", description = "로그인이 필요한 요청입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "해당 리뷰가 존재하지 않습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 리뷰가 없습니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<ResponseDestinationDto> addRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+        if (logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 추천 실패");
+        }
+
+        destinationReviewService.addRecommend(id, logined.getNickname());
+        DestinationReview updatedReview = destinationReviewService.findById(id);
+        Destination destination = destinationService.findById(updatedReview.getDestination().getId());
+        Boolean isMyDestinationReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+
+        ResponseDestinationDto responseDto = ResponseDestinationDto.toDto(destination, updatedReview, isMyDestinationReview);
+        return ResponseEntity.ok(responseDto);
+    }
+
+
+    @PostMapping("/{id}/unrecommend")
+    @Operation(summary = "리뷰 추천 취소", description = "리뷰에 대해 추가된 추천(좋아요)를 취소합니다. 로그인된 사용자만 이용 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추천이 성공적으로 취소되었습니다.", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
+            @ApiResponse(responseCode = "401", description = "로그인이 필요한 요청입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "해당 리뷰가 존재하지 않습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 리뷰가 없습니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<ResponseDestinationDto> removeRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+        if (logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 추천 취소 실패");
+        }
+
+        destinationReviewService.removeRecommend(id, logined.getNickname());
+        DestinationReview updatedReview = destinationReviewService.findById(id);
+        Destination destination = destinationService.findById(updatedReview.getDestination().getId());
+        Boolean isMyDestinationReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+
+        ResponseDestinationDto responseDto = ResponseDestinationDto.toDto(destination, updatedReview, isMyDestinationReview);
+        return ResponseEntity.ok(responseDto);
     }
 
 }

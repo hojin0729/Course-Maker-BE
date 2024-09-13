@@ -6,8 +6,10 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.review.dto.RequestCourseDto;
 import coursemaker.coursemaker.domain.review.entity.CourseReview;
+import coursemaker.coursemaker.domain.review.entity.CourseReviewRecommendation;
 import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException;
 import coursemaker.coursemaker.domain.review.exception.ReviewNotFoundException;
+import coursemaker.coursemaker.domain.review.repository.CourseReviewRecommendationRepository;
 import coursemaker.coursemaker.domain.review.repository.CourseReviewRepository;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.util.CourseMakerPagination;
@@ -29,13 +31,15 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     private final CourseService courseService;
     private final TagService tagService;
     private final MemberService memberService;
+    private final CourseReviewRecommendationRepository courseReviewRecommendationRepository;
 
     @Autowired
-    public CourseReviewServiceImpl(CourseReviewRepository courseReviewRepository, CourseService courseService, TagService tagService, MemberService memberService) {
+    public CourseReviewServiceImpl(CourseReviewRepository courseReviewRepository, CourseService courseService, TagService tagService, MemberService memberService, CourseReviewRecommendationRepository courseReviewRecommendationRepository) {
         this.courseReviewRepository = courseReviewRepository;
         this.courseService = courseService;
         this.tagService = tagService;
         this.memberService = memberService;
+        this.courseReviewRecommendationRepository = courseReviewRecommendationRepository;
     }
 
     @Override
@@ -74,7 +78,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
         existingReview.setTitle(requestCourseDto.getTitle());
         existingReview.setDescription(requestCourseDto.getDescription());
-        existingReview.setPicture(requestCourseDto.getPicture());
+        existingReview.setPictures(requestCourseDto.getPictures());
         existingReview.setRating(requestCourseDto.getRating());
 
         CourseReview updatedReview = courseReviewRepository.save(existingReview);
@@ -104,12 +108,32 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     }
 
     @Override
-    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable) {
+    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable, OrderBy orderBy) {
         log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 시작 - 코스 ID: {}", courseId);
-        Page<CourseReview> page = courseReviewRepository.findByTravelCourseId(courseId, pageable);
-        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, page.getTotalElements());
-        return new CourseMakerPagination<>(pageable, page, page.getTotalElements());
+
+        Page<CourseReview> reviews;
+        switch (orderBy) {
+            case RATING_UP:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRatingDesc(courseId, pageable); // 별점 높은 순
+                break;
+            case RATING_DOWN:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRatingAsc(courseId, pageable); // 별점 낮은 순
+                break;
+            case NEWEST:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByCreatedAtDesc(courseId, pageable); // 최신순
+                break;
+            case RECOMMEND:
+                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRecommendCountDesc(courseId, pageable); // 추천순
+                break;
+            default:
+                reviews = courseReviewRepository.findByTravelCourseId(courseId, pageable); // 기본 정렬
+                break;
+        }
+
+        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, reviews.getTotalElements());
+        return new CourseMakerPagination<>(pageable, reviews, reviews.getTotalElements());
     }
+
 
     @Override
     public Double getAverageRating(Long courseId) {
@@ -148,6 +172,42 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         Page<CourseReview> page = courseReviewRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
         long total = page.getTotalElements();
         return new CourseMakerPagination<>(pageable, page, total);
+    }
+
+    @Override
+    public void addRecommend(Long reviewId, String nickname) {
+        Member member = memberService.findByNickname(nickname);
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] reviewId: " + reviewId));
+
+        // 이미 추천했는지 확인
+        if (courseReviewRecommendationRepository.findByCourseReviewAndMember(review, member).isPresent()) {
+            throw new IllegalStateException("이미 이 리뷰에 추천을 했습니다.");
+        }
+
+        // 추천 추가
+        CourseReviewRecommendation recommendation = new CourseReviewRecommendation();
+        recommendation.setCourseReview(review);
+        recommendation.setMember(member);
+        courseReviewRecommendationRepository.save(recommendation);
+
+        review.setRecommendCount(review.getRecommendCount() + 1);
+        courseReviewRepository.save(review);
+    }
+
+    @Override
+    public void removeRecommend(Long reviewId, String nickname) {
+        Member member = memberService.findByNickname(nickname);
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] reviewId: " + reviewId));
+
+        // 추천 기록을 찾고 삭제
+        CourseReviewRecommendation recommendation = courseReviewRecommendationRepository.findByCourseReviewAndMember(review, member)
+                .orElseThrow(() -> new IllegalStateException("추천한 적이 없습니다."));
+        courseReviewRecommendationRepository.delete(recommendation);
+
+        review.setRecommendCount(Math.max(0, review.getRecommendCount() - 1));
+        courseReviewRepository.save(review);
     }
 }
 
