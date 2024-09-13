@@ -45,6 +45,9 @@ public class ResponseCourseDto {
     @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
     private Boolean isMyCourseReview;
 
+    @Schema(description = "리뷰 좋아요 수", example = "10")
+    private Integer recommendCount;
+
     public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview) {
         ResponseCourseDto dto = new ResponseCourseDto();
         dto.setCourseId(travelCourse.getId());
@@ -55,6 +58,7 @@ public class ResponseCourseDto {
         dto.setRating(courseReview.getRating());
         dto.setReviewId(courseReview.getId());
         dto.setIsMyCourseReview(isMyCourseReview);
+        dto.setRecommendCount(courseReview.getRecommendCount());
         return dto;
     }
 }

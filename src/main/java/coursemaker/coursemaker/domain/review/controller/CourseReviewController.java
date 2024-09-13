@@ -288,4 +288,69 @@ public class CourseReviewController {
 
         return ResponseEntity.ok(responseReviewPage);
     }
+
+    @PostMapping("/{id}/recommend")
+    @Operation(summary = "코스 리뷰 추천 추가", description = "코스 리뷰에 대해 추천(좋아요)를 추가합니다. 로그인된 사용자만 이용 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추천이 성공적으로 추가되었습니다.", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
+            @ApiResponse(responseCode = "401", description = "로그인이 필요한 요청입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "해당 리뷰가 존재하지 않습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당 리뷰가 없습니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<ResponseCourseDto> addRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+        if (logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 추천 실패");
+        }
+        courseReviewService.addRecommend(id, logined.getNickname());
+        CourseReview updatedReview = courseReviewService.findById(id);
+        TravelCourse travelCourse = courseService.findById(updatedReview.getTravelCourse().getId());
+        Boolean isMyCourseReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+
+        ResponseCourseDto responseDto = ResponseCourseDto.toDto(travelCourse, updatedReview, isMyCourseReview);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/{id}/unrecommend")
+    @Operation(summary = "코스 리뷰 추천 취소", description = "코스 리뷰에 대해 추가된 추천(좋아요)를 취소합니다. 로그인된 사용자만 이용 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추천이 성공적으로 취소되었습니다.", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
+            @ApiResponse(responseCode = "401", description = "로그인이 필요한 요청입니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "해당 리뷰가 존재하지 않습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당 리뷰가 없습니다.\"}"
+                    )
+            ))
+    })
+    public ResponseEntity<ResponseCourseDto> removeRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+        if (logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 추천 취소 실패");
+        }
+        courseReviewService.removeRecommend(id, logined.getNickname());
+        CourseReview updatedReview = courseReviewService.findById(id);
+        TravelCourse travelCourse = courseService.findById(updatedReview.getTravelCourse().getId());
+        Boolean isMyCourseReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+
+        ResponseCourseDto responseDto = ResponseCourseDto.toDto(travelCourse, updatedReview, isMyCourseReview);
+        return ResponseEntity.ok(responseDto);
+    }
+
 }

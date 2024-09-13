@@ -23,5 +23,8 @@ public interface CourseReviewService {
     Integer getReviewCount(Long courseId);
 
     CourseMakerPagination<CourseReview> findByMemberNickname(String nickname, Pageable pageable);
+
+    void addRecommend(Long reviewId, String nickname);
+    void removeRecommend(Long reviewId, String nickname);
 }
 

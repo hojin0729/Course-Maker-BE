@@ -6,8 +6,10 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.review.dto.RequestCourseDto;
 import coursemaker.coursemaker.domain.review.entity.CourseReview;
+import coursemaker.coursemaker.domain.review.entity.CourseReviewRecommendation;
 import coursemaker.coursemaker.domain.review.exception.DuplicatedReviewException;
 import coursemaker.coursemaker.domain.review.exception.ReviewNotFoundException;
+import coursemaker.coursemaker.domain.review.repository.CourseReviewRecommendationRepository;
 import coursemaker.coursemaker.domain.review.repository.CourseReviewRepository;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.util.CourseMakerPagination;
@@ -29,13 +31,15 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     private final CourseService courseService;
     private final TagService tagService;
     private final MemberService memberService;
+    private final CourseReviewRecommendationRepository courseReviewRecommendationRepository;
 
     @Autowired
-    public CourseReviewServiceImpl(CourseReviewRepository courseReviewRepository, CourseService courseService, TagService tagService, MemberService memberService) {
+    public CourseReviewServiceImpl(CourseReviewRepository courseReviewRepository, CourseService courseService, TagService tagService, MemberService memberService, CourseReviewRecommendationRepository courseReviewRecommendationRepository) {
         this.courseReviewRepository = courseReviewRepository;
         this.courseService = courseService;
         this.tagService = tagService;
         this.memberService = memberService;
+        this.courseReviewRecommendationRepository = courseReviewRecommendationRepository;
     }
 
     @Override
@@ -168,6 +172,42 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         Page<CourseReview> page = courseReviewRepository.findByMemberNicknameAndDeletedAtIsNull(nickname, pageable);
         long total = page.getTotalElements();
         return new CourseMakerPagination<>(pageable, page, total);
+    }
+
+    @Override
+    public void addRecommend(Long reviewId, String nickname) {
+        Member member = memberService.findByNickname(nickname);
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] reviewId: " + reviewId));
+
+        // 이미 추천했는지 확인
+        if (courseReviewRecommendationRepository.findByCourseReviewAndMember(review, member).isPresent()) {
+            throw new IllegalStateException("이미 이 리뷰에 추천을 했습니다.");
+        }
+
+        // 추천 추가
+        CourseReviewRecommendation recommendation = new CourseReviewRecommendation();
+        recommendation.setCourseReview(review);
+        recommendation.setMember(member);
+        courseReviewRecommendationRepository.save(recommendation);
+
+        review.setRecommendCount(review.getRecommendCount() + 1);
+        courseReviewRepository.save(review);
+    }
+
+    @Override
+    public void removeRecommend(Long reviewId, String nickname) {
+        Member member = memberService.findByNickname(nickname);
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] reviewId: " + reviewId));
+
+        // 추천 기록을 찾고 삭제
+        CourseReviewRecommendation recommendation = courseReviewRecommendationRepository.findByCourseReviewAndMember(review, member)
+                .orElseThrow(() -> new IllegalStateException("추천한 적이 없습니다."));
+        courseReviewRecommendationRepository.delete(recommendation);
+
+        review.setRecommendCount(Math.max(0, review.getRecommendCount() - 1));
+        courseReviewRepository.save(review);
     }
 }
 
