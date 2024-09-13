@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 public class ResponseCourseDto {
@@ -32,10 +34,9 @@ public class ResponseCourseDto {
     @NotBlank(message = "리뷰 설명은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String description;
 
-    @Schema(description = "리뷰 사진 URL", example = "http://example.com/review.jpg")
+    @Schema(description = "리뷰 사진 URL 목록", example = "[\"http://example.com/review1.jpg\", \"http://example.com/review2.jpg\"]")
     @NotNull(message = "리뷰 사진 URL을 입력하세요.")
-    @NotBlank(message = "리뷰 사진 URL은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    private String picture;
+    private List<String> pictures;
 
     @Schema(description = "평점", example = "4.5")
     @NotNull(message = "평점을 입력하세요.")
@@ -50,7 +51,7 @@ public class ResponseCourseDto {
         dto.setNickname(courseReview.getMember().getNickname());
         dto.setTitle(courseReview.getTitle());
         dto.setDescription(courseReview.getDescription());
-        dto.setPicture(courseReview.getPicture());
+        dto.setPictures(courseReview.getPictures());
         dto.setRating(courseReview.getRating());
         dto.setReviewId(courseReview.getId());
         dto.setIsMyCourseReview(isMyCourseReview);

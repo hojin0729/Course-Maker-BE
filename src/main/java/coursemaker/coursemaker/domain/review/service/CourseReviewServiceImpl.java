@@ -74,7 +74,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
 
         existingReview.setTitle(requestCourseDto.getTitle());
         existingReview.setDescription(requestCourseDto.getDescription());
-        existingReview.setPicture(requestCourseDto.getPicture());
+        existingReview.setPictures(requestCourseDto.getPictures());
         existingReview.setRating(requestCourseDto.getRating());
 
         CourseReview updatedReview = courseReviewRepository.save(existingReview);
