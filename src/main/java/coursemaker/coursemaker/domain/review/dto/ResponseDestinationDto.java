@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ResponseDestinationDto {
     @Schema(description = "여행지 ID", example = "1")
@@ -29,10 +31,9 @@ public class ResponseDestinationDto {
     @NotBlank(message = "리뷰 설명은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String description;
 
-    @Schema(description = "리뷰 사진 URL", example = "http://example.com/destination.jpg")
-    @NotNull(message = "리뷰 사진 URL을 입력하세요.")
-    @NotBlank(message = "리뷰 사진 URL은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    private String picture;
+    @Schema(description = "리뷰 사진 URL 목록", example = "[\"http://example.com/pic1.jpg\", \"http://example.com/pic2.jpg\"]")
+    @NotNull(message = "리뷰 사진 URL 목록을 입력하세요.")
+    private List<String> pictures;
 
     @Schema(description = "평점", example = "4.8")
     @NotNull(message = "평점을 입력하세요.")
@@ -48,7 +49,7 @@ public class ResponseDestinationDto {
         dto.setNickname(destinationReview.getMember().getNickname());
         dto.setTitle(destinationReview.getTitle());
         dto.setDescription(destinationReview.getDescription());
-        dto.setPicture(destinationReview.getPicture());
+        dto.setPictures(destinationReview.getPictures());
         dto.setRating(destinationReview.getRating());
         dto.setReviewId(destinationReview.getId());
         dto.setIsMyDestinationReview(isMyDestinationReview);

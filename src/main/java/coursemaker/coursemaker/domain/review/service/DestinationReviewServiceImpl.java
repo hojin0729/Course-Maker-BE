@@ -78,7 +78,7 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
         existingReview.setTitle(requestDestinationDto.getTitle());
         existingReview.setDescription(requestDestinationDto.getDescription());
-        existingReview.setPicture(requestDestinationDto.getPicture());
+        existingReview.setPictures(requestDestinationDto.getPictures());
         existingReview.setRating(requestDestinationDto.getRating());
 
         DestinationReview updatedReview = destinationReviewRepository.save(existingReview);
