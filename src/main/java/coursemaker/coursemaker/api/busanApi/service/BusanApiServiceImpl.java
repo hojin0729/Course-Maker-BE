@@ -54,20 +54,23 @@ public class BusanApiServiceImpl implements BusanApiService {
                 .queryParam("serviceKey", serviceKey)
                 .build(true)
                 .toUri();
+
+        log.info("[BusanApi] 부산 API 초기 업데이트 시작, 요청 URI: {}", uri);
+
         try {
             String responseBody = webClientBuilder.build().get()
                     .uri(uri)
                     .retrieve()
                     .onStatus(status -> status.value() >= 400, clientResponse -> {
-                        log.error("Error response code: {}", clientResponse.statusCode().value());
+                        log.error("[BusanApi] API 오류 응답 코드: {}", clientResponse.statusCode().value());
                         return clientResponse.bodyToMono(String.class)
                                 .flatMap(errorBody -> {
-                                    log.error("Error body: {}", errorBody);
-                                    return Mono.error(new RuntimeException("Error response from API: " + clientResponse.statusCode().value() + " " + errorBody));
+                                    log.error("[BusanApi] API 오류 응답 본문: {}", errorBody);
+                                    return Mono.error(new RuntimeException("API 오류 응답: " + clientResponse.statusCode().value() + " " + errorBody));
                                 });
                     })
                     .bodyToMono(String.class)  // 일단 String으로 응답 받기
-                    .doOnNext(res -> log.debug("Received raw response: {}", res))
+                    .doOnNext(res -> log.debug("[BusanApi] 받은 원시 응답: {}", res))
                     .block();
 
             // Raw response를 DTO로 변환
@@ -75,6 +78,7 @@ public class BusanApiServiceImpl implements BusanApiService {
             BusanApiResponse response = objectMapper.readValue(responseBody, BusanApiResponse.class);
 
             if (response != null && response.getResponse() != null && response.getResponse().getBody() != null && response.getResponse().getBody().getItems().getItem() != null) {
+                log.info("[BusanApi] 부산 API 초기 업데이트 응답 수신: {} 개 항목", response.getResponse().getBody().getItems().getItem().size());
                 List<BusanApi> tourList = response.getResponse().getBody().getItems().getItem().stream()
                         .map(this::convertToEntity)
                         .collect(Collectors.toList());
@@ -82,22 +86,25 @@ public class BusanApiServiceImpl implements BusanApiService {
                     tourList.forEach(this::saveOrUpdateTour);
                 }
             } else {
-                log.error("Received null or incomplete response");
+                log.error("[BusanApi] 받은 응답이 null이거나 불완전함");
             }
             return response;
         } catch (Exception e) {
-            log.error("Exception occurred while updating tours: ", e);
-            throw new RuntimeException("Failed to update tours", e);
+            log.error("[BusanApi] 투어 업데이트 중 예외 발생: ", e);
+            throw new RuntimeException("투어 업데이트 실패", e);
         }
     }
 
     @Override
     public void busanConvertAndSaveToDestination() {
+        log.info("[BusanApi] 부산 API 데이터를 Destination으로 변환 및 저장 시작");
         List<BusanApi> busanApis = busanApiRepository.findAll();
+        log.debug("[BusanApi] 부산 API 데이터 조회 완료: {} 개 항목", busanApis.size());
         for (BusanApi busanApi : busanApis) {
             // Destination 테이블에 이미 해당 BusanApi의 seq가 있는지 확인
             Optional<Destination> existingDestination = destinationRepository.findBySeqAndDeletedAtIsNull(busanApi.getSeq());
             if (existingDestination.isEmpty()) {
+                log.info("[BusanApi] 새로운 Destination 저장: seq={}", busanApi.getSeq());
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
                 RequestDto dto = new RequestDto();
                 LocationDto locationDto = new LocationDto(busanApi.getStartAddr(), null, null);
@@ -171,11 +178,15 @@ public class BusanApiServiceImpl implements BusanApiService {
                 dto.setNickname(adminMember.get().getNickname());
                 dto.setTags(List.of(trailTag));
                 destinationService.save(dto);
+            } else {
+                log.debug("[BusanApi] 기존 Destination 존재: seq={}", busanApi.getSeq());
             }
         }
+        log.info("[BusanApi] 부산 API 데이터를 Destination으로 변환 및 저장 완료");
     }
 
     private BusanApi convertToEntity(BusanApiResponse.Item item) {
+        log.debug("[BusanApi] Busan API 응답 항목을 엔티티로 변환: seq={}", item.getSeq());
         return BusanApi.builder()
                 .guganNm(item.getGuganNm())
                 .courseNm(item.getCourseNm())
@@ -196,6 +207,7 @@ public class BusanApiServiceImpl implements BusanApiService {
     private synchronized void saveOrUpdateTour(BusanApi busanApi) {
         Optional<BusanApi> existingTour = busanApiRepository.findBySeq(busanApi.getSeq());
         if (existingTour.isPresent()) {
+            log.info("[BusanApi] 기존 투어 업데이트: seq={}", busanApi.getSeq());
             BusanApi existing = existingTour.get();
             existing.setGuganNm(busanApi.getGuganNm());
             existing.setCourseNm(busanApi.getCourseNm());
@@ -212,6 +224,7 @@ public class BusanApiServiceImpl implements BusanApiService {
             existing.setGmText(busanApi.getGmText());
             busanApiRepository.save(existing);
         } else {
+            log.info("[BusanApi] 새로운 투어 저장: seq={}", busanApi.getSeq());
             busanApiRepository.save(busanApi);
         }
     }

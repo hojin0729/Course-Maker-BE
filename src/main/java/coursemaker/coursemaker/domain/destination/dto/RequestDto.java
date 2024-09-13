@@ -65,16 +65,37 @@ public class RequestDto {
         Destination destination = new Destination();
         destination.setMember(member);
         destination.setName(this.name);
-        destination.setPictureLink(this.pictureLink);
+
+        if (this.pictureLink == null || this.pictureLink.isEmpty() || this.pictureLink.isBlank()) {
+            destination.setPictureLink("https://i.ibb.co/XsNmR3Q/url-null.jpg");
+        } else {
+            destination.setPictureLink(this.pictureLink);
+        }
+
         destination.setContent(this.content);
         destination.setLocation(this.location.getAddress());
         destination.setLongitude(this.location.getLongitude());
         destination.setLatitude(this.location.getLatitude());
         destination.setAverageRating(this.averageRating);
-        destination.setDisabled(this.disabled);
+
+        if (this.disabled == null) {
+            destination.setDisabled(false);
+        } else {
+            destination.setDisabled(this.disabled);
+        }
+
         destination.setContentId(this.contentId);
-        destination.setIsApiData(this.isApiData);
+
+        if (this.isApiData == null) {
+            destination.setIsApiData(false);
+        } else {
+            destination.setIsApiData(this.isApiData);
+        }
         destination.setSeq(this.seq);
+
+        destination.setWishCount(0);
+        destination.setLikeCount(0);
+        destination.setReviewCount(0);
 
         return destination;
     }

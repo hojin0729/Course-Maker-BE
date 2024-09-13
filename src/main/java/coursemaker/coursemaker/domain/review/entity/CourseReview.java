@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
+
 import org.springframework.data.annotation.CreatedDate;
 
 @Entity
@@ -39,6 +41,11 @@ public class CourseReview extends BaseEntity {
     @JoinColumn(name = "courseId")
     private TravelCourse travelCourse;
 
+    @ElementCollection
+    @CollectionTable(name = "course_review_pictures", joinColumns = @JoinColumn(name = "review_id"))
     @Column(name = "picture")
-    private String picture;
+    private List<String> pictures;
+
+    @Column(name = "recommend_count")
+    private Integer recommendCount = 0;
 }

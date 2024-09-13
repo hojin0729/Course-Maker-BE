@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -37,7 +38,12 @@ public class DestinationReview extends BaseEntity {
     @JoinColumn(name = "destinationId")
     private Destination destination;
 
+    @ElementCollection
+    @CollectionTable(name = "destination_review_pictures", joinColumns = @JoinColumn(name = "review_id"))
     @Column(name = "picture")
-    private String picture;
+    private List<String> pictures;
+
+    @Column(name = "recommend_count")
+    private Integer recommendCount = 0;
 
 }

@@ -66,7 +66,8 @@ public class TravelCourse extends BaseEntity {
 //    private List<CourseTag> courseTags = new ArrayList<>();
 
     @Builder
-    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member, Double averageRating) {
+    public TravelCourse(String title, String content, int duration, int travelerCount, int travelType, String pictureLink, Member member, Double averageRating,
+                        Integer wishCount, Integer likeCount, Integer reviewCount) {
         this.title = title;
         this.content = content;
         this.views = 0;
@@ -76,6 +77,9 @@ public class TravelCourse extends BaseEntity {
         this.pictureLink = pictureLink;
         this.member = member;
         this.averageRating = averageRating;
+        this.wishCount = wishCount;
+        this.likeCount = likeCount;
+        this.reviewCount = reviewCount;
     }
 
     public void update(String title, String content, int duration, int travelerCount, int travelType, String pictureLink) {
