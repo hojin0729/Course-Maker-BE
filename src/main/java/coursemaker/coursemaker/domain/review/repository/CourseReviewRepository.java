@@ -20,4 +20,16 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
     Integer countByTravelCourseId(Long courseId);
 
     Page<CourseReview> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
+
+    // 별점 높은 순
+    Page<CourseReview> findAllByTravelCourseIdOrderByRatingDesc(Long courseId, Pageable pageable);
+
+    // 별점 낮은 순
+    Page<CourseReview> findAllByTravelCourseIdOrderByRatingAsc(Long courseId, Pageable pageable);
+
+    // 최신순
+    Page<CourseReview> findAllByTravelCourseIdOrderByCreatedAtDesc(Long courseId, Pageable pageable);
+
+    // 추천순
+    Page<CourseReview> findAllByTravelCourseIdOrderByRecommendCountDesc(Long courseId, Pageable pageable);
 }

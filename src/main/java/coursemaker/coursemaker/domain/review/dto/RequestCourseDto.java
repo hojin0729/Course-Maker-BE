@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class RequestCourseDto {
@@ -24,10 +25,9 @@ public class RequestCourseDto {
     @NotBlank(message = "리뷰 설명은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String description;
 
-    @Schema(description = "리뷰 사진 URL", example = "http://example.com/review.jpg")
+    @Schema(description = "리뷰 사진 URL 목록", example = "[\"http://example.com/review1.jpg\", \"http://example.com/review2.jpg\"]")
     @NotNull(message = "리뷰 사진 URL을 입력하세요.")
-    @NotBlank(message = "리뷰 사진 URL은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    private String picture;
+    private List<String> pictures;
 
     @Schema(description = "평점", example = "4.5")
     @NotNull(message = "평점을 입력하세요.")
@@ -38,7 +38,7 @@ public class RequestCourseDto {
         courseReview.setMember(member);
         courseReview.setTitle(this.title);
         courseReview.setDescription(this.description);
-        courseReview.setPicture(this.picture);
+        courseReview.setPictures(this.pictures);
         courseReview.setRating(this.rating);
         return courseReview;
     }
