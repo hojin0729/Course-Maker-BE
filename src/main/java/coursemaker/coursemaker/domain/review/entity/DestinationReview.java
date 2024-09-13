@@ -44,6 +44,6 @@ public class DestinationReview extends BaseEntity {
     private List<String> pictures;
 
     @Column(name = "recommend_count")
-    private Integer recommendCount;
+    private Integer recommendCount = 0;
 
 }

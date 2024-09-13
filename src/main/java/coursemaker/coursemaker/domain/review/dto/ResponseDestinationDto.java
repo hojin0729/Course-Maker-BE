@@ -42,6 +42,10 @@ public class ResponseDestinationDto {
     @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
     private Boolean isMyDestinationReview;
 
+    @Schema(description = "리뷰 좋아요 수", example = "10")
+    private Integer recommendCount;
+
+
 
     public static ResponseDestinationDto toDto(Destination destination, DestinationReview destinationReview, Boolean isMyDestinationReview) {
         ResponseDestinationDto dto = new ResponseDestinationDto();
@@ -53,6 +57,7 @@ public class ResponseDestinationDto {
         dto.setRating(destinationReview.getRating());
         dto.setReviewId(destinationReview.getId());
         dto.setIsMyDestinationReview(isMyDestinationReview);
+        dto.setRecommendCount(destinationReview.getRecommendCount());
         return dto;
     }
 }
