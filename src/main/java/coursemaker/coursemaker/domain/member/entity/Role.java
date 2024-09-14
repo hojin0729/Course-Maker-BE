@@ -24,18 +24,23 @@ public enum Role {
 
         switch (role) {
             case "ADMIN":
+            case "ROLE_ADMIN":
                 result = ADMIN.roleKor;
                 break;
             case "PARTNER":
+            case "ROLE_PARTNER":
                 result = PARTNER.roleKor;
                 break;
             case "BEGINNER_TRAVELER":
+            case "ROLE_BEGINNER_TRAVELER":
                 result = BEGINNER_TRAVELER.roleKor;
                 break;
             case "INTERMEDIATE_TRAVELER":
+            case "ROLE_INTERMEDIATE_TRAVELER":
                 result = INTERMEDIATE_TRAVELER.roleKor;
                 break;
             case "PRO_TRAVELER":
+            case "ROLE_PRO_TRAVELER":
                 result = PRO_TRAVELER.roleKor;
                 break;
             }
