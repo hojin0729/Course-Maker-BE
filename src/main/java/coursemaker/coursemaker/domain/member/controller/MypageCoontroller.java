@@ -6,7 +6,6 @@ import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.member.service.MypageService;
-import coursemaker.coursemaker.domain.tag.service.OrderBy;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,14 +85,12 @@ public class MypageCoontroller {
     @Parameters({
             @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
             @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)"),
-            @Parameter(name = "tagIds", description = "태그를 선택하지 않으면 전체 태그로 조회됩니다."),
-            @Parameter(name = "orderBy", description = "정렬하는 기능을 나타냅니다. NEWEST는 최신순을 의미합니다.")
     })
     @GetMapping("/course")
     public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> getMyCourse(@AuthenticationPrincipal LoginedInfo loginedInfo,
                                                                                    @RequestParam(defaultValue = "20", name = "record") Integer record,
-                                                                                   @RequestParam(defaultValue = "1", name = "page") Integer page,
-                                                                                   @RequestParam(defaultValue = "NEWEST", name = "orderBy") OrderBy orderBy) {
+                                                                                   @RequestParam(defaultValue = "1", name = "page") Integer page
+    ) {
         if(loginedInfo == null) {
             throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
         }
