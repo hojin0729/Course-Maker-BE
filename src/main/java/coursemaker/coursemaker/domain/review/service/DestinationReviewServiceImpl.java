@@ -80,7 +80,6 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
                     return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] nickname: " + nickname);
                 });
 
-        existingReview.setTitle(requestDestinationDto.getTitle());
         existingReview.setDescription(requestDestinationDto.getDescription());
         existingReview.setPictures(requestDestinationDto.getPictures());
         existingReview.setRating(requestDestinationDto.getRating());

@@ -76,7 +76,6 @@ public class CourseReviewServiceImpl implements CourseReviewService {
                     return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] nickname: " + nickname);
                 });
 
-        existingReview.setTitle(requestCourseDto.getTitle());
         existingReview.setDescription(requestCourseDto.getDescription());
         existingReview.setPictures(requestCourseDto.getPictures());
         existingReview.setRating(requestCourseDto.getRating());
