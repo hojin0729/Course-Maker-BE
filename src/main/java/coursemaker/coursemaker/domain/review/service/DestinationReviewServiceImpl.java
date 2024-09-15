@@ -212,4 +212,14 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
         review.setRecommendCount(Math.max(0, review.getRecommendCount() - 1));
         destinationReviewRepository.save(review);
     }
+
+    @Override
+    public boolean isReviewRecommendedByUser(Long reviewId, String nickname) {
+        Member member = memberService.findByNickname(nickname);
+        DestinationReview review = destinationReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] reviewId: " + reviewId));
+
+        return destinationReviewRecommendationRepository.findByDestinationReviewAndMember(review, member).isPresent();
+    }
+
 }

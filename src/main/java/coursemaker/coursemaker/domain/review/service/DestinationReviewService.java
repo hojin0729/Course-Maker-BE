@@ -28,4 +28,6 @@ public interface DestinationReviewService {
 
     void addRecommend(Long reviewId, String nickname);
     void removeRecommend(Long reviewId, String nickname);
+
+    boolean isReviewRecommendedByUser(Long reviewId, String nickname);
 }

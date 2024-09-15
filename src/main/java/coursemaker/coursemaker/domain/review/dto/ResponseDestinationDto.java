@@ -38,6 +38,9 @@ public class ResponseDestinationDto {
     @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
     private Boolean isMyDestinationReview;
 
+    @Schema(description = "내가 좋아요를 누른 리뷰인지 여부", example = "true")
+    private Boolean isMyLikeReview;
+
     @Schema(description = "리뷰 좋아요 수", example = "10")
     private Integer recommendCount;
 
@@ -46,7 +49,7 @@ public class ResponseDestinationDto {
 
 
 
-    public static ResponseDestinationDto toDto(Destination destination, DestinationReview destinationReview, Boolean isMyDestinationReview) {
+    public static ResponseDestinationDto toDto(Destination destination, DestinationReview destinationReview, Boolean isMyDestinationReview, Boolean isMyLikeReview) {
         ResponseDestinationDto dto = new ResponseDestinationDto();
         dto.setDestinationId(destination.getId());
         dto.setNickname(destinationReview.getMember().getNickname());
@@ -55,6 +58,7 @@ public class ResponseDestinationDto {
         dto.setRating(destinationReview.getRating());
         dto.setReviewId(destinationReview.getId());
         dto.setIsMyDestinationReview(isMyDestinationReview);
+        dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(destinationReview.getRecommendCount());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         dto.setReviewedAt(destinationReview.getReviewedAt().format(formatter));
