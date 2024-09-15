@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -43,6 +44,9 @@ public class ResponseCourseDto {
     @Schema(description = "리뷰 좋아요 수", example = "10")
     private Integer recommendCount;
 
+    @Schema(description = "리뷰 작성 날짜", example = "2024-09-14")
+    private String reviewedAt;
+
     public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview) {
         ResponseCourseDto dto = new ResponseCourseDto();
         dto.setCourseId(travelCourse.getId());
@@ -53,6 +57,8 @@ public class ResponseCourseDto {
         dto.setReviewId(courseReview.getId());
         dto.setIsMyCourseReview(isMyCourseReview);
         dto.setRecommendCount(courseReview.getRecommendCount());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        dto.setReviewedAt(courseReview.getReviewedAt().format(formatter));
         return dto;
     }
 }
