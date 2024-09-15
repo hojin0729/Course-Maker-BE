@@ -208,5 +208,18 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         review.setRecommendCount(Math.max(0, review.getRecommendCount() - 1));
         courseReviewRepository.save(review);
     }
+
+    @Override
+    public boolean isReviewRecommendedByUser(Long reviewId, String nickname) {
+        // 사용자의 정보를 가져옴
+        Member member = memberService.findByNickname(nickname);
+
+        // 리뷰 정보를 가져옴
+        CourseReview review = courseReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] reviewId: " + reviewId));
+
+        // 추천 여부 확인
+        return courseReviewRecommendationRepository.findByCourseReviewAndMember(review, member).isPresent();
+    }
 }
 

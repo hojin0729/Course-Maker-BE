@@ -60,8 +60,9 @@ public class CourseReviewController {
                                                                  @AuthenticationPrincipal LoginedInfo logined) {
         CourseReview courseReview = courseReviewService.findById(id);
         Boolean isMyCourseReview = logined != null && logined.getNickname().equals(courseReview.getMember().getNickname());
+        Boolean isMyLikeReview = logined != null && courseReviewService.isReviewRecommendedByUser(id, logined.getNickname());
         TravelCourse travelCourse = courseService.findById(courseReview.getTravelCourse().getId());
-        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview);
+        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview, isMyLikeReview);
         return ResponseEntity.ok(responseCourseDto);
     }
 
@@ -105,8 +106,9 @@ public class CourseReviewController {
         CourseReview savedCourseReview = courseReviewService.save(requestCourseDto, courseId);
         // 로그인한 사용자와 리뷰 작성자가 같은지 여부를 확인
         Boolean isMyCourseReview = logined.getNickname().equals(savedCourseReview.getMember().getNickname());
+        Boolean isMyLikeReview = false;
         TravelCourse travelCourse = courseService.findById(courseId);
-        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, savedCourseReview, isMyCourseReview);
+        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, savedCourseReview, isMyCourseReview, isMyLikeReview);
         return ResponseEntity.created(URI.create("/v1/coursereview/" + savedCourseReview.getId())).body(responseCourseDto);
     }
 
@@ -160,7 +162,8 @@ public class CourseReviewController {
         CourseReview updatedCourseReview = courseReviewService.update(courseId, requestCourseDto, nickname);
         TravelCourse travelCourse = courseService.findById(courseId);
         Boolean isMyCourseReview = logined.getNickname().equals(updatedCourseReview.getMember().getNickname());
-        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, updatedCourseReview, isMyCourseReview);
+        Boolean isMyLikeReview = courseReviewService.isReviewRecommendedByUser(updatedCourseReview.getId(), logined.getNickname());
+        ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, updatedCourseReview, isMyCourseReview, isMyLikeReview);
         return ResponseEntity.ok(responseCourseDto);
     }
 
@@ -233,7 +236,8 @@ public class CourseReviewController {
                 .map(review -> {
                     TravelCourse travelCourse = courseService.findById(review.getTravelCourse().getId());
                     Boolean isMyCourseReview = logined != null && logined.getNickname().equals(review.getMember().getNickname());
-                    return ResponseCourseDto.toDto(travelCourse, review, isMyCourseReview);
+                    Boolean isMyLikeReview = logined != null && courseReviewService.isReviewRecommendedByUser(review.getId(), logined.getNickname());
+                    return ResponseCourseDto.toDto(travelCourse, review, isMyCourseReview, isMyLikeReview);
                 })
                 .collect(Collectors.toList());
 
@@ -274,9 +278,9 @@ public class CourseReviewController {
                 .map(courseReview -> {
 
                     Boolean isMyCourseReview = logined != null && logined.getNickname().equals(courseReview.getMember().getNickname());
-
+                    Boolean isMyLikeReview = logined != null && courseReviewService.isReviewRecommendedByUser(courseReview.getId(), logined.getNickname());
                     TravelCourse travelCourse = courseService.findById(courseReview.getTravelCourse().getId());
-                    return ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview);
+                    return ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview, isMyLikeReview);
                 })
                 .collect(Collectors.toList());
 
@@ -316,8 +320,9 @@ public class CourseReviewController {
         CourseReview updatedReview = courseReviewService.findById(id);
         TravelCourse travelCourse = courseService.findById(updatedReview.getTravelCourse().getId());
         Boolean isMyCourseReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+        Boolean isMyLikeReview = true;
 
-        ResponseCourseDto responseDto = ResponseCourseDto.toDto(travelCourse, updatedReview, isMyCourseReview);
+        ResponseCourseDto responseDto = ResponseCourseDto.toDto(travelCourse, updatedReview, isMyCourseReview, isMyLikeReview);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -348,8 +353,9 @@ public class CourseReviewController {
         CourseReview updatedReview = courseReviewService.findById(id);
         TravelCourse travelCourse = courseService.findById(updatedReview.getTravelCourse().getId());
         Boolean isMyCourseReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+        Boolean isMyLikeReview = false;
 
-        ResponseCourseDto responseDto = ResponseCourseDto.toDto(travelCourse, updatedReview, isMyCourseReview);
+        ResponseCourseDto responseDto = ResponseCourseDto.toDto(travelCourse, updatedReview, isMyCourseReview, isMyLikeReview);
         return ResponseEntity.ok(responseDto);
     }
 
