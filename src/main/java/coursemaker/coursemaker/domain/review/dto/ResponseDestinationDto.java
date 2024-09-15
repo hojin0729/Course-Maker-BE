@@ -21,11 +21,6 @@ public class ResponseDestinationDto {
     @Schema(description = "리뷰 작성자 닉네임", example = "traveler123")
     private String nickname;
 
-    @Schema(description = "리뷰 제목", example = "환상적인 여행지!")
-    @NotNull(message = "리뷰 제목을 입력하세요.")
-    @NotBlank(message = "리뷰 제목은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    private String title;
-
     @Schema(description = "리뷰 설명", example = "이 여행지는 정말 환상적이었습니다. 자연경관이 뛰어나고 즐길 거리가 많아요.")
     @NotNull(message = "리뷰 설명을 입력하세요.")
     @NotBlank(message = "리뷰 설명은 공백 혹은 빈 문자는 허용하지 않습니다.")
@@ -51,7 +46,6 @@ public class ResponseDestinationDto {
         ResponseDestinationDto dto = new ResponseDestinationDto();
         dto.setDestinationId(destination.getId());
         dto.setNickname(destinationReview.getMember().getNickname());
-        dto.setTitle(destinationReview.getTitle());
         dto.setDescription(destinationReview.getDescription());
         dto.setPictures(destinationReview.getPictures());
         dto.setRating(destinationReview.getRating());

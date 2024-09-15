@@ -14,11 +14,6 @@ public class RequestDestinationDto {
     @Schema(hidden = true)
     private String nickname;
 
-    @Schema(description = "리뷰 제목", example = "환상적인 여행지!")
-    @NotNull(message = "리뷰 제목을 입력하세요.")
-    @NotBlank(message = "리뷰 제목은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    private String title;
-
     @Schema(description = "리뷰 설명", example = "이 여행지는 정말 환상적이었습니다. 자연경관이 뛰어나고 즐길 거리가 많아요.")
     @NotNull(message = "리뷰 설명을 입력하세요.")
     @NotBlank(message = "리뷰 설명은 공백 혹은 빈 문자는 허용하지 않습니다.")
@@ -35,7 +30,6 @@ public class RequestDestinationDto {
     public DestinationReview toEntity(Member member) {
         DestinationReview destinationReview = new DestinationReview();
         destinationReview.setMember(member);
-        destinationReview.setTitle(this.title);
         destinationReview.setDescription(this.description);
         destinationReview.setPictures(this.pictures);
         destinationReview.setRating(this.rating);
