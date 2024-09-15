@@ -6,7 +6,10 @@ import coursemaker.coursemaker.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -45,5 +48,9 @@ public class DestinationReview extends BaseEntity {
 
     @Column(name = "recommend_count")
     private Integer recommendCount = 0;
+
+    @CreationTimestamp
+    @Column(name = "reviewed_at", updatable = false)
+    private LocalDateTime reviewedAt;
 
 }
