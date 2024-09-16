@@ -27,7 +27,7 @@ public class DestinationReview extends BaseEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT", length = 4000)
     private String description;
 
     @ManyToOne

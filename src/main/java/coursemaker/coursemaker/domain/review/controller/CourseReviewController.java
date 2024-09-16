@@ -54,13 +54,13 @@ public class CourseReviewController {
                     )
             ))
     })
-    @Parameter(name = "id", description = "리뷰 ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseCourseDto> getCourseReviewById(@PathVariable("id") Long id,
+    @Parameter(name = "reviewId", description = "리뷰 ID")
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ResponseCourseDto> getCourseReviewById(@PathVariable("reviewId") Long reviewId,
                                                                  @AuthenticationPrincipal LoginedInfo logined) {
-        CourseReview courseReview = courseReviewService.findById(id);
+        CourseReview courseReview = courseReviewService.findById(reviewId);
         Boolean isMyCourseReview = logined != null && logined.getNickname().equals(courseReview.getMember().getNickname());
-        Boolean isMyLikeReview = logined != null && courseReviewService.isReviewRecommendedByUser(id, logined.getNickname());
+        Boolean isMyLikeReview = logined != null && courseReviewService.isReviewRecommendedByUser(reviewId, logined.getNickname());
         TravelCourse travelCourse = courseService.findById(courseReview.getTravelCourse().getId());
         ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, courseReview, isMyCourseReview, isMyLikeReview);
         return ResponseEntity.ok(responseCourseDto);
@@ -144,23 +144,22 @@ public class CourseReviewController {
                     )
             ))
     })
-    @Parameter(name = "id", description = "리뷰 ID")
-    @PutMapping("/{id}")
+    @Parameter(name = "reviewId", description = "리뷰 ID")
+    @PutMapping("/{reviewId}")
     public ResponseEntity<ResponseCourseDto> updateCourseReview(@RequestBody @Valid RequestCourseDto requestCourseDto,
-                                                                @RequestParam(name = "courseId") Long courseId,
+                                                                @PathVariable("reviewId") Long reviewId,
                                                                 @AuthenticationPrincipal LoginedInfo logined) {
 
         // 로그인한 사용자 닉네임 가져오기
-
-        if(logined==null){
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        if (logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 수정 실패");
         }
 
         String nickname = logined.getNickname();
         requestCourseDto.setNickname(nickname);
 
-        CourseReview updatedCourseReview = courseReviewService.update(courseId, requestCourseDto, nickname);
-        TravelCourse travelCourse = courseService.findById(courseId);
+        CourseReview updatedCourseReview = courseReviewService.update(reviewId, requestCourseDto, nickname);
+        TravelCourse travelCourse = updatedCourseReview.getTravelCourse();
         Boolean isMyCourseReview = logined.getNickname().equals(updatedCourseReview.getMember().getNickname());
         Boolean isMyLikeReview = courseReviewService.isReviewRecommendedByUser(updatedCourseReview.getId(), logined.getNickname());
         ResponseCourseDto responseCourseDto = ResponseCourseDto.toDto(travelCourse, updatedCourseReview, isMyCourseReview, isMyLikeReview);
@@ -192,15 +191,15 @@ public class CourseReviewController {
                     )
             ))
     })
-    @Parameter(name = "id", description = "리뷰 ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deleteCourseReview(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+    @Parameter(name = "reviewId", description = "리뷰 ID")
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Long> deleteCourseReview(@PathVariable("reviewId") Long reviewId, @AuthenticationPrincipal LoginedInfo logined) {
 
         if(logined==null){
             throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 삭제 실패");
         }
 
-        CourseReview courseReview = courseReviewService.findById(id);
+        CourseReview courseReview = courseReviewService.findById(reviewId);
         if (courseReview == null) {
             return ResponseEntity.notFound().build();
         }
@@ -210,8 +209,8 @@ public class CourseReviewController {
         if (!courseReview.getMember().getNickname().equals(nickname)) {
             throw new ForbiddenException("작성자와 정보가 일치하지 않습니다.", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
-        courseReviewService.delete(id);
-        return ResponseEntity.ok(id);
+        courseReviewService.delete(reviewId);
+        return ResponseEntity.ok(reviewId);
     }
 
     @Operation(summary = "코스 ID에 따른 리뷰 페이지네이션 조회", description = "특정 코스에 대한 리뷰를 페이지네이션하여 조회합니다.")
@@ -293,7 +292,7 @@ public class CourseReviewController {
         return ResponseEntity.ok(responseReviewPage);
     }
 
-    @PostMapping("/{id}/recommend")
+    @PostMapping("/{reviewId}/recommend")
     @Operation(summary = "코스 리뷰 추천 추가", description = "코스 리뷰에 대해 추천(좋아요)를 추가합니다. 로그인된 사용자만 이용 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천이 성공적으로 추가되었습니다.", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
@@ -312,12 +311,12 @@ public class CourseReviewController {
                     )
             ))
     })
-    public ResponseEntity<ResponseCourseDto> addRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<ResponseCourseDto> addRecommend(@PathVariable("reviewId") Long reviewId, @AuthenticationPrincipal LoginedInfo logined) {
         if (logined == null) {
             throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 추천 실패");
         }
-        courseReviewService.addRecommend(id, logined.getNickname());
-        CourseReview updatedReview = courseReviewService.findById(id);
+        courseReviewService.addRecommend(reviewId, logined.getNickname());
+        CourseReview updatedReview = courseReviewService.findById(reviewId);
         TravelCourse travelCourse = courseService.findById(updatedReview.getTravelCourse().getId());
         Boolean isMyCourseReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
         Boolean isMyLikeReview = true;
@@ -326,7 +325,7 @@ public class CourseReviewController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PostMapping("/{id}/unrecommend")
+    @PostMapping("/{reviewId}/unrecommend")
     @Operation(summary = "코스 리뷰 추천 취소", description = "코스 리뷰에 대해 추가된 추천(좋아요)를 취소합니다. 로그인된 사용자만 이용 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천이 성공적으로 취소되었습니다.", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
@@ -345,12 +344,12 @@ public class CourseReviewController {
                     )
             ))
     })
-    public ResponseEntity<ResponseCourseDto> removeRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<ResponseCourseDto> removeRecommend(@PathVariable("reviewId") Long reviewId, @AuthenticationPrincipal LoginedInfo logined) {
         if (logined == null) {
             throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 추천 취소 실패");
         }
-        courseReviewService.removeRecommend(id, logined.getNickname());
-        CourseReview updatedReview = courseReviewService.findById(id);
+        courseReviewService.removeRecommend(reviewId, logined.getNickname());
+        CourseReview updatedReview = courseReviewService.findById(reviewId);
         TravelCourse travelCourse = courseService.findById(updatedReview.getTravelCourse().getId());
         Boolean isMyCourseReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
         Boolean isMyLikeReview = false;
