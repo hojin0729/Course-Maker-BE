@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -24,11 +25,6 @@ public class ResponseCourseDto {
     @NotBlank(message = "리뷰 작성자 닉네임은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String nickname;
 
-    @Schema(description = "리뷰 제목", example = "멋진 여행 코스!")
-    @NotNull(message = "리뷰 제목을 입력하세요.")
-    @NotBlank(message = "리뷰 제목은 공백 혹은 빈 문자는 허용하지 않습니다.")
-    private String title;
-
     @Schema(description = "리뷰 설명", example = "이 코스는 정말 멋졌어요! 경치가 아름답고, 음식도 맛있었습니다.")
     @NotNull(message = "리뷰 설명을 입력하세요.")
     @NotBlank(message = "리뷰 설명은 공백 혹은 빈 문자는 허용하지 않습니다.")
@@ -45,20 +41,28 @@ public class ResponseCourseDto {
     @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
     private Boolean isMyCourseReview;
 
+    @Schema(description = "내가 좋아요를 누른 리뷰인지 여부", example = "true")
+    private Boolean isMyLikeReview;
+
     @Schema(description = "리뷰 좋아요 수", example = "10")
     private Integer recommendCount;
 
-    public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview) {
+    @Schema(description = "리뷰 작성 날짜", example = "2024-09-14")
+    private String reviewedAt;
+
+    public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview, Boolean isMyLikeReview) {
         ResponseCourseDto dto = new ResponseCourseDto();
         dto.setCourseId(travelCourse.getId());
         dto.setNickname(courseReview.getMember().getNickname());
-        dto.setTitle(courseReview.getTitle());
         dto.setDescription(courseReview.getDescription());
         dto.setPictures(courseReview.getPictures());
         dto.setRating(courseReview.getRating());
         dto.setReviewId(courseReview.getId());
         dto.setIsMyCourseReview(isMyCourseReview);
+        dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(courseReview.getRecommendCount());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        dto.setReviewedAt(courseReview.getReviewedAt().format(formatter));
         return dto;
     }
 }
