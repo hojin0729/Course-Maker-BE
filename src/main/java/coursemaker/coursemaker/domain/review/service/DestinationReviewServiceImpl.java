@@ -18,11 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -113,30 +115,42 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
 
     @Override
-    public CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable, OrderBy orderBy) {
-        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 시작 - 여행지 ID: {}", destinationId);
+    public CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable, OrderBy orderBy, String nickname) {
+        log.info("[DestinationReview] 여행지 리뷰 목록 조회 시작 - 여행지 ID: {}, 사용자: {}", destinationId, nickname);
 
-        Page<DestinationReview> reviews;
+        Page<DestinationReview> myReviews;
+        Page<DestinationReview> otherReviews;
+
         switch (orderBy) {
             case RATING_UP:
-                reviews = destinationReviewRepository.findAllByDestinationIdOrderByRatingDesc(destinationId, pageable); // 별점 높은 순
+                myReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameOrderByRatingDesc(destinationId, nickname, pageable); // 별점 높은 순
+                otherReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameNotOrderByRatingDesc(destinationId, nickname, pageable);
                 break;
             case RATING_DOWN:
-                reviews = destinationReviewRepository.findAllByDestinationIdOrderByRatingAsc(destinationId, pageable); // 별점 낮은 순
+                myReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameOrderByRatingAsc(destinationId, nickname, pageable); // 별점 낮은 순
+                otherReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameNotOrderByRatingAsc(destinationId, nickname, pageable);
                 break;
             case NEWEST:
-                reviews = destinationReviewRepository.findAllByDestinationIdOrderByCreatedAtDesc(destinationId, pageable); // 최신순
+                myReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameOrderByCreatedAtDesc(destinationId, nickname, pageable); // 최신순
+                otherReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameNotOrderByCreatedAtDesc(destinationId, nickname, pageable);
                 break;
             case RECOMMEND:
-                reviews = destinationReviewRepository.findAllByDestinationIdOrderByRecommendCountDesc(destinationId, pageable); // 추천순
+                myReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameOrderByRecommendCountDesc(destinationId, nickname, pageable); // 추천순
+                otherReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameNotOrderByRecommendCountDesc(destinationId, nickname, pageable);
                 break;
             default:
-                reviews = destinationReviewRepository.findAllByDestinationId(destinationId, pageable);
+                myReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNickname(destinationId, nickname, pageable); // 기본 정렬
+                otherReviews = destinationReviewRepository.findAllByDestinationIdAndMemberNicknameNot(destinationId, nickname, pageable);
                 break;
         }
 
-        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 완료 - 여행지 ID: {}, 총 리뷰 수: {}", destinationId, reviews.getTotalElements());
-        return new CourseMakerPagination<>(pageable, reviews, reviews.getTotalElements());
+        // 두 결과 리스트를 합침
+        List<DestinationReview> allReviews = Stream.concat(myReviews.getContent().stream(), otherReviews.getContent().stream())
+                .toList();
+
+        log.info("[DestinationReview] 여행지 ID로 리뷰 목록 조회 완료 - 여행지 ID: {}, 총 리뷰 수: {}", destinationId, allReviews.size());
+
+        return new CourseMakerPagination<>(pageable, new PageImpl<>(allReviews, pageable, allReviews.size()), allReviews.size());
     }
 
     @Override

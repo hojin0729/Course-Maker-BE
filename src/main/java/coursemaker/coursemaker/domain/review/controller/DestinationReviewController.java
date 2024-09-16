@@ -232,7 +232,9 @@ public class DestinationReviewController {
 
         Pageable pageable = PageRequest.of(page - 1, record);
 
-        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy);
+        String nickname = logined != null ? logined.getNickname() : null;
+
+        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy, nickname);
         List<DestinationReview> reviewList = reviewPage.getContents();
 
         List<ResponseDestinationDto> responseDtos = reviewList.stream()
