@@ -8,6 +8,7 @@ import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueResponseDTO;
 import coursemaker.coursemaker.domain.auth.dto.role.RoleUpdateDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.SendValidateCodeRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.ValidateEmailRequestDTO;
+import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.auth.exception.TimeOutValidationException;
 import coursemaker.coursemaker.domain.auth.exception.UnMatchValidateCodeException;
 import coursemaker.coursemaker.domain.auth.exception.UnSendEmailException;
@@ -51,8 +52,14 @@ public class AuthService {
         }
         else{
             if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof LoginedInfo){
-                System.out.println("principal = " + principal);
-                return (LoginedInfo)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                LoginedInfo loginedInfo = (LoginedInfo) SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+
+                log.debug("[AUTH] 사용자 정보 조회. 사용자: "+ loginedInfo.getNickname());
+                
+                return loginedInfo;
             }
         }
 
@@ -65,12 +72,12 @@ public class AuthService {
 
         /*닉네임 중복 검증*/
         memberRepository.findByNicknameAndDeletedAtIsNull(request.getNickname()).ifPresent(m -> {
-            throw new UserDuplicatedException("이미 존재하는 닉네임입니다.", "Nickname: " + request.getNickname());
+            throw new UserDuplicatedException("이미 존재하는 닉네임입니다.", "닉네임 중복. Nickname: " + request.getNickname());
         });
 
         /*이메일 중복 검증*/
         memberRepository.findByEmailAndDeletedAtIsNull(request.getEmail()).ifPresent(m -> {
-            throw new UserDuplicatedException("이미 존재하는 이메일입니다.", "email: " + request.getEmail());
+            throw new UserDuplicatedException("이미 존재하는 이메일입니다.", "이메일 중복. email: " + request.getEmail());
         });
 
         /*DTO -> entity*/
@@ -88,7 +95,7 @@ public class AuthService {
         member = memberRepository.save(member);
         response.setNickname(member.getNickname());
 
-        log.info("[Auth] 신규 회원가입(이메일). 닉네임: {}", member.getNickname());
+        log.info("[AUTH] 신규 회원가입(이메일). 닉네임: {}", member.getNickname());
 
         return response;
     }
@@ -99,7 +106,7 @@ public class AuthService {
 
         response.setAccessToken(jwtProvider.reIssue(request.getRefreshToken()) );
 
-        log.info("[Auth] 토큰 재발행. 토큰: {}", response.getAccessToken());
+        log.info("[AUTH] 토큰 재발행. 토큰: {}", response.getAccessToken());
         return response;
     }
 
@@ -107,7 +114,7 @@ public class AuthService {
     public void withdrawal(String nickname) {
 
         if(nickname == null) {
-            throw new IllegalArgumentException("로그인 상태를 확인해주세요.");
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[AUTH] 비 로그인 사용자 회원삭제 접근.");
         }
 
         Member member = memberRepository.findByNicknameAndDeletedAtIsNull(nickname).orElseThrow(() ->
@@ -182,12 +189,12 @@ public class AuthService {
         /*시간초과*/
         if(code.getExpireTime().isBefore(LocalDateTime.now())){
             emailCodeRepository.delete(code);
-            throw new TimeOutValidationException("인증 시간이 초과됬습니다. 다시 이메일을 전송해주세요.", "[Email] timeout. email: "+code.getExpireTime() + " current time: "+ LocalDateTime.now());
+            throw new TimeOutValidationException("인증 시간이 초과됬습니다. 다시 이메일을 전송해주세요.", "[AUTH] email timeout. email: "+code.getExpireTime() + " current time: "+ LocalDateTime.now());
         }
 
 
         /*검증 끝났으면 삭제함.*/
-        log.info("[Auth] 이메일 인증 완료. 사용자: {}", dto.getEmail());
+        log.info("[AUTH] 이메일 인증 완료. 사용자: {}", dto.getEmail());
         emailCodeRepository.delete(code);
     }
 
