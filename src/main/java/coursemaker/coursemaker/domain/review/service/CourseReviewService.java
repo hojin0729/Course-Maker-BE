@@ -16,7 +16,7 @@ public interface CourseReviewService {
     // id 기반으로 특정 코스리뷰 조회하는 메서드
     CourseReview findById(Long id);
     // 코스 리뷰 전체 보기
-    CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable, OrderBy orderBy);
+    CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable, OrderBy orderBy, String nickname);
     // 코스 평균 평점 계산
     Double getAverageRating(Long courseId);
 

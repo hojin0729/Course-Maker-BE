@@ -21,15 +21,22 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
 
     Page<CourseReview> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
 
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNickname(Long courseId, String nickname, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameNot(Long courseId, String nickname, Pageable pageable);
+
     // 별점 높은 순
-    Page<CourseReview> findAllByTravelCourseIdOrderByRatingDesc(Long courseId, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameOrderByRatingDesc(Long courseId, String nickname, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameNotOrderByRatingDesc(Long courseId, String nickname, Pageable pageable);
 
     // 별점 낮은 순
-    Page<CourseReview> findAllByTravelCourseIdOrderByRatingAsc(Long courseId, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameOrderByRatingAsc(Long courseId, String nickname, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameNotOrderByRatingAsc(Long courseId, String nickname, Pageable pageable);
 
     // 최신순
-    Page<CourseReview> findAllByTravelCourseIdOrderByCreatedAtDesc(Long courseId, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameOrderByCreatedAtDesc(Long courseId, String nickname, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameNotOrderByCreatedAtDesc(Long courseId, String nickname, Pageable pageable);
 
     // 추천순
-    Page<CourseReview> findAllByTravelCourseIdOrderByRecommendCountDesc(Long courseId, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameOrderByRecommendCountDesc(Long courseId, String nickname, Pageable pageable);
+    Page<CourseReview> findAllByTravelCourseIdAndMemberNicknameNotOrderByRecommendCountDesc(Long courseId, String nickname, Pageable pageable);
 }

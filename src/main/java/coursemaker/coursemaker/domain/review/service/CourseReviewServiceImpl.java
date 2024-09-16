@@ -18,11 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -106,31 +108,43 @@ public class CourseReviewServiceImpl implements CourseReviewService {
                 });
     }
 
-    @Override
-    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable, OrderBy orderBy) {
-        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 시작 - 코스 ID: {}", courseId);
 
-        Page<CourseReview> reviews;
+    @Override
+    public CourseMakerPagination<CourseReview> findAllByCourseId(Long courseId, Pageable pageable, OrderBy orderBy, String nickname) {
+        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 시작 - 코스 ID: {}, 사용자: {}", courseId, nickname);
+
+        Page<CourseReview> myReviews;
+        Page<CourseReview> otherReviews;
+
         switch (orderBy) {
             case RATING_UP:
-                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRatingDesc(courseId, pageable); // 별점 높은 순
+                myReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameOrderByRatingDesc(courseId, nickname, pageable); // 별점 높은 순
+                otherReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameNotOrderByRatingDesc(courseId, nickname, pageable);
                 break;
             case RATING_DOWN:
-                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRatingAsc(courseId, pageable); // 별점 낮은 순
+                myReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameOrderByRatingAsc(courseId, nickname, pageable); // 별점 낮은 순
+                otherReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameNotOrderByRatingAsc(courseId, nickname, pageable);
                 break;
             case NEWEST:
-                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByCreatedAtDesc(courseId, pageable); // 최신순
+                myReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameOrderByCreatedAtDesc(courseId, nickname, pageable); // 최신순
+                otherReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameNotOrderByCreatedAtDesc(courseId, nickname, pageable);
                 break;
             case RECOMMEND:
-                reviews = courseReviewRepository.findAllByTravelCourseIdOrderByRecommendCountDesc(courseId, pageable); // 추천순
+                myReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameOrderByRecommendCountDesc(courseId, nickname, pageable); // 추천순
+                otherReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameNotOrderByRecommendCountDesc(courseId, nickname, pageable);
                 break;
             default:
-                reviews = courseReviewRepository.findByTravelCourseId(courseId, pageable); // 기본 정렬
+                myReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNickname(courseId, nickname, pageable); // 기본 정렬
+                otherReviews = courseReviewRepository.findAllByTravelCourseIdAndMemberNicknameNot(courseId, nickname, pageable);
                 break;
         }
 
-        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, reviews.getTotalElements());
-        return new CourseMakerPagination<>(pageable, reviews, reviews.getTotalElements());
+        List<CourseReview> allReviews = Stream.concat(myReviews.getContent().stream(), otherReviews.getContent().stream())
+                        .toList();
+
+        log.info("[CourseReview] 코스 ID로 리뷰 목록 조회 완료 - 코스 ID: {}, 총 리뷰 수: {}", courseId, allReviews.size());
+
+        return new CourseMakerPagination<>(pageable, new PageImpl<>(allReviews, pageable, allReviews.size()), allReviews.size());
     }
 
 
