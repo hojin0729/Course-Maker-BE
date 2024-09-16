@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.review.service;
 
+import coursemaker.coursemaker.domain.auth.policy.RoleUpdatePolicy;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.member.entity.Member;
@@ -33,13 +34,15 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
     private final DestinationService destinationService;
     private final MemberService memberService;
     private final DestinationReviewRecommendationRepository destinationReviewRecommendationRepository;
+    private final RoleUpdatePolicy roleUpdatePolicy;
 
     @Autowired
-    public DestinationReviewServiceImpl(DestinationReviewRepository destinationReviewRepository, DestinationService destinationService, MemberService memberService, DestinationReviewRecommendationRepository destinationReviewRecommendationRepository) {
+    public DestinationReviewServiceImpl(DestinationReviewRepository destinationReviewRepository, DestinationService destinationService, MemberService memberService, DestinationReviewRecommendationRepository destinationReviewRecommendationRepository, RoleUpdatePolicy roleUpdatePolicy) {
         this.destinationReviewRepository = destinationReviewRepository;
         this.destinationService = destinationService;
         this.memberService = memberService;
         this.destinationReviewRecommendationRepository = destinationReviewRecommendationRepository;
+        this.roleUpdatePolicy = roleUpdatePolicy;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
             log.debug("Debug: 저장 전 리뷰 평점 = {}", destinationReview.getRating());
             DestinationReview savedReview = destinationReviewRepository.save(destinationReview);
             log.info("[DestinationReview] 리뷰 저장 완료 - 리뷰 ID: {}, 여행지 ID: {}", savedReview.getId(), destinationId);
+            roleUpdatePolicy.updateRoleToFit(member);
             return savedReview;
         } catch (DataIntegrityViolationException e) {
             log.error("[DestinationReview] 중복 리뷰 오류 - 닉네임: {}, 여행지 ID: {}", member.getNickname(), destinationId);
