@@ -8,8 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 @Entity
@@ -48,4 +50,8 @@ public class CourseReview extends BaseEntity {
 
     @Column(name = "recommend_count")
     private Integer recommendCount = 0;
+
+    @CreationTimestamp
+    @Column(name = "reviewed_at", updatable = false)
+    private LocalDateTime reviewedAt;
 }

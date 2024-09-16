@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.review.repository;
 
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.review.entity.CourseReview;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +21,23 @@ public interface DestinationReviewRepository extends JpaRepository<DestinationRe
     Integer countByDestinationId(Long destinationId);
 
     Page<DestinationReview> findByMemberNicknameAndDeletedAtIsNull(String nickname, Pageable pageable);
-    Page<DestinationReview> findAllByDestinationIdOrderByRatingDesc(Long destinationId, Pageable pageable); // 별점 높은 순
 
-    Page<DestinationReview> findAllByDestinationIdOrderByRatingAsc(Long destinationId, Pageable pageable);  // 별점 낮은 순
+    Page<DestinationReview> findAllByDestinationIdAndMemberNickname(Long destinationId, String nickname, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameNot(Long destinationId, String nickname, Pageable pageable);
 
-    Page<DestinationReview> findAllByDestinationIdOrderByCreatedAtDesc(Long destinationId, Pageable pageable); // 최신순
+    // 별점 높은 순
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameOrderByRatingDesc(Long destinationId, String nickname, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameNotOrderByRatingDesc(Long destinationId, String nickname, Pageable pageable);
 
-    Page<DestinationReview> findAllByDestinationIdOrderByRecommendCountDesc(Long destinationId, Pageable pageable); // 추천순
+    // 별점 낮은 순
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameOrderByRatingAsc(Long destinationId, String nickname, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameNotOrderByRatingAsc(Long destinationId, String nickname, Pageable pageable);
+
+    // 최신순
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameOrderByCreatedAtDesc(Long destinationId, String nickname, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameNotOrderByCreatedAtDesc(Long destinationId, String nickname, Pageable pageable);
+
+    // 추천순
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameOrderByRecommendCountDesc(Long destinationId, String nickname, Pageable pageable);
+    Page<DestinationReview> findAllByDestinationIdAndMemberNicknameNotOrderByRecommendCountDesc(Long destinationId, String nickname, Pageable pageable);
 }

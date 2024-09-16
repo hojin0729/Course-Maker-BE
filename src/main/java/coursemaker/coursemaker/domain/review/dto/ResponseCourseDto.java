@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -40,10 +41,16 @@ public class ResponseCourseDto {
     @Schema(description = "내가 작성한 리뷰인지 여부", example = "true")
     private Boolean isMyCourseReview;
 
+    @Schema(description = "내가 좋아요를 누른 리뷰인지 여부", example = "true")
+    private Boolean isMyLikeReview;
+
     @Schema(description = "리뷰 좋아요 수", example = "10")
     private Integer recommendCount;
 
-    public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview) {
+    @Schema(description = "리뷰 작성 날짜", example = "2024-09-14")
+    private String reviewedAt;
+
+    public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview, Boolean isMyLikeReview) {
         ResponseCourseDto dto = new ResponseCourseDto();
         dto.setCourseId(travelCourse.getId());
         dto.setNickname(courseReview.getMember().getNickname());
@@ -52,7 +59,10 @@ public class ResponseCourseDto {
         dto.setRating(courseReview.getRating());
         dto.setReviewId(courseReview.getId());
         dto.setIsMyCourseReview(isMyCourseReview);
+        dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(courseReview.getRecommendCount());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        dto.setReviewedAt(courseReview.getReviewedAt().format(formatter));
         return dto;
     }
 }
