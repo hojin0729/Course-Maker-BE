@@ -27,7 +27,7 @@ out/
 !**/src/test/**/out/
 *.yml
 src/main/generated/
-
+logs/**
 
 ### NetBeans ###
 /nbproject/private/
