@@ -81,7 +81,6 @@ public class EmailLoginFilter extends UsernamePasswordAuthenticationFilter {
         String accessToken = jwtProvider.createAccessToken(member.getUsername(), role);
         String refreshToken = jwtProvider.createRefreshToken(member.getUsername(), role);
         log.info("[JWT] JWT 발급 완료");
-        System.out.println(role);
 
         /*토큰을 반환 객체에 담아서 반환*/
         LoginResponseDTO responseDto = new LoginResponseDTO();

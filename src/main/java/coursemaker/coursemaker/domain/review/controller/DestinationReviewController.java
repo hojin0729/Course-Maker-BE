@@ -6,7 +6,6 @@ import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.review.dto.RequestDestinationDto;
-import coursemaker.coursemaker.domain.review.dto.ResponseCourseDto;
 import coursemaker.coursemaker.domain.review.dto.ResponseDestinationDto;
 import coursemaker.coursemaker.domain.review.entity.DestinationReview;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
@@ -45,10 +44,10 @@ public class DestinationReviewController {
         this.destinationService = destinationService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{reviewId}")
     @Operation(summary = "리뷰 ID로 목적지 리뷰 가져오기", description = "리뷰 ID를 사용하여 특정 목적지 리뷰를 가져옵니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "해당 ID에 맞는 리뷰 조회 성공", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
+            @ApiResponse(responseCode = "200", description = "해당 ID에 맞는 리뷰 조회 성공", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
             @ApiResponse(responseCode = "404", description = "해당 ID에 맞는 리뷰를 찾지 못할 때 반환합니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -57,13 +56,14 @@ public class DestinationReviewController {
                     )
             ))
     })
-    @Parameter(name = "id", description = "리뷰 ID", required = true, example = "1")
-    public ResponseEntity<ResponseDestinationDto> getDestinationReviewById(@PathVariable("id") Long id,
+    @Parameter(name = "reviewId", description = "리뷰 ID", required = true, example = "1")
+    public ResponseEntity<ResponseDestinationDto> getDestinationReviewById(@PathVariable("reviewId") Long reviewId,
                                                                            @AuthenticationPrincipal LoginedInfo logined) {
-        DestinationReview destinationReview = destinationReviewService.findById(id);
+        DestinationReview destinationReview = destinationReviewService.findById(reviewId);
         Boolean isMyDestinationReview = logined != null && logined.getNickname().equals(destinationReview.getMember().getNickname());
+        Boolean isMyLikeReview = logined != null && destinationReviewService.isReviewRecommendedByUser(reviewId, logined.getNickname());
         Destination destination = destinationService.findById(destinationReview.getDestination().getId());
-        ResponseDestinationDto responseDestinationDto = ResponseDestinationDto.toDto(destination, destinationReview, isMyDestinationReview);
+        ResponseDestinationDto responseDestinationDto = ResponseDestinationDto.toDto(destination, destinationReview, isMyDestinationReview, isMyLikeReview);
         return ResponseEntity.ok(responseDestinationDto);
     }
 
@@ -85,11 +85,11 @@ public class DestinationReviewController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 코스입니다.", content = @Content(
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 목적지입니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 코스입니다.\"}"
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"존재하지 않는 목적지입니다.\"}"
                     )
             ))
     })
@@ -98,26 +98,25 @@ public class DestinationReviewController {
                                                                           @RequestParam(name = "destinationId") Long destinationId,
                                                                           @AuthenticationPrincipal LoginedInfo logined) {
 
-        /*로그인 여부 확인*/
-        if(logined==null){
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        if(logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 리뷰 생성 실패");
         }
 
-        // 로그인한 사용자 닉네임 가져오기
         String nickname = logined.getNickname();
         requestDestinationDto.setNickname(nickname);
 
         DestinationReview savedDestinationReview = destinationReviewService.save(requestDestinationDto, destinationId);
         Boolean isMyDestinationReview = logined.getNickname().equals(savedDestinationReview.getMember().getNickname());
         Destination destination = destinationService.findById(destinationId);
-        ResponseDestinationDto responseDestinationDto = ResponseDestinationDto.toDto(destination, savedDestinationReview, isMyDestinationReview);
+        Boolean isMyLikeReview = false;
+        ResponseDestinationDto responseDestinationDto = ResponseDestinationDto.toDto(destination, savedDestinationReview, isMyDestinationReview, isMyLikeReview);
         return ResponseEntity.created(URI.create("/v1/destinationreview/" + savedDestinationReview.getId())).body(responseDestinationDto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{reviewId}")
     @Operation(summary = "목적지 리뷰 업데이트", description = "기존 목적지 리뷰를 업데이트합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "ID에 해당하는 리뷰 수정 성공", content = @Content(schema = @Schema(implementation = ResponseCourseDto.class))),
+            @ApiResponse(responseCode = "200", description = "ID에 해당하는 리뷰 수정 성공", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
             @ApiResponse(responseCode = "400", description = "수정하려는 리뷰의 인자값이 올바르지 않을 때 반환합니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -147,27 +146,26 @@ public class DestinationReviewController {
                     )
             ))
     })
-    @Parameter(name = "id", description = "리뷰 ID", required = true, example = "1")
+    @Parameter(name = "reviewId", description = "리뷰 ID", required = true, example = "1")
     public ResponseEntity<ResponseDestinationDto> updateDestinationReview(@RequestBody @Valid RequestDestinationDto requestDestinationDto,
-                                                                          @RequestParam(name = "destinationId") Long destinationId,
+                                                                          @PathVariable("reviewId") Long reviewId,
                                                                           @AuthenticationPrincipal LoginedInfo logined) {
-        /*로그인 여부 확인*/
-        if(logined==null){
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 생성 실패");
+        if(logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 리뷰 생성 실패");
         }
 
-        // 로그인한 사용자 닉네임 가져오기
         String nickname = logined.getNickname();
         requestDestinationDto.setNickname(nickname);
 
-        DestinationReview updatedDestinationReview = destinationReviewService.update(destinationId, requestDestinationDto, nickname);
-        Destination destination = destinationService.findById(destinationId);
+        DestinationReview updatedDestinationReview = destinationReviewService.update(reviewId, requestDestinationDto, nickname);
+        Destination destination = updatedDestinationReview.getDestination();
         Boolean isMyDestinationReview = logined.getNickname().equals(updatedDestinationReview.getMember().getNickname());
-        ResponseDestinationDto responseDestinationDto = ResponseDestinationDto.toDto(destination, updatedDestinationReview, isMyDestinationReview);
+        Boolean isMyLikeReview = destinationReviewService.isReviewRecommendedByUser(updatedDestinationReview.getId(), logined.getNickname());
+        ResponseDestinationDto responseDestinationDto = ResponseDestinationDto.toDto(destination, updatedDestinationReview, isMyDestinationReview, isMyLikeReview);
         return ResponseEntity.ok(responseDestinationDto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reviewId}")
     @Operation(summary = "목적지 리뷰 삭제", description = "특정 목적지 리뷰를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "ID에 해당하는 리뷰 삭제 성공", content = @Content),
@@ -193,15 +191,14 @@ public class DestinationReviewController {
                     )
             ))
     })
-    @Parameter(name = "id", description = "리뷰 ID", required = true, example = "1")
-    public ResponseEntity<Long> deleteDestinationReview(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
-        /*로그인 여부 확인*/
-        if(logined==null){
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[CourseReview] 리뷰 삭제 실패");
+    @Parameter(name = "reviewId", description = "리뷰 ID", required = true, example = "1")
+    public ResponseEntity<Long> deleteDestinationReview(@PathVariable("reviewId") Long reviewId, @AuthenticationPrincipal LoginedInfo logined) {
+        if(logined == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 리뷰 삭제 실패");
         }
 
         // 해당 ID의 리뷰가 존재하는지 확인합니다.
-        DestinationReview destinationReview = destinationReviewService.findById(id);
+        DestinationReview destinationReview = destinationReviewService.findById(reviewId);
         if (destinationReview == null) {
             return ResponseEntity.notFound().build();
         }
@@ -213,8 +210,8 @@ public class DestinationReviewController {
             throw new ForbiddenException("작성자와 정보가 일치하지 않습니다.", "사용자가 이 자원에 접근할 권한이 없습니다.");
         }
         // 리뷰를 삭제합니다.
-        destinationReviewService.delete(id);
-        return ResponseEntity.ok(id);
+        destinationReviewService.delete(reviewId);
+        return ResponseEntity.ok(reviewId);
     }
 
     @Operation(summary = "목적지 리뷰 페이지네이션 조회", description = "페이지네이션을 사용하여 특정 목적지에 대한 리뷰를 조회합니다.")
@@ -235,14 +232,17 @@ public class DestinationReviewController {
 
         Pageable pageable = PageRequest.of(page - 1, record);
 
-        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy);
+        String nickname = logined != null ? logined.getNickname() : null;
+
+        CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy, nickname);
         List<DestinationReview> reviewList = reviewPage.getContents();
 
         List<ResponseDestinationDto> responseDtos = reviewList.stream()
                 .map(review -> {
                     Destination destination = destinationService.findById(review.getDestination().getId());
                     Boolean isMyDestinationReview = logined != null && logined.getNickname().equals(review.getMember().getNickname());
-                    return ResponseDestinationDto.toDto(destination, review, isMyDestinationReview);
+                    Boolean isMyLikeReview = logined != null && destinationReviewService.isReviewRecommendedByUser(review.getId(), logined.getNickname());
+                    return ResponseDestinationDto.toDto(destination, review, isMyDestinationReview, isMyLikeReview);
                 })
                 .collect(Collectors.toList());
 
@@ -281,8 +281,9 @@ public class DestinationReviewController {
         List<ResponseDestinationDto> contents = destinationReviewPage.getContents().stream()
                 .map(destinationReview -> {
                     Boolean isMyDestinationReview = logined != null && logined.getNickname().equals(destinationReview.getMember().getNickname());
+                    Boolean isMyLikeReview = logined != null && destinationReviewService.isReviewRecommendedByUser(destinationReview.getId(), logined.getNickname());
                     Destination destination = destinationService.findById(destinationReview.getDestination().getId());
-                    return ResponseDestinationDto.toDto(destination, destinationReview, isMyDestinationReview);
+                    return ResponseDestinationDto.toDto(destination, destinationReview, isMyDestinationReview, isMyLikeReview);
                 })
                 .collect(Collectors.toList());
 
@@ -295,7 +296,7 @@ public class DestinationReviewController {
         return ResponseEntity.ok(responseReviewPage);
     }
 
-    @PostMapping("/{id}/recommend")
+    @PostMapping("/{reviewId}/recommend")
     @Operation(summary = "리뷰 추천 추가", description = "리뷰에 대해 추천(좋아요)를 추가합니다. 로그인된 사용자만 이용 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천이 성공적으로 추가되었습니다.", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
@@ -314,22 +315,23 @@ public class DestinationReviewController {
                     )
             ))
     })
-    public ResponseEntity<ResponseDestinationDto> addRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<ResponseDestinationDto> addRecommend(@PathVariable("reviewId") Long reviewId, @AuthenticationPrincipal LoginedInfo logined) {
         if (logined == null) {
             throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 추천 실패");
         }
 
-        destinationReviewService.addRecommend(id, logined.getNickname());
-        DestinationReview updatedReview = destinationReviewService.findById(id);
+        destinationReviewService.addRecommend(reviewId, logined.getNickname());
+        DestinationReview updatedReview = destinationReviewService.findById(reviewId);
         Destination destination = destinationService.findById(updatedReview.getDestination().getId());
         Boolean isMyDestinationReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+        Boolean isMyLikeReview = true;
 
-        ResponseDestinationDto responseDto = ResponseDestinationDto.toDto(destination, updatedReview, isMyDestinationReview);
+        ResponseDestinationDto responseDto = ResponseDestinationDto.toDto(destination, updatedReview, isMyDestinationReview, isMyLikeReview);
         return ResponseEntity.ok(responseDto);
     }
 
 
-    @PostMapping("/{id}/unrecommend")
+    @PostMapping("/{reviewId}/unrecommend")
     @Operation(summary = "리뷰 추천 취소", description = "리뷰에 대해 추가된 추천(좋아요)를 취소합니다. 로그인된 사용자만 이용 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천이 성공적으로 취소되었습니다.", content = @Content(schema = @Schema(implementation = ResponseDestinationDto.class))),
@@ -348,17 +350,18 @@ public class DestinationReviewController {
                     )
             ))
     })
-    public ResponseEntity<ResponseDestinationDto> removeRecommend(@PathVariable("id") Long id, @AuthenticationPrincipal LoginedInfo logined) {
+    public ResponseEntity<ResponseDestinationDto> removeRecommend(@PathVariable("reviewId") Long reviewId, @AuthenticationPrincipal LoginedInfo logined) {
         if (logined == null) {
             throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[DestinationReview] 추천 취소 실패");
         }
 
-        destinationReviewService.removeRecommend(id, logined.getNickname());
-        DestinationReview updatedReview = destinationReviewService.findById(id);
+        destinationReviewService.removeRecommend(reviewId, logined.getNickname());
+        DestinationReview updatedReview = destinationReviewService.findById(reviewId);
         Destination destination = destinationService.findById(updatedReview.getDestination().getId());
         Boolean isMyDestinationReview = logined.getNickname().equals(updatedReview.getMember().getNickname());
+        Boolean isMyLikeReview = false;
 
-        ResponseDestinationDto responseDto = ResponseDestinationDto.toDto(destination, updatedReview, isMyDestinationReview);
+        ResponseDestinationDto responseDto = ResponseDestinationDto.toDto(destination, updatedReview, isMyDestinationReview, isMyLikeReview);
         return ResponseEntity.ok(responseDto);
     }
 

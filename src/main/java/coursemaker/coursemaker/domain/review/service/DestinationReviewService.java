@@ -17,7 +17,7 @@ public interface DestinationReviewService {
     DestinationReview findById(Long id);
     // 여행지 리뷰 전체 보기
 
-    CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable, OrderBy orderBy);
+    CourseMakerPagination<DestinationReview> findAllByDestinationId(Long destinationId, Pageable pageable, OrderBy orderBy, String nickname);
 
     // 특정 여행지의 평균 평점 조회
     Double getAverageRating(Long destinationId);
@@ -28,4 +28,6 @@ public interface DestinationReviewService {
 
     void addRecommend(Long reviewId, String nickname);
     void removeRecommend(Long reviewId, String nickname);
+
+    boolean isReviewRecommendedByUser(Long reviewId, String nickname);
 }
