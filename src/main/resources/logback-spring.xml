@@ -29,7 +29,7 @@
         </encoder>
     </appender>
 
-
+<!--    쿼리 로깅-->
     <appender name="QUERY" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>./logs/QUERY.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -47,12 +47,31 @@
         </encoder>
     </appender>
 
-    <!--    AUTH 도메인-->
-    <appender name="AUTH_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/auth/auth.log</file> <!--로그 파일 기본 경로-->
+<!--    전체 에러 로깅-->
+    <appender name="GLOBAL_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/ERROR.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/auth/auth-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/ERROR-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10GB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!--    AUTH 도메인-->
+    <appender name="AUTH_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/auth/auth-raw.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/auth/auth-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -65,12 +84,81 @@
         </encoder>
     </appender>
 
-    <!--    MEMBER 도메인-->
-    <appender name="MEMBER_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/member/member.log</file> <!--로그 파일 기본 경로-->
+    <appender name="AUTH_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/auth/auth-event.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/member/member-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/auth/auth-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AUTH_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/auth/auth-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/auth/auth-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!--    MEMBER 도메인-->
+    <appender name="MEMBER_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/member/member-raw.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/member/member-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="MEMBER_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/member/member-event.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/member/member-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="MEMBER_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/member/member-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/member/member-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -84,11 +172,45 @@
     </appender>
 
 <!--    코스 도메인-->
-    <appender name="COURSE_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/course/course.log</file> <!--로그 파일 기본 경로-->
+    <appender name="COURSE_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/course/course-raw.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/course/course-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/course/course-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="COURSE_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/course/course-event.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/course/course-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="COURSE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/course/course-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/course/course-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -103,11 +225,11 @@
 
 
     <!--    여행지 도메인-->
-    <appender name="DESTINATION_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/destination/destination.log</file> <!--로그 파일 기본 경로-->
+    <appender name="DESTINATION_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/destination/destination-raw.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/destination/destination-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/destination/destination-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -120,12 +242,11 @@
         </encoder>
     </appender>
 
-    <!--    좋아요 도메인-->
-    <appender name="LIKE_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/like/like.log</file> <!--로그 파일 기본 경로-->
+    <appender name="DESTINATION_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/destination/destination-event.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/like/like-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/destination/destination-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -137,14 +258,119 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <appender name="DESTINATION_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/destination/destination-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/destination/destination-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!--    좋아요 도메인-->
+    <appender name="LIKE_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/like/like-raw.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/like/like-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LIKE_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/like/like-event.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/like/like-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LIKE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/like/like-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/like/like-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
 
 
     <!--    리뷰 도메인-->
-    <appender name="REVIEW_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/review/review.log</file> <!--로그 파일 기본 경로-->
+    <appender name="REVIEW_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/review/review-raw.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/review/review-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/review/review-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REVIEW_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/review/review-event.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/review/review-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REVIEW_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/review/review-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/review/review-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -159,11 +385,45 @@
 
 
     <!--    태그 도메인-->
-    <appender name="TAG_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/tag/tag.log</file> <!--로그 파일 기본 경로-->
+    <appender name="TAG_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/tag/tag-raw.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/tag/tag-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/tag/tag-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TAG_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/tag/tag-event.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/tag/tag-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TAG_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/tag/tag-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/tag/tag-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -177,12 +437,47 @@
     </appender>
 
 
+
     <!--    찜 도메인-->
-    <appender name="WISH_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/domain/wish/wish.log</file> <!--로그 파일 기본 경로-->
+    <appender name="WISH_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/wish/wish-raw.log</file> <!--로그 파일 기본 경로-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 로그 파일의 이름 형식 지정 -->
-            <fileNamePattern>./logs/domain/wish/wish-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/domain/wish/wish-raw-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="WISH_EVENT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/wish/wish-event.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/wish/wish-event-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 하루 단위로 로그 파일 생성 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 로그 보관 기간 지정 (30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="WISH_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/domain/wish/wish-error.log</file> <!--로그 파일 기본 경로-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일의 이름 형식 지정 -->
+            <fileNamePattern>./logs/domain/wish/wish-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 하루 단위로 로그 파일 생성 -->
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
@@ -205,68 +500,143 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
+<!--    전체 에러 로깅-->
+    <logger name="coursemaker.coursemaker.exception" level="ERROR" additivity="false">
+        <appender-ref ref="GLOBAL_ERROR" />
+    </logger>
 
-    <logger name="coursemaker.coursemaker" level="info" additivity="false">
+    <logger name="org.hibernate.SQL" level="ERROR">
+        <appender-ref ref="GLOBAL_ERROR" />
+    </logger>
+
+
+    <logger name="coursemaker.coursemaker" level="INFO" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 
 <!--    모든 로그를 debug 레벨로 찍음.-->
-    <logger name="coursemaker.coursemaker" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker" level="DEBUG" additivity="false">
         <appender-ref ref="RAW_FILE" />
     </logger>
 
 <!--    인증/인가 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.auth" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.auth" level="DEBUG" additivity="false">
+        <appender-ref ref="AUTH_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.auth" level="INFO" additivity="false">
         <appender-ref ref="AUTH_EVENT" />
     </logger>
 
+    <logger name="coursemaker.coursemaker.domain.auth.exception" level="ERROR" additivity="false">
+        <appender-ref ref="AUTH_ERROR" />
+    </logger>
+
+
 <!--    멤버 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.member" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.member" level="DEBUG" additivity="false">
+        <appender-ref ref="MEMBER_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.member" level="INFO" additivity="false">
         <appender-ref ref="MEMBER_EVENT" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.member" level="ERROR" additivity="false">
+        <appender-ref ref="MEMBER_ERROR" />
     </logger>
 
 
     <!--    코스 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.course" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.course" level="DEBUG" additivity="false">
+        <appender-ref ref="COURSE_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.course" level="INFO" additivity="false">
         <appender-ref ref="COURSE_EVENT" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.course" level="ERROR" additivity="false">
+        <appender-ref ref="COURSE_ERROR" />
     </logger>
 
 
     <!--    여행지 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.destination" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.destination" level="DEBUG" additivity="false">
+        <appender-ref ref="DESTINATION_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.destination" level="INFO" additivity="false">
         <appender-ref ref="DESTINATION_EVENT" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.destination" level="ERROR" additivity="false">
+        <appender-ref ref="DESTINATION_ERROR" />
     </logger>
 
 
     <!--    좋아요 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.like" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.like" level="DEBUG" additivity="false">
+        <appender-ref ref="LIKE_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.like" level="INFO" additivity="false">
         <appender-ref ref="LIKE_EVENT" />
     </logger>
 
+    <logger name="coursemaker.coursemaker.domain.like" level="ERROR" additivity="false">
+        <appender-ref ref="LIKE_ERROR" />
+    </logger>
+
+
     <!--    리뷰 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.review" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.review" level="DEBUG" additivity="false">
+        <appender-ref ref="REVIEW_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.review" level="INFO" additivity="false">
         <appender-ref ref="REVIEW_EVENT" />
     </logger>
 
+    <logger name="coursemaker.coursemaker.domain.review" level="ERROR" additivity="false">
+        <appender-ref ref="REVIEW_ERROR" />
+    </logger>
+
+
 
     <!--    태그 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.tag" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.tag" level="DEBUG" additivity="false">
+        <appender-ref ref="TAG_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.tag" level="INFO" additivity="false">
         <appender-ref ref="TAG_EVENT" />
     </logger>
 
+    <logger name="coursemaker.coursemaker.domain.tag" level="ERROR" additivity="false">
+        <appender-ref ref="TAG_ERROR" />
+    </logger>
+
+
     <!--    찜 이벤트-->
-    <logger name="coursemaker.coursemaker.domain.wish" level="debug" additivity="false">
+    <logger name="coursemaker.coursemaker.domain.wish" level="DEBUG" additivity="false">
+        <appender-ref ref="WISH_RAW" />
+    </logger>
+
+    <logger name="coursemaker.coursemaker.domain.wish" level="INFO" additivity="false">
         <appender-ref ref="WISH_EVENT" />
     </logger>
+
+    <logger name="coursemaker.coursemaker.domain.wish" level="ERROR" additivity="false">
+        <appender-ref ref="WISH_ERROR" />
+    </logger>
+
 
 
     <!-- 루트 로거 설정 -->
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
-
-
-
 
 
 </configuration>
