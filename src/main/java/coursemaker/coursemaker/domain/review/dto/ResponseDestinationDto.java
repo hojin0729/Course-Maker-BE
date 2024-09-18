@@ -45,7 +45,7 @@ public class ResponseDestinationDto {
     private Integer recommendCount;
 
     @Schema(description = "리뷰 작성 날짜", example = "2024-09-14")
-    private String createdAt;
+    private String reviewedAt;
 
 
 
@@ -61,7 +61,7 @@ public class ResponseDestinationDto {
         dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(destinationReview.getRecommendCount());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        dto.setCreatedAt(destinationReview.getCreatedAt().format(formatter));
+        dto.setReviewedAt(destinationReview.getCreatedAt().format(formatter));
         return dto;
     }
 }
