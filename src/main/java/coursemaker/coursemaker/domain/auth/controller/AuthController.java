@@ -9,6 +9,7 @@ import coursemaker.coursemaker.domain.auth.dto.jwt.ReIssueResponseDTO;
 import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.login_logout.LoginResponseDTO;
 import coursemaker.coursemaker.domain.auth.dto.login_logout.LogoutRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.role.RoleUpdateDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.NicknameValidateRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.SendValidateCodeRequestDTO;
 import coursemaker.coursemaker.domain.auth.dto.validate.ValidateEmailRequestDTO;
@@ -210,6 +211,14 @@ public class AuthController {
 
         authService.validateEmail(dto);
         return ResponseEntity.ok().build();
+    }
 
+    /*백엔드 롤 강제 업데이트 API*/
+    @Operation(summary = "등급 강제 업데이트", description = "백엔드에서 테스트용으로 만든 API 입니다.")
+    @PostMapping("/role-update")
+    public ResponseEntity<Void> updateRole(@RequestBody RoleUpdateDTO dto){
+        authService.updateRole(dto);
+
+        return ResponseEntity.ok().build();
     }
 }

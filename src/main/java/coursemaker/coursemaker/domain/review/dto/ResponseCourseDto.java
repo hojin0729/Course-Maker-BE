@@ -48,7 +48,7 @@ public class ResponseCourseDto {
     private Integer recommendCount;
 
     @Schema(description = "리뷰 작성 날짜", example = "2024-09-14")
-    private String reviewedAt;
+    private String createdAt;
 
     public static ResponseCourseDto toDto(TravelCourse travelCourse, CourseReview courseReview, Boolean isMyCourseReview, Boolean isMyLikeReview) {
         ResponseCourseDto dto = new ResponseCourseDto();
@@ -62,7 +62,7 @@ public class ResponseCourseDto {
         dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(courseReview.getRecommendCount());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        dto.setReviewedAt(courseReview.getReviewedAt().format(formatter));
+        dto.setCreatedAt(courseReview.getCreatedAt().format(formatter));
         return dto;
     }
 }
