@@ -49,8 +49,4 @@ public class DestinationReview extends BaseEntity {
     @Column(name = "recommend_count")
     private Integer recommendCount = 0;
 
-    @CreationTimestamp
-    @Column(name = "reviewed_at", updatable = false)
-    private LocalDateTime reviewedAt;
-
 }
