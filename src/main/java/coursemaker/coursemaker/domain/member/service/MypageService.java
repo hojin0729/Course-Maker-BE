@@ -6,17 +6,22 @@ import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
+import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
+import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.like.dto.CourseLikeResponseDto;
 import coursemaker.coursemaker.domain.like.service.CourseLikeService;
+import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.entity.Role;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
+import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
 import coursemaker.coursemaker.domain.tag.service.TagService;
 import coursemaker.coursemaker.domain.wish.dto.CourseWishResponseDto;
 import coursemaker.coursemaker.domain.wish.service.CourseWishService;
+import coursemaker.coursemaker.domain.wish.service.DestinationWishService;
 import coursemaker.coursemaker.util.CourseMakerPagination;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +38,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MypageService {
     private final MemberService memberService;
+    private final TagService tagService;
+
     private final CourseService courseService;
     private final CourseDestinationService courseDestinationService;
-    private final TagService tagService;
-    private final DestinationService destinationService;
     private final CourseLikeService courseLikeService;
     private final CourseWishService courseWishService;
     private final CourseReviewService courseReviewService;
+
+    private final DestinationWishService destinationWishService;
+    private final DestinationService destinationService;
+    private final DestinationLikeService destinationLikeService;
+    private final DestinationReviewService destinationReviewService;
 
     /**
      * 도메인 분리 이유: 순환참조
@@ -139,12 +149,12 @@ public class MypageService {
 
     public CourseMakerPagination<TravelCourseResponse> getMyLikeCourse(String nickname, Pageable pageable){
 
-        /*위시리스트 받아옴*/
-        List<CourseLikeResponseDto> courseWishesByNickname = courseLikeService.getCourseLikesByNickname(nickname);
+        /*좋아요  받아옴*/
+        List<CourseLikeResponseDto> courseLikesByNickname = courseLikeService.getCourseLikesByNickname(nickname);
 
         List<TravelCourse> courseLikeList = new ArrayList<>();
         /*받아온 리스트를 코스 객체로 변환함*/
-        for(CourseLikeResponseDto wish : courseWishesByNickname){
+        for(CourseLikeResponseDto wish : courseLikesByNickname){
             courseLikeList.add(courseService.findById(wish.getCourseId()));
         }
 
@@ -172,6 +182,33 @@ public class MypageService {
         }
 
         return new CourseMakerPagination<>(pageable, contents);
+    }
+
+
+    public CourseMakerPagination<DestinationDto> getMyDestination(String nickname, Pageable pageable) {
+        CourseMakerPagination<Destination> destinationPage = destinationService.findByMemberNickname(nickname, pageable);
+
+        /*더미 객체 생성*/
+        LoginedInfo loginedInfo = new LoginedInfo();
+        loginedInfo.setNickname(nickname);
+
+        List<DestinationDto> contents = destinationPage.getContents().stream()
+                .map(destination -> {
+                    Boolean isMyDestination = true;
+                    Boolean isMyWishDestination = destinationWishService.isDestinationWishedByUser(destination.getId(), loginedInfo.getNickname());
+                    Boolean isMyLikeDestination = destinationLikeService.isDestinationLikedByUser(destination.getId(), loginedInfo.getNickname());
+                    List<TagResponseDto> tags = tagService.findAllByDestinationId(destination.getId());
+                    Double averageRating = destinationReviewService.getAverageRating(destination.getId());
+                    Integer reviewCount = destinationReviewService.getReviewCount(destination.getId());
+                    Integer wishCount = destinationWishService.getDestinationWishCount(destination.getId());
+                    Integer likeCount = destinationLikeService.getDestinationLikeCount(destination.getId());
+                    return DestinationDto.toDto(destination, tags, destination.getIsApiData(), averageRating, isMyDestination, reviewCount, wishCount, likeCount, isMyWishDestination, isMyLikeDestination);
+                })
+                .toList();
+
+        Page<DestinationDto> responsePage = new PageImpl<>(contents, pageable, destinationPage.getTotalPage());
+
+        return new CourseMakerPagination<>(pageable, responsePage, destinationPage.getTotalContents());
     }
 
 }

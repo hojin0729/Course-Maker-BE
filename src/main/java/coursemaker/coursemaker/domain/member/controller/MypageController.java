@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.member.controller;
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
 import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
+import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
 import coursemaker.coursemaker.domain.member.service.MypageService;
 import coursemaker.coursemaker.exception.ErrorResponse;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/my")
 @RequiredArgsConstructor
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Mypage", description = "마이페이지 관련 API")
-public class MypageCoontroller {
+public class MypageController {
 
     private final MypageService mypageService;
 
@@ -128,7 +129,7 @@ public class MypageCoontroller {
             @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
             @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)"),
     })
-    @GetMapping("/course/wish")
+    @GetMapping("/wish/course")
     public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> getMyWishCourse(@AuthenticationPrincipal LoginedInfo loginedInfo,
                                                                                    @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                    @RequestParam(defaultValue = "1", name = "page") Integer page
@@ -171,7 +172,7 @@ public class MypageCoontroller {
             @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
             @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)"),
     })
-    @GetMapping("/course/like")
+    @GetMapping("/like/course")
     public ResponseEntity<CourseMakerPagination<TravelCourseResponse>> getMyLikeCourse(@AuthenticationPrincipal LoginedInfo loginedInfo,
                                                                                        @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                        @RequestParam(defaultValue = "1", name = "page") Integer page
@@ -184,6 +185,51 @@ public class MypageCoontroller {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @Operation(summary = "내가 만든 여행 여행지 조회", description = "로그인 한 사용자가 만든 여행지를 정렬 기준에 맞게 페이지네이션하여 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청 형식입니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 여행지를 찾을 수 없습니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)"),
+    })
+    @GetMapping("/destination")
+    public ResponseEntity<CourseMakerPagination<DestinationDto>> getMyDestination(@AuthenticationPrincipal LoginedInfo loginedInfo,
+                                                                             @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                             @RequestParam(defaultValue = "1", name = "page") Integer page
+    ) {
+        if(loginedInfo == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
+        }
+
+        CourseMakerPagination<DestinationDto> response = mypageService.getMyDestination(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }
