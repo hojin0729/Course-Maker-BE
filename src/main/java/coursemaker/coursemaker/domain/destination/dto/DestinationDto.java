@@ -48,6 +48,11 @@ public class DestinationDto {
     @NotBlank(message = "내용은 공백 혹은 빈 문자는 허용하지 않습니다.")
     private String content; // 텍스트 에디터
 
+    @Schema(description = "API에서 가져온 추가 내용")
+    @NotNull(message = "API 내용은 null일 수 없습니다.")
+    @NotBlank(message = "API 내용은 공백일 수 없습니다.")
+    private String apiContent;
+
     @Schema(description = "평균 평점", example = "4.5")
     private Double averageRating; // 평균 평점
 
@@ -86,6 +91,7 @@ public class DestinationDto {
         dto.setViews(destination.getViews());
         dto.setPictureLink(destination.getPictureLink());
         dto.setContent(destination.getContent());
+        dto.setApiContent(destination.getApiContent());
         dto.setTags(tagDtos);
         dto.setDisabled(destination.getDisabled());
         LocationDto location = new LocationDto(
