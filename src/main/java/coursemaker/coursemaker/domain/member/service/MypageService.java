@@ -7,6 +7,7 @@ import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseDestinationService;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
+import coursemaker.coursemaker.domain.like.dto.CourseLikeResponseDto;
 import coursemaker.coursemaker.domain.like.service.CourseLikeService;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
 import coursemaker.coursemaker.domain.member.entity.Member;
@@ -103,20 +104,58 @@ public class MypageService {
         /*위시리스트 받아옴*/
         List<CourseWishResponseDto> courseWishesByNickname = courseWishService.getCourseWishesByNickname(nickname);
 
-        List<TravelCourse> wishCourses = new ArrayList<>();
+        List<TravelCourse> courseWishList = new ArrayList<>();
         /*받아온 리스트를 코스 객체로 변환함*/
         for(CourseWishResponseDto wish : courseWishesByNickname){
-            wishCourses.add(courseService.findById(wish.getCourseId()));
+            courseWishList.add(courseService.findById(wish.getCourseId()));
         }
 
         LoginedInfo loginedInfo = new LoginedInfo();
         loginedInfo.setNickname(nickname);
 
         List<TravelCourseResponse> contents = new ArrayList<>();
-        for (TravelCourse travelCourse : wishCourses) {
+        for (TravelCourse travelCourse : courseWishList) {
+
+            Boolean isMyWishCourse = true;
+            Boolean isMyLikeCourse = courseLikeService.isCourseLikedByUser(travelCourse.getId(), nickname);
+
+            List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
+                    .stream()
+                    .map(courseDestination -> courseDestinationService.toResponse(courseDestination, loginedInfo))
+                    .toList();
+
+            List<TagResponseDto> tags = tagService.findAllByCourseId(travelCourse.getId());
+            Double averageRating = courseReviewService.getAverageRating(travelCourse.getId());
+            Integer reviewCount = courseReviewService.getReviewCount(travelCourse.getId());
+            Integer wishCount = courseWishService.getCourseWishCount(travelCourse.getId());
+            Integer likeCount = courseLikeService.getCourseLikeCount(travelCourse.getId());
+
+            contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, true, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
+        }
+
+        return new CourseMakerPagination<>(pageable, contents);
+    }
+
+
+    public CourseMakerPagination<TravelCourseResponse> getMyLikeCourse(String nickname, Pageable pageable){
+
+        /*위시리스트 받아옴*/
+        List<CourseLikeResponseDto> courseWishesByNickname = courseLikeService.getCourseLikesByNickname(nickname);
+
+        List<TravelCourse> courseLikeList = new ArrayList<>();
+        /*받아온 리스트를 코스 객체로 변환함*/
+        for(CourseLikeResponseDto wish : courseWishesByNickname){
+            courseLikeList.add(courseService.findById(wish.getCourseId()));
+        }
+
+        LoginedInfo loginedInfo = new LoginedInfo();
+        loginedInfo.setNickname(nickname);
+
+        List<TravelCourseResponse> contents = new ArrayList<>();
+        for (TravelCourse travelCourse : courseLikeList) {
 
             Boolean isMyWishCourse = courseWishService.isCourseWishedByUser(travelCourse.getId(), nickname);
-            Boolean isMyLikeCourse = courseLikeService.isCourseLikedByUser(travelCourse.getId(), nickname);
+            Boolean isMyLikeCourse = true;
 
             List<CourseDestinationResponse> courseDestinationResponses = courseDestinationService.getCourseDestinations(travelCourse)
                     .stream()
