@@ -39,12 +39,19 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         /*URL 접근 권한 설정*/
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers("/v1/my/**").authenticated()
                         .anyRequest().permitAll()
                 );
+
+        http
+                .exceptionHandling( (exception) ->
+                        exception
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        );
 
         /*세션 무상태 설정*/
         http
