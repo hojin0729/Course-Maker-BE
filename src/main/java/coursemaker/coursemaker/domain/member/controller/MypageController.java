@@ -231,5 +231,49 @@ public class MypageController {
     }
 
 
+    @Operation(summary = "내가 찜 한 여행 여행지 조회", description = "로그인 한 사용자가 찜 한 여행자를 정렬 기준에 맞게 페이지네이션하여 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"잘못된 요청 형식입니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+                    )
+            )),
+            @ApiResponse(responseCode = "404", description = "찜 한 코스가 존재하지 않음.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 404, \"errorType\": \"Invalid wish\", \"message\": \"여행지 찜이 존재하지 않습니다.\"}"
+                    )
+            ))
+    })
+    @Parameters({
+            @Parameter(name = "record", description = "한 페이지당 표시할 데이터 수"),
+            @Parameter(name = "page", description = "조회할 페이지 번호(페이지는 1 페이지 부터 시작합니다.)"),
+    })
+    @GetMapping("/wish/destination")
+    public ResponseEntity<CourseMakerPagination<DestinationDto>> getMyWishDestination(@AuthenticationPrincipal LoginedInfo loginedInfo,
+                                                                                       @RequestParam(defaultValue = "20", name = "record") Integer record,
+                                                                                       @RequestParam(defaultValue = "1", name = "page") Integer page
+    ) {
+        if(loginedInfo == null) {
+            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
+        }
+
+        CourseMakerPagination<DestinationDto> response = mypageService.getMyWishDestination(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }
