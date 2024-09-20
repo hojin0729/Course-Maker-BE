@@ -170,7 +170,8 @@ public class BusanApiServiceImpl implements BusanApiService {
                         .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "피서지 태그"));
 
                 dto.setName(busanApi.getGuganNm());
-                dto.setContent(busanApi.getGmCourse());
+//                dto.setContent(busanApi.getGmCourse());
+                dto.setApiContent(busanApi.getGmCourse());
                 dto.setLocation(locationDto);
                 dto.setSeq(busanApi.getSeq());
                 dto.setIsApiData(true);
