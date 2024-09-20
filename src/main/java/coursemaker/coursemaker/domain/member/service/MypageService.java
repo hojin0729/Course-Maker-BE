@@ -10,6 +10,7 @@ import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.like.dto.CourseLikeResponseDto;
+import coursemaker.coursemaker.domain.like.dto.DestinationLikeResponseDto;
 import coursemaker.coursemaker.domain.like.service.CourseLikeService;
 import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
@@ -80,7 +81,7 @@ public class MypageService {
     public CourseMakerPagination<TravelCourseResponse> getMyCourses(String nickname, Pageable pageable) {
         CourseMakerPagination<TravelCourse> travelCoursePage = courseService.findByMemberNickname(nickname, pageable);
 
-        /*더미 객체 생성*/
+        /*사용자 정보 입력*/
         LoginedInfo loginedInfo = new LoginedInfo();
         loginedInfo.setNickname(nickname);
 
@@ -103,6 +104,7 @@ public class MypageService {
             courseWishList.add(courseService.findById(wish.getCourseId()));
         }
 
+        /*사용자 정보 입력*/
         LoginedInfo loginedInfo = new LoginedInfo();
         loginedInfo.setNickname(nickname);
 
@@ -123,6 +125,7 @@ public class MypageService {
             courseLikeList.add(courseService.findById(wish.getCourseId()));
         }
 
+        /*사용자 정보 입력*/
         LoginedInfo loginedInfo = new LoginedInfo();
         loginedInfo.setNickname(nickname);
 
@@ -135,7 +138,7 @@ public class MypageService {
     public CourseMakerPagination<DestinationDto> getMyDestination(String nickname, Pageable pageable) {
         CourseMakerPagination<Destination> destinationPage = destinationService.findByMemberNickname(nickname, pageable);
 
-        /*더미 객체 생성*/
+        /*사용자 정보 입력*/
         LoginedInfo loginedInfo = new LoginedInfo();
         loginedInfo.setNickname(nickname);
 
@@ -162,6 +165,27 @@ public class MypageService {
         loginedInfo.setNickname(nickname);
 
         List<DestinationDto> contents = destinationToDTO(destinationWishList, loginedInfo);
+
+        return new CourseMakerPagination<>(pageable, contents);
+    }
+
+    /*내가 좋아요 한 여행지 반환*/
+    public CourseMakerPagination<DestinationDto> getMyLikeDestination(String nickname, Pageable pageable){
+
+        /*좋아요  받아옴*/
+        List<DestinationLikeResponseDto> destinationLikesByNickname = destinationLikeService.getDestinationLikesByNickname(nickname);
+
+        List<Destination> destinationLikeList = new ArrayList<>();
+        /*받아온 리스트를 여행지 객체로 변환함*/
+        for(DestinationLikeResponseDto like : destinationLikesByNickname){
+            destinationLikeList.add(destinationService.findById(like.getDestinationId()));
+        }
+
+        /*사용자 정보 입력*/
+        LoginedInfo loginedInfo = new LoginedInfo();
+        loginedInfo.setNickname(nickname);
+
+        List<DestinationDto> contents = destinationToDTO(destinationLikeList, loginedInfo);
 
         return new CourseMakerPagination<>(pageable, contents);
     }
