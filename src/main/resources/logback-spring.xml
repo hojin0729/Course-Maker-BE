@@ -206,7 +206,7 @@
     </logger>
 
 
-    <logger name="coursemaker.coursemaker" level="info" additivity="false">
+    <logger name="coursemaker.coursemaker" level="debug" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 
