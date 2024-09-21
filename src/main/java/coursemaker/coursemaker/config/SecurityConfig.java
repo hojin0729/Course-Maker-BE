@@ -20,7 +20,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -37,9 +39,11 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtProvider jwtProvider;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         /*URL 접근 권한 설정*/
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
@@ -50,7 +54,8 @@ public class SecurityConfig {
         http
                 .exceptionHandling( (exception) ->
                         exception
-                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                                .authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(customAccessDeniedHandler)
                         );
 
         /*세션 무상태 설정*/
@@ -151,7 +156,11 @@ public class SecurityConfig {
          *     INTERMEDIATE_TRAVELER("ROLE_INTERMEDIATE_TRAVELER"),// 중급 여행가
          *     PRO_TRAVELER("ROLE_PRO_TRAVELER");// 프로 여행가
          * */
-        hierarchy.setHierarchy("ROLE_ADMIN > ROLE_PRO_TRAVELER > ROLE_INTERMEDIATE_TRAVELER > ROLE_BEGINNER_TRAVELER");
+        hierarchy.setHierarchy(
+                        "ROLE_ADMIN > ROLE_PRO_TRAVELER \n" +
+                        "ROLE_PRO_TRAVELER > ROLE_INTERMEDIATE_TRAVELER \n" +
+                        "ROLE_INTERMEDIATE_TRAVELER > ROLE_BEGINNER_TRAVELER"
+        );
 
 
         return hierarchy;
