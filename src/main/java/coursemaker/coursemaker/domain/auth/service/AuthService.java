@@ -88,7 +88,7 @@ public class AuthService {
                 passwordEncoder.encode(request.getPassword()),
                 request.getPhoneNumber(),
                 Member.LoginType.BASIC,
-                Role.BEGINNER_TRAVELER
+                Role.ROLE_BEGINNER_TRAVELER
         );
 
         /*DB에 회원정보 저장*/

@@ -59,6 +59,9 @@ public class RequestDto {
     @Schema(description = "부산광역시 공공데이터 또는 Tour Api 공공데이터일 경우에 1이라는 값이 할당됩니다.", example = "false", defaultValue = "false", nullable = true, hidden = true)
     private Boolean isApiData;
 
+    @Schema(description = "공공데이터 여행지의 설명입니다.", nullable = true, hidden = true)
+    private String apiContent;
+
 
     // RequestDto를 Destination 엔티티로 변환하는 메서드
     public Destination toEntity(Member member) {
@@ -96,6 +99,7 @@ public class RequestDto {
         destination.setWishCount(0);
         destination.setLikeCount(0);
         destination.setReviewCount(0);
+        destination.setApiContent(this.apiContent);
 
         return destination;
     }

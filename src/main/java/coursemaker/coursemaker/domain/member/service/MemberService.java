@@ -25,7 +25,7 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "ID: " + userId));
 
         /*관리자의 경우*/
-        if(authService.getLoginInfo()!=null && authService.getLoginInfo().getRole()== Role.ADMIN){
+        if(authService.getLoginInfo()!=null && authService.getLoginInfo().getRole()== Role.ROLE_ADMIN){
             return result;
         }
 
@@ -43,7 +43,7 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Nickname: " + nickname));
 
         /*관리자의 경우*/
-        if(authService.getLoginInfo()!=null && authService.getLoginInfo().getRole()== Role.ADMIN){
+        if(authService.getLoginInfo()!=null && authService.getLoginInfo().getRole()== Role.ROLE_ADMIN){
             return result;
         }
 
@@ -60,7 +60,7 @@ public class MemberService {
                 .orElseThrow(() -> new UserNotFoundException("해당 회원을 찾을 수 없습니다. ", "Email: " + email));
 
         /*관리자의 경우*/
-        if(authService.getLoginInfo()!=null && authService.getLoginInfo().getRole()== Role.ADMIN){
+        if(authService.getLoginInfo()!=null && authService.getLoginInfo().getRole()== Role.ROLE_ADMIN){
             return result;
         }
 

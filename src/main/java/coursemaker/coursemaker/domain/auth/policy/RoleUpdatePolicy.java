@@ -34,7 +34,7 @@ public class RoleUpdatePolicy {
     public boolean isUpdatable(Member member) {
 
         /*초보 여행가 -> 중급 여행가 등업 여부*/
-        if(member.getRoles() == Role.BEGINNER_TRAVELER) {
+        if(member.getRoles() == Role.ROLE_BEGINNER_TRAVELER) {
 
             int reviewCnt = 0;
 
@@ -44,7 +44,7 @@ public class RoleUpdatePolicy {
             /*리뷰가 50개 이상일 경우 등업*/
             if (reviewCnt >= 50) {
                 return true;
-            } else if (member.getRoles() == Role.INTERMEDIATE_TRAVELER) {
+            } else if (member.getRoles() == Role.ROLE_INTERMEDIATE_TRAVELER) {
                 return false;
             }
         }
@@ -60,7 +60,7 @@ public class RoleUpdatePolicy {
         }
 
         /*초보 여행가 -> 중급 여행가 등업 여부*/
-        if(member.getRoles() == Role.BEGINNER_TRAVELER){
+        if(member.getRoles() == Role.ROLE_BEGINNER_TRAVELER){
 
             int reviewCnt = 0;
 
@@ -72,13 +72,13 @@ public class RoleUpdatePolicy {
                 log.debug("[AUTH] 등업 권한 충족. 닉네임: {}, 등업: {} -> {}",
                         member.getNickname(),
                         member.getRoles().getRole(),
-                        Role.INTERMEDIATE_TRAVELER.getRole()
+                        Role.ROLE_INTERMEDIATE_TRAVELER.getRole()
                 );
 
-                return Role.INTERMEDIATE_TRAVELER;
+                return Role.ROLE_INTERMEDIATE_TRAVELER;
             }
-        } else if(member.getRoles() == Role.INTERMEDIATE_TRAVELER){
-            return Role.INTERMEDIATE_TRAVELER;
+        } else if(member.getRoles() == Role.ROLE_INTERMEDIATE_TRAVELER){
+            return Role.ROLE_INTERMEDIATE_TRAVELER;
         }
 
         return member.getRoles();

@@ -510,7 +510,8 @@
     </logger>
 
 
-    <logger name="coursemaker.coursemaker" level="INFO" additivity="false">
+
+    <logger name="coursemaker.coursemaker" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

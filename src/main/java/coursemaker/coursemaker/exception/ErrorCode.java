@@ -44,6 +44,7 @@ public enum ErrorCode {
 
     MISMATCH_EMAIL(HttpStatus.NOT_FOUND, "Invalid item", "이메일 전송 기록이 없습니다.", "AUTH-005"),
     MISMATCH_CODE(HttpStatus.BAD_REQUEST, "Mismatch code", "검증 코드가 일치하지 않습니다.", "AUTH-006"),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "Access denied", "여행자 등급이 부족해서 접근할 수 없습니다.", "AUTH-007"),
 
     TIME_OUT(HttpStatus.BAD_REQUEST, "Timeout", "유효 시간이 지났습니다.", "TIME-OUT"),
 

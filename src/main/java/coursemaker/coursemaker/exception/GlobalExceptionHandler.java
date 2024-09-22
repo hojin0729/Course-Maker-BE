@@ -17,6 +17,7 @@ import coursemaker.coursemaker.domain.wish.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,16 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(RootException e) {
+        ErrorResponse response = new ErrorResponse();
+        response.setErrorType(ErrorCode.ACCESS_DENIED.getErrorType());
+        response.setMessage(ErrorCode.ACCESS_DENIED.getDescription());
+        response.setStatus(ErrorCode.ACCESS_DENIED.getStatus().value());
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 
     /*인증 관련 예외처리*/
     @ExceptionHandler(

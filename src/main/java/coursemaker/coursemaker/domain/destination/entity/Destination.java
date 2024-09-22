@@ -36,6 +36,9 @@ public class Destination extends BaseEntity {
     @Column(name = "content", columnDefinition = "MEDIUMTEXT")
     private String content;
 
+    @Column(name = "apiContent", columnDefinition = "TEXT")
+    private String apiContent;
+
     @Column(name = "location", length = 50)
     private String location;
 

@@ -719,7 +719,8 @@ public class TourApiServiceImpl implements TourApiService {
 //                dto.setTags(List.of(natureViewTag));
                 dto.setName(tourApi.getTitle());
                 dto.setPictureLink(tourApi.getFirstimage());
-                dto.setContent(tourApi.getOverview());
+//                dto.setContent(tourApi.getOverview());
+                dto.setApiContent(tourApi.getOverview());
                 dto.setLocation(locationDto);
                 dto.setDisabled(tourApi.getDisabled());
 //                dto.setWithPet(tourApi.getWithPet());

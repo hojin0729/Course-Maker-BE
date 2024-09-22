@@ -37,6 +37,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -78,6 +79,13 @@ public class CourseApiController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
+            @ApiResponse(responseCode = "403", description = "여행자 등급이 부족해서 코스를 생성하지 못할때.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(
+                            value = "{\"status\": 403, \"errorType\": \"Access denied\", \"message\": \"여행자 등급이 부족해서 접근할 수 없습니다.\"}"
+                    )
+            )),
             @ApiResponse(responseCode = "409", description = "생성하려는 코스의 이름이 이미 있을 때 반환합니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -88,6 +96,14 @@ public class CourseApiController {
     })
 /*********스웨거 어노테이션**********/
     @PostMapping
+    @PreAuthorize(value = "" +
+            "hasAnyRole(" +
+            "'ROLE_INTERMEDIATE_TRAVELER', " +
+            "'ROLE_PRO_TRAVELER', " +
+            "'ROLE_PARTNER', " +
+            "'ROLE_ADMIN'" +
+            ")"
+    )
     public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
@@ -339,18 +355,18 @@ public class CourseApiController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "해당 코스에 접근 권한이 없을 때 반환합니다.", content = @Content(
+            @ApiResponse(responseCode = "403", description = "여행자 등급이 부족해서 코스를 수정하지 못할때.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"접근 권한이 없습니다.\"}"
+                            value = "{\"status\": 403, \"errorType\": \"Access denied\", \"message\": \"여행자 등급이 부족해서 접근할 수 없습니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "404", description = "수정하려는 코스의 id를 찾지 못할 때 반환합니다.", content = @Content(
+            @ApiResponse(responseCode = "403", description = "여행자 등급이 부족해서 코스를 삭제하지 못할때.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
                     examples = @ExampleObject(
-                            value = "{\"status\": 404, \"errorType\": \"Invalid item\", \"message\": \"해당하는 코스를 찾을 수 없습니다.\"}"
+                            value = "{\"status\": 403, \"errorType\": \"Access denied\", \"message\": \"여행자 등급이 부족해서 접근할 수 없습니다.\"}"
                     )
             )),
             @ApiResponse(responseCode = "409", description = "수정하려는 코스의 이름이 이미 있을 때 반환합니다.", content = @Content(
@@ -366,6 +382,14 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @PutMapping("/{id}")
+    @PreAuthorize(value = "" +
+            "hasAnyRole(" +
+            "'ROLE_INTERMEDIATE_TRAVELER', " +
+            "'ROLE_PRO_TRAVELER', " +
+            "'ROLE_PARTNER', " +
+            "'ROLE_ADMIN'" +
+            ")"
+    )
     public ResponseEntity<TravelCourseResponse> updateTravelCourse(@PathVariable("id") Long id,
                                                                    @Valid @RequestBody UpdateTravelCourseRequest request,
                                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
@@ -441,6 +465,14 @@ public class CourseApiController {
     })
     /*********스웨거 어노테이션**********/
     @DeleteMapping("/{id}")
+    @PreAuthorize(value = "" +
+            "hasAnyRole(" +
+            "'ROLE_INTERMEDIATE_TRAVELER', " +
+            "'ROLE_PRO_TRAVELER', " +
+            "'ROLE_PARTNER', " +
+            "'ROLE_ADMIN'" +
+            ")"
+    )
     public ResponseEntity<Void> deleteTravelCourse(@PathVariable("id") Long id,
                                                    @AuthenticationPrincipal LoginedInfo loginedInfo) {
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null

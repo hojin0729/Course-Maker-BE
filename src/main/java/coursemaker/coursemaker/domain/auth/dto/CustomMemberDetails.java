@@ -19,8 +19,7 @@ public class CustomMemberDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-        authorities.add((GrantedAuthority) () -> member.getRoles()
-                .name());
+        authorities.add((GrantedAuthority) () -> member.getRoles().getRole());
 
         return authorities;
     }
