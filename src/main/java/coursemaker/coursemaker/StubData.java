@@ -1,6 +1,7 @@
 package coursemaker.coursemaker;
 
 import coursemaker.coursemaker.domain.auth.dto.join_withdraw.JoinRequestDTO;
+import coursemaker.coursemaker.domain.auth.dto.role.RoleUpdateDTO;
 import coursemaker.coursemaker.domain.auth.service.AuthService;
 import coursemaker.coursemaker.domain.course.dto.AddCourseDestinationRequest;
 import coursemaker.coursemaker.domain.course.dto.AddTravelCourseRequest;
@@ -11,7 +12,12 @@ import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.member.entity.Member;
+import coursemaker.coursemaker.domain.member.entity.Role;
 import coursemaker.coursemaker.domain.member.service.MemberService;
+import coursemaker.coursemaker.domain.review.dto.RequestCourseDto;
+import coursemaker.coursemaker.domain.review.dto.RequestDestinationDto;
+import coursemaker.coursemaker.domain.review.service.CourseReviewService;
+import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagPostDto;
 import coursemaker.coursemaker.domain.tag.exception.TagNotFoundException;
 import coursemaker.coursemaker.domain.tag.service.TagService;
@@ -21,6 +27,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,12 +39,49 @@ public class StubData implements CommandLineRunner {
     private final DestinationService destinationService;
     private final CourseService courseService;
     private final AuthService authService;
+    private final CourseReviewService courseReviewService;
+    private final DestinationReviewService destinationReviewService;
 
     public void MemberStubData() throws Exception { // 1 ~ 5번 회원 생성
 
         /*회원가입*/
         JoinRequestDTO request;
-        for(long i = 1; i <= 5; i++) {
+
+        request = new JoinRequestDTO();
+        request.setName("chobo");
+        request.setEmail("chobo@example.com");
+        request.setNickname("초보");
+        request.setPassword("password");
+        request.setPhoneNumber("010-0000-0000");
+        authService.join(request);
+
+        request = new JoinRequestDTO();
+        request.setName("middle");
+        request.setEmail("middle@example.com");
+        request.setNickname("중급");
+        request.setPassword("password");
+        request.setPhoneNumber("010-0000-0000");
+        authService.join(request);
+
+        RoleUpdateDTO update = new RoleUpdateDTO();
+        update.setNickname("중급");
+        update.setRole(Role.ROLE_INTERMEDIATE_TRAVELER);
+        authService.updateRole(update);
+
+        request = new JoinRequestDTO();
+        request.setName("pro");
+        request.setEmail("pro@example.com");
+        request.setNickname("프로");
+        request.setPassword("password");
+        request.setPhoneNumber("010-0000-0000");
+        authService.join(request);
+
+        update = new RoleUpdateDTO();
+        update.setNickname("프로");
+        update.setRole(Role.ROLE_PRO_TRAVELER);
+        authService.updateRole(update);
+
+        for(long i = 4; i <= 5; i++) {
             request = new JoinRequestDTO();
             request.setName("User");
             request.setEmail("User" + i + "@example.com");
@@ -45,6 +89,11 @@ public class StubData implements CommandLineRunner {
             request.setPassword("password" + i);
             request.setPhoneNumber("010-0000-000" + i);
             authService.join(request);
+
+            update = new RoleUpdateDTO();
+            update.setNickname("nickname"+i);
+            update.setRole(Role.ROLE_INTERMEDIATE_TRAVELER);
+            authService.updateRole(update);
         }
     }
 
@@ -695,7 +744,7 @@ public class StubData implements CommandLineRunner {
     }
 
     public void CourseStubData() throws Exception {
-        Member member1 = memberService.findById(1L);
+        Member member1 = memberService.findById(2L);
         Member member2 = memberService.findById(2L);
         Member member3 = memberService.findById(3L);
         Member member4 = memberService.findById(4L);
@@ -1143,6 +1192,67 @@ public class StubData implements CommandLineRunner {
         return request;
     }
 
+    private void courseReviewStubData(){
+
+        List<String> images = new ArrayList<String>();
+        images.add("https://picsum.photos/id/1/5000/3333");
+        images.add("https://picsum.photos/id/2/5000/3333");
+        images.add("https://picsum.photos/id/3/5000/3333");
+
+
+        RequestCourseDto dto = new RequestCourseDto();
+        dto.setNickname("초보");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        dto.setPictures(images);
+        courseReviewService.save(dto, 1L);
+
+        dto = new RequestCourseDto();
+        dto.setNickname("초보");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        dto.setPictures(images);
+        courseReviewService.save(dto, 2L);
+
+        dto.setNickname("중급");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        courseReviewService.save(dto, 3L);
+
+        dto.setNickname("프로");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        courseReviewService.save(dto, 4L);
+    }
+
+    private void destinationReviewStubData(){
+
+        List<String> images = new ArrayList<String>();
+        images.add("https://picsum.photos/id/1/5000/3333");
+        images.add("https://picsum.photos/id/2/5000/3333");
+        images.add("https://picsum.photos/id/3/5000/3333");
+
+        RequestDestinationDto dto = new RequestDestinationDto();
+
+        dto.setNickname("초보");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        dto.setPictures(images);
+        destinationReviewService.save(dto, 2L);
+
+        dto.setNickname("중급");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        dto.setPictures(images);
+        destinationReviewService.save(dto, 3L);
+
+        dto.setNickname("프로");
+        dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
+        dto.setRating(4.5);
+        dto.setPictures(images);
+        destinationReviewService.save(dto, 4L);
+    }
+
 
     @Override
     public void run(String... args) throws Exception {
@@ -1150,5 +1260,7 @@ public class StubData implements CommandLineRunner {
         TagStubData();
         DestinationStubData();
         CourseStubData();
+        courseReviewStubData();
+        destinationReviewStubData();
     }
 }
