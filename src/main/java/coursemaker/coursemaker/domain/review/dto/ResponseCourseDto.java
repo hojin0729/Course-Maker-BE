@@ -62,7 +62,7 @@ public class ResponseCourseDto {
         dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(courseReview.getRecommendCount());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        dto.setReviewedAt(courseReview.getReviewedAt().format(formatter));
+        dto.setReviewedAt(courseReview.getCreatedAt().format(formatter));
         return dto;
     }
 }

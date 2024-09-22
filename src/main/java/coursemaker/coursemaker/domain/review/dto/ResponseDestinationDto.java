@@ -61,7 +61,7 @@ public class ResponseDestinationDto {
         dto.setIsMyLikeReview(isMyLikeReview);
         dto.setRecommendCount(destinationReview.getRecommendCount());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        dto.setReviewedAt(destinationReview.getReviewedAt().format(formatter));
+        dto.setReviewedAt(destinationReview.getCreatedAt().format(formatter));
         return dto;
     }
 }

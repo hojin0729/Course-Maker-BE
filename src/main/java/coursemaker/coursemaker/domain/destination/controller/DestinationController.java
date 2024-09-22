@@ -371,13 +371,13 @@ public class DestinationController {
                             value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
                     )
             )),
-            @ApiResponse(responseCode = "403", description = "접근 권한이 없을 때 반환합니다.", content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ErrorResponse.class),
-                    examples = @ExampleObject(
-                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"접근 권한이 없습니다.\"}"
-                    )
-            )),
+//            @ApiResponse(responseCode = "403", description = "접근 권한이 없을 때 반환합니다.", content = @Content(
+//                    mediaType = "application/json",
+//                    schema = @Schema(implementation = ErrorResponse.class),
+//                    examples = @ExampleObject(
+//                            value = "{\"status\": 403, \"errorType\": \"Forbidden\", \"message\": \"접근 권한이 없습니다.\"}"
+//                    )
+//            )),
             @ApiResponse(responseCode = "404", description = "수정하려는 여행지의 id를 찾지 못할 때 반환합니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -405,11 +405,12 @@ public class DestinationController {
             throw new UnAuthorizedException("login required", "로그인 후 이용이 가능합니다.");
         }
         request.setNickname(nickname);
-        // 해당 여행지가 로그인한 사용자에게 속하는지 확인
-        Destination existingDestination = destinationService.findById(id);
-        if (!existingDestination.getMember().getNickname().equals(nickname)) {
-            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
-        }
+
+        /*여행지는 위키처럼 누구나 수정 가능.*/
+//        Destination existingDestination = destinationService.findById(id);
+//        if (!existingDestination.getMember().getNickname().equals(nickname)) {
+//            throw new ForbiddenException("Forbidden", "사용자가 이 자원에 접근할 권한이 없습니다.");
+//        }
         Destination updatedDestination = destinationService.update(id, request);
         Boolean isMyDestination = loginedInfo != null && loginedInfo.getNickname().equals(updatedDestination.getMember().getNickname());
         Boolean isMyWishDestination = loginedInfo != null && destinationWishService.isDestinationWishedByUser(updatedDestination.getId(), loginedInfo.getNickname());
