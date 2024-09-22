@@ -1,7 +1,6 @@
 package coursemaker.coursemaker.domain.member.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
-import coursemaker.coursemaker.domain.auth.exception.LoginRequiredException;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
@@ -48,9 +47,6 @@ public class MypageController {
     })
     @GetMapping("/basicInfo")
     public ResponseEntity<BasicUserInfoResponseDTO> getBasicInfo(@AuthenticationPrincipal LoginedInfo loginedInfo) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         BasicUserInfoResponseDTO response = mypageService.getBasicUserInfo(loginedInfo.getNickname());
 
@@ -93,9 +89,6 @@ public class MypageController {
                                                                                    @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                    @RequestParam(defaultValue = "1", name = "page") Integer page
     ) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         CourseMakerPagination<TravelCourseResponse> response = mypageService.getMyCourses(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
 
@@ -137,9 +130,6 @@ public class MypageController {
                                                                                   @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                   @RequestParam(defaultValue = "1", name = "page") Integer page
     ) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         CourseMakerPagination<DestinationDto> response = mypageService.getMyDestination(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
 
@@ -183,9 +173,6 @@ public class MypageController {
                                                                                    @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                    @RequestParam(defaultValue = "1", name = "page") Integer page
     ) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         CourseMakerPagination<TravelCourseResponse> response = mypageService.getMyWishCourse(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
 
@@ -227,9 +214,6 @@ public class MypageController {
                                                                                       @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                       @RequestParam(defaultValue = "1", name = "page") Integer page
     ) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         CourseMakerPagination<DestinationDto> response = mypageService.getMyWishDestination(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
 
@@ -274,9 +258,6 @@ public class MypageController {
                                                                                        @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                        @RequestParam(defaultValue = "1", name = "page") Integer page
     ) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         CourseMakerPagination<TravelCourseResponse> response = mypageService.getMyLikeCourse(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
 
@@ -319,9 +300,6 @@ public class MypageController {
                                                                                        @RequestParam(defaultValue = "20", name = "record") Integer record,
                                                                                        @RequestParam(defaultValue = "1", name = "page") Integer page
     ) {
-        if(loginedInfo == null) {
-            throw new LoginRequiredException("로그인 후 이용 가능합니다.", "[MEMBER] 비 로그인 사용자 마이페이지 접근");
-        }
 
         CourseMakerPagination<DestinationDto> response = mypageService.getMyLikeDestination(loginedInfo.getNickname(), PageRequest.of(page - 1, record));
 
