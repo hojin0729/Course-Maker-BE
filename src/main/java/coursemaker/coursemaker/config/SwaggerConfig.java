@@ -2,6 +2,8 @@ package coursemaker.coursemaker.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,21 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("Bearer Token", apiKey))
-                .addSecurityItem(securityRequirement);
+                .addSecurityItem(securityRequirement)
+                .info(apiInfo());
+    }
+
+    private Info apiInfo(){
+        Contact contact = new Contact();
+        contact.setEmail("gurwls0214@naver.com");
+        contact.setName("coursemaker");
+        contact.setUrl("http://course-maker.net");
+
+
+        return new Info()
+                .title("Course Maker API")
+                .description("코스메이커 API 스웨거 입니다.")
+                .version("0.1.0")
+                .contact(contact);
     }
 }
