@@ -46,33 +46,46 @@ public class StubData implements CommandLineRunner {
 
         /*회원가입*/
         JoinRequestDTO request;
+        RoleUpdateDTO update;
 
-        request = new JoinRequestDTO();
-        request.setName("chobo");
-        request.setEmail("chobo@example.com");
-        request.setNickname("초보");
-        request.setPassword("password");
-        request.setPhoneNumber("010-0000-0000");
-        authService.join(request);
+        /*초보 여행가*/
+        for(long i = 1; i < 3; i++) {
+            request = new JoinRequestDTO();
+            request.setName("초보"+i);
+            request.setEmail("chobo" + i + "@example.com");
+            request.setNickname("초보" + i);
+            request.setPassword("password1!");
+            request.setPhoneNumber("010-0000-000" + i);
+            authService.join(request);
 
-        request = new JoinRequestDTO();
-        request.setName("middle");
-        request.setEmail("middle@example.com");
-        request.setNickname("중급");
-        request.setPassword("password");
-        request.setPhoneNumber("010-0000-0000");
-        authService.join(request);
+            update = new RoleUpdateDTO();
+            update.setNickname("초보"+i);
+            update.setRole(Role.ROLE_BEGINNER_TRAVELER);
+            authService.updateRole(update);
+        }
 
-        RoleUpdateDTO update = new RoleUpdateDTO();
-        update.setNickname("중급");
-        update.setRole(Role.ROLE_INTERMEDIATE_TRAVELER);
-        authService.updateRole(update);
+        /*중급 여행가*/
+        for(long i = 1; i < 3; i++) {
+            request = new JoinRequestDTO();
+            request.setName("중급"+i);
+            request.setEmail("middle" + i + "@example.com");
+            request.setNickname("중급" + i);
+            request.setPassword("password1!");
+            request.setPhoneNumber("010-0000-000" + i);
+            authService.join(request);
 
+            update = new RoleUpdateDTO();
+            update.setNickname("중급"+i);
+            update.setRole(Role.ROLE_INTERMEDIATE_TRAVELER);
+            authService.updateRole(update);
+        }
+
+        /*프로 여행가*/
         request = new JoinRequestDTO();
         request.setName("pro");
         request.setEmail("pro@example.com");
         request.setNickname("프로");
-        request.setPassword("password");
+        request.setPassword("password1!");
         request.setPhoneNumber("010-0000-0000");
         authService.join(request);
 
@@ -81,20 +94,6 @@ public class StubData implements CommandLineRunner {
         update.setRole(Role.ROLE_PRO_TRAVELER);
         authService.updateRole(update);
 
-        for(long i = 4; i <= 5; i++) {
-            request = new JoinRequestDTO();
-            request.setName("User");
-            request.setEmail("User" + i + "@example.com");
-            request.setNickname("nickname" + i);
-            request.setPassword("password" + i);
-            request.setPhoneNumber("010-0000-000" + i);
-            authService.join(request);
-
-            update = new RoleUpdateDTO();
-            update.setNickname("nickname"+i);
-            update.setRole(Role.ROLE_INTERMEDIATE_TRAVELER);
-            authService.updateRole(update);
-        }
     }
 
     public void TagStubData() throws Exception { // 1 ~ 5번 태그 생성
@@ -744,9 +743,9 @@ public class StubData implements CommandLineRunner {
     }
 
     public void CourseStubData() throws Exception {
-        Member member1 = memberService.findById(2L);
-        Member member2 = memberService.findById(2L);
-        Member member3 = memberService.findById(3L);
+        Member member1 = memberService.findById(3L);
+        Member member2 = memberService.findById(3L);
+        Member member3 = memberService.findById(4L);
         Member member4 = memberService.findById(4L);
         Member member5 = memberService.findById(5L);
 
@@ -1201,20 +1200,20 @@ public class StubData implements CommandLineRunner {
 
 
         RequestCourseDto dto = new RequestCourseDto();
-        dto.setNickname("초보");
+        dto.setNickname("초보1");
         dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
         dto.setRating(4.5);
         dto.setPictures(images);
         courseReviewService.save(dto, 1L);
 
         dto = new RequestCourseDto();
-        dto.setNickname("초보");
+        dto.setNickname("초보2");
         dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
         dto.setRating(4.5);
         dto.setPictures(images);
         courseReviewService.save(dto, 2L);
 
-        dto.setNickname("중급");
+        dto.setNickname("중급1");
         dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
         dto.setRating(4.5);
         courseReviewService.save(dto, 3L);
@@ -1234,13 +1233,13 @@ public class StubData implements CommandLineRunner {
 
         RequestDestinationDto dto = new RequestDestinationDto();
 
-        dto.setNickname("초보");
+        dto.setNickname("초보1");
         dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
         dto.setRating(4.5);
         dto.setPictures(images);
         destinationReviewService.save(dto, 2L);
 
-        dto.setNickname("중급");
+        dto.setNickname("중급2");
         dto.setDescription("여행하기 정말 좋았여요.(이미지 사이즈는 5000*3333 입니다.)");
         dto.setRating(4.5);
         dto.setPictures(images);
