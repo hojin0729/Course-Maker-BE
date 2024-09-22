@@ -28,6 +28,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Collections;
+import java.util.List;
 
 //커스텀 순서 AF(authentication filter) -> AM(authentication manager)
 //         ->AP(authentication provider) -> US(userdetails service)
@@ -76,7 +77,7 @@ public class SecurityConfig {
 
             CorsConfiguration configuration = new CorsConfiguration();
             // 모든 출처에서 요청 허용 (http://localhost:3000와 같이 주소로 허용가능)
-            configuration.setAllowedOrigins(Collections.singletonList("http://course-maker.net")); // http://localhost:3000와 같이 주소로 허용가능
+            configuration.setAllowedOrigins(List.of("http://course-maker.net", "http://localhost:5173"));
             // HTTP 메소드(GET, POST 등 모든요청)의 요청을 허용합니다.
             configuration.setAllowedMethods(Collections.singletonList("*"));
             // 인증 정보(쿠키, 인증 토큰 등)의 전송을 허용합니다.
