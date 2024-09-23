@@ -491,116 +491,148 @@
     </appender>
 
 
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- 로그 스태시 주소 -->
+        <destination>localhost:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        </encoder>
+    </appender>
 
+    <logger name="INFO_LOG" level="DEBUG">
+        <appender-ref ref="LOGSTASH"/>
+    </logger>
 
 <!--    sql 쿼리를 따로 로깅함-->
     <logger name="org.hibernate.SQL" level="DEBUG">
         <appender-ref ref="QUERY" />
         <appender-ref ref="RAW_FILE" />
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 <!--    전체 에러 로깅-->
     <logger name="coursemaker.coursemaker.exception" level="ERROR" additivity="false">
         <appender-ref ref="GLOBAL_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="org.hibernate.SQL" level="ERROR">
         <appender-ref ref="GLOBAL_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
 
     <logger name="coursemaker.coursemaker" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 <!--    모든 로그를 debug 레벨로 찍음.-->
     <logger name="coursemaker.coursemaker" level="DEBUG" additivity="false">
         <appender-ref ref="RAW_FILE" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 <!--    인증/인가 이벤트-->
     <logger name="coursemaker.coursemaker.domain.auth" level="DEBUG" additivity="false">
         <appender-ref ref="AUTH_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.auth" level="INFO" additivity="false">
         <appender-ref ref="AUTH_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.auth.exception" level="ERROR" additivity="false">
         <appender-ref ref="AUTH_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
 <!--    멤버 이벤트-->
     <logger name="coursemaker.coursemaker.domain.member" level="DEBUG" additivity="false">
         <appender-ref ref="MEMBER_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.member" level="INFO" additivity="false">
         <appender-ref ref="MEMBER_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.member" level="ERROR" additivity="false">
         <appender-ref ref="MEMBER_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
     <!--    코스 이벤트-->
     <logger name="coursemaker.coursemaker.domain.course" level="DEBUG" additivity="false">
         <appender-ref ref="COURSE_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.course" level="INFO" additivity="false">
         <appender-ref ref="COURSE_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.course" level="ERROR" additivity="false">
         <appender-ref ref="COURSE_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
     <!--    여행지 이벤트-->
     <logger name="coursemaker.coursemaker.domain.destination" level="DEBUG" additivity="false">
         <appender-ref ref="DESTINATION_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.destination" level="INFO" additivity="false">
         <appender-ref ref="DESTINATION_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.destination" level="ERROR" additivity="false">
         <appender-ref ref="DESTINATION_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
     <!--    좋아요 이벤트-->
     <logger name="coursemaker.coursemaker.domain.like" level="DEBUG" additivity="false">
         <appender-ref ref="LIKE_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.like" level="INFO" additivity="false">
         <appender-ref ref="LIKE_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.like" level="ERROR" additivity="false">
         <appender-ref ref="LIKE_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
     <!--    리뷰 이벤트-->
     <logger name="coursemaker.coursemaker.domain.review" level="DEBUG" additivity="false">
         <appender-ref ref="REVIEW_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.review" level="INFO" additivity="false">
         <appender-ref ref="REVIEW_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.review" level="ERROR" additivity="false">
         <appender-ref ref="REVIEW_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
@@ -608,28 +640,34 @@
     <!--    태그 이벤트-->
     <logger name="coursemaker.coursemaker.domain.tag" level="DEBUG" additivity="false">
         <appender-ref ref="TAG_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.tag" level="INFO" additivity="false">
         <appender-ref ref="TAG_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.tag" level="ERROR" additivity="false">
         <appender-ref ref="TAG_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
     <!--    찜 이벤트-->
     <logger name="coursemaker.coursemaker.domain.wish" level="DEBUG" additivity="false">
         <appender-ref ref="WISH_RAW" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.wish" level="INFO" additivity="false">
         <appender-ref ref="WISH_EVENT" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
     <logger name="coursemaker.coursemaker.domain.wish" level="ERROR" additivity="false">
         <appender-ref ref="WISH_ERROR" />
+        <appender-ref ref="LOGSTASH"/>
     </logger>
 
 
