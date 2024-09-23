@@ -10,7 +10,7 @@ public interface CourseReviewService {
     // 코스 리뷰 등록
     CourseReview save(RequestCourseDto requestCourseDto, Long courseId);
     // 코스 리뷰 수정
-    CourseReview update(Long courseId, RequestCourseDto requestCourseDto, String nickname);
+    CourseReview update(Long reviewId, RequestCourseDto requestCourseDto, String nickname);
     // 코스 리뷰 삭제
     void delete(Long id);
     // id 기반으로 특정 코스리뷰 조회하는 메서드

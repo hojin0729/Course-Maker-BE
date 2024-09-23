@@ -231,13 +231,11 @@ public class DestinationReviewController {
             @AuthenticationPrincipal LoginedInfo logined) {
 
         Pageable pageable = PageRequest.of(page - 1, record);
-
-        String nickname = logined != null ? logined.getNickname() : null;
+        String nickname = logined != null ? logined.getNickname() : "";
 
         CourseMakerPagination<DestinationReview> reviewPage = destinationReviewService.findAllByDestinationId(destinationId, pageable, orderBy, nickname);
-        List<DestinationReview> reviewList = reviewPage.getContents();
 
-        List<ResponseDestinationDto> responseDtos = reviewList.stream()
+        List<ResponseDestinationDto> responseDtos = reviewPage.getContents().stream()
                 .map(review -> {
                     Destination destination = destinationService.findById(review.getDestination().getId());
                     Boolean isMyDestinationReview = logined != null && logined.getNickname().equals(review.getMember().getNickname());

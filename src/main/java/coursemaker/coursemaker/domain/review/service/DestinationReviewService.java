@@ -10,7 +10,7 @@ public interface DestinationReviewService {
     // 여행지 리뷰 등록
     DestinationReview save(RequestDestinationDto requestDestinationReviewDto, Long destinationId);
     // 여행지 리뷰 수정
-    DestinationReview update(Long destinationId, RequestDestinationDto requestDestinationReviewDto, String nickname);
+    DestinationReview update(Long reviewId, RequestDestinationDto requestDestinationReviewDto, String nickname);
     // 여행지 리뷰 삭제
     void delete(Long id);
     // id 기반으로 특정 여행지 리뷰 조회하는 메서드

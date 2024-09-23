@@ -3,6 +3,7 @@ package coursemaker.coursemaker.domain.review.service;
 import coursemaker.coursemaker.domain.auth.policy.RoleUpdatePolicy;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
+import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
 import coursemaker.coursemaker.domain.review.dto.RequestCourseDto;
@@ -69,25 +70,29 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         }
     }
 
-    @Override
-    public CourseReview update(Long courseId, @Valid RequestCourseDto requestCourseDto, String nickname) {
-        log.info("[CourseReview] 리뷰 업데이트 시작 - 코스 ID: {}, 닉네임: {}", courseId, nickname);
+    public CourseReview update(Long reviewId, @Valid RequestCourseDto requestCourseDto, String nickname) {
+        log.info("[CourseReview] 리뷰 업데이트 시작 - 리뷰 ID: {}, 닉네임: {}", reviewId, nickname);
 
         Member member = memberService.findByNickname(nickname);
-        TravelCourse travelCourse = courseService.findById(courseId);
 
-        CourseReview existingReview = courseReviewRepository.findByMemberAndTravelCourse(member, travelCourse)
+        // 리뷰 ID를 기반으로 CourseReview 조회
+        CourseReview existingReview = courseReviewRepository.findById(reviewId)
                 .orElseThrow(() -> {
-                    log.error("[CourseReview] 리뷰 찾기 실패 - 닉네임: {}, 코스 ID: {}", nickname, courseId);
-                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] nickname: " + nickname);
+                    log.error("[CourseReview] 리뷰 찾기 실패 - 닉네임: {}, 리뷰 ID: {}", nickname, reviewId);
+                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[CourseReview] reviewId: " + reviewId);
                 });
+
+        if (!existingReview.getMember().getNickname().equals(nickname)) {
+            log.error("[CourseReview] 권한 없음 - 닉네임: {}, 리뷰 ID: {}", nickname, reviewId);
+            throw new ForbiddenException("리뷰를 수정할 권한이 없습니다.", "[CourseReview] reviewId: " + reviewId);
+        }
 
         existingReview.setDescription(requestCourseDto.getDescription());
         existingReview.setPictures(requestCourseDto.getPictures());
         existingReview.setRating(requestCourseDto.getRating());
 
         CourseReview updatedReview = courseReviewRepository.save(existingReview);
-        log.info("[CourseReview] 리뷰 업데이트 완료 - 리뷰 ID: {}, 코스 ID: {}", updatedReview.getId(), courseId);
+        log.info("[CourseReview] 리뷰 업데이트 완료 - 리뷰 ID: {}, 닉네임: {}", updatedReview.getId(), nickname);
 
         return updatedReview;
     }

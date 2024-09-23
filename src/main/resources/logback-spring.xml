@@ -498,12 +498,12 @@
         </encoder>
     </appender>
 
-    <logger name="INFO_LOG" level="DEBUG">
+    <logger name="INFO_LOG" level="debug">
         <appender-ref ref="LOGSTASH"/>
     </logger>
 
 <!--    sql 쿼리를 따로 로깅함-->
-    <logger name="org.hibernate.SQL" level="DEBUG">
+    <logger name="org.hibernate" level="debug">
         <appender-ref ref="QUERY" />
         <appender-ref ref="RAW_FILE" />
         <appender-ref ref="STDOUT" />
@@ -516,7 +516,7 @@
         <appender-ref ref="LOGSTASH"/>
     </logger>
 
-    <logger name="org.hibernate.SQL" level="ERROR">
+    <logger name="org.hibernate" level="ERROR">
         <appender-ref ref="GLOBAL_ERROR" />
         <appender-ref ref="LOGSTASH"/>
     </logger>
