@@ -2,6 +2,7 @@ package coursemaker.coursemaker.domain.review.service;
 
 import coursemaker.coursemaker.domain.auth.policy.RoleUpdatePolicy;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
+import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
 import coursemaker.coursemaker.domain.destination.service.DestinationService;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.service.MemberService;
@@ -74,24 +75,28 @@ public class DestinationReviewServiceImpl implements DestinationReviewService {
 
 
     @Override
-    public DestinationReview update(Long destinationId, @Valid RequestDestinationDto requestDestinationDto, String nickname) {
-        log.info("[DestinationReview] 리뷰 업데이트 시작 - 여행지 ID: {}, 닉네임: {}", destinationId, nickname);
+    public DestinationReview update(Long reviewId, @Valid RequestDestinationDto requestDestinationDto, String nickname) {
+        log.info("[DestinationReview] 리뷰 업데이트 시작 - 리뷰 ID: {}, 닉네임: {}", reviewId, nickname);
 
         Member member = memberService.findByNickname(nickname);
-        Destination destination = destinationService.findById(destinationId);
 
-        DestinationReview existingReview = destinationReviewRepository.findByMemberAndDestination(member, destination)
+        DestinationReview existingReview = destinationReviewRepository.findById(reviewId)
                 .orElseThrow(() -> {
-                    log.error("[DestinationReview] 리뷰 찾기 실패 - 닉네임: {}, 여행지 ID: {}", nickname, destinationId);
-                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] nickname: " + nickname);
+                    log.error("[DestinationReview] 리뷰 찾기 실패 - 닉네임: {}, 리뷰 ID: {}", nickname, reviewId);
+                    return new ReviewNotFoundException("리뷰를 찾을 수 없습니다.", "[DestinationReview] reviewId: " + reviewId);
                 });
+
+        if (!existingReview.getMember().getNickname().equals(nickname)) {
+            log.error("[DestinationReview] 권한 없음 - 닉네임: {}, 리뷰 ID: {}", nickname, reviewId);
+            throw new ForbiddenException("리뷰를 수정할 권한이 없습니다.", "[DestinationReview] reviewId: " + reviewId);
+        }
 
         existingReview.setDescription(requestDestinationDto.getDescription());
         existingReview.setPictures(requestDestinationDto.getPictures());
         existingReview.setRating(requestDestinationDto.getRating());
 
         DestinationReview updatedReview = destinationReviewRepository.save(existingReview);
-        log.info("[DestinationReview] 리뷰 업데이트 완료 - 리뷰 ID: {}, 여행지 ID: {}", updatedReview.getId(), destinationId);
+        log.info("[DestinationReview] 리뷰 업데이트 완료 - 리뷰 ID: {}, 닉네임: {}", updatedReview.getId(), nickname);
 
         return updatedReview;
     }
