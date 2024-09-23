@@ -75,6 +75,10 @@ public class TourApiServiceImpl implements TourApiService {
 
         CompletableFuture<BusanApiResponse> busanApiUpdateFuture = CompletableFuture.supplyAsync(busanApiService::initialUpdate, executorService);
 
+        busanApiUpdateFuture
+                .thenRunAsync(busanApiService::busanConvertAndSaveToDestination, executorService)
+                .join();
+
         initialUpdateFuture
                 .thenComposeAsync(response -> updateDisabledTours()
                         .thenRunAsync(this::handleMissingDisabledData, executorService)
@@ -87,10 +91,6 @@ public class TourApiServiceImpl implements TourApiService {
                         }, executorService), executorService)
                 .thenRunAsync(this::updateMissingData, executorService)
                 .thenRunAsync(this::convertAndSaveToDestination, executorService)
-                .join();
-
-        busanApiUpdateFuture
-                .thenRunAsync(busanApiService::busanConvertAndSaveToDestination, executorService)
                 .join();
 
         log.info("[TourApi] 투어 API 업데이트 완료");

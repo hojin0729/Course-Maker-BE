@@ -97,7 +97,7 @@ public class TourApiResponse {
         private String homepage;
         @Schema(description = "개요")
         private String overview;
-        @Schema(description = "애견동반 여행지", example = "1")
-        private Integer withPet;
+//        @Schema(description = "애견동반 여행지", example = "1")
+//        private Integer withPet;
     }
 }

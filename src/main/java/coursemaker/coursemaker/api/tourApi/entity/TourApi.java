@@ -80,8 +80,8 @@ public class TourApi {
     @Column(name = "overview", columnDefinition = "TEXT")
     private String overview;
 
-    @Column(name = "withPet")
-    private Integer withPet;
+//    @Column(name = "withPet")
+//    private Integer withPet;
 
 //    @OneToOne
 //    private Tag tag;
