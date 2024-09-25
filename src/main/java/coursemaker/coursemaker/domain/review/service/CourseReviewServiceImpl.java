@@ -1,5 +1,6 @@
 package coursemaker.coursemaker.domain.review.service;
 
+import coursemaker.coursemaker.domain.auth.policy.RoleUpdatePolicy;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
 import coursemaker.coursemaker.domain.course.service.CourseService;
 import coursemaker.coursemaker.domain.destination.exception.ForbiddenException;
@@ -35,14 +36,16 @@ public class CourseReviewServiceImpl implements CourseReviewService {
     private final TagService tagService;
     private final MemberService memberService;
     private final CourseReviewRecommendationRepository courseReviewRecommendationRepository;
+    private final RoleUpdatePolicy roleUpdatePolicy;
 
     @Autowired
-    public CourseReviewServiceImpl(CourseReviewRepository courseReviewRepository, CourseService courseService, TagService tagService, MemberService memberService, CourseReviewRecommendationRepository courseReviewRecommendationRepository) {
+    public CourseReviewServiceImpl(CourseReviewRepository courseReviewRepository, CourseService courseService, TagService tagService, MemberService memberService, CourseReviewRecommendationRepository courseReviewRecommendationRepository, RoleUpdatePolicy roleUpdatePolicy) {
         this.courseReviewRepository = courseReviewRepository;
         this.courseService = courseService;
         this.tagService = tagService;
         this.memberService = memberService;
         this.courseReviewRecommendationRepository = courseReviewRecommendationRepository;
+        this.roleUpdatePolicy = roleUpdatePolicy;
     }
 
     @Override
@@ -57,6 +60,7 @@ public class CourseReviewServiceImpl implements CourseReviewService {
         try {
             CourseReview savedReview = courseReviewRepository.save(courseReview);
             log.info("[CourseReview] 리뷰 저장 완료 - 리뷰 ID: {}, 코스 ID: {}", savedReview.getId(), courseId);
+            roleUpdatePolicy.updateRoleToFit(member);
             return savedReview;
         } catch (DataIntegrityViolationException e) {
             log.error("[CourseReview] 중복 리뷰 오류 - 닉네임: {}, 코스 ID: {}", courseReview.getMember().getNickname(), courseId);
