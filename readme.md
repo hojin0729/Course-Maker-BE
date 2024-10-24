@@ -44,8 +44,7 @@
 
 ## 데이터베이스 구조
 
-![Uploading image.png…]()
-
+![image](https://github.com/user-attachments/assets/fb175d55-50df-450a-86d3-450bd83e4d35)
 <img width="1011" alt="스크린샷 2024-06-07 15 31 37" src="https://github.com/course-maker/Course-Maker-BE/assets/105052888/b6fcc336-aaf7-4d0b-b4b1-16d95e795fe9">
 
 ## 팀원
