@@ -44,6 +44,7 @@
 
 ## 데이터베이스 구조
 
+![Uploading image.png…]()
 
 <img width="1011" alt="스크린샷 2024-06-07 15 31 37" src="https://github.com/course-maker/Course-Maker-BE/assets/105052888/b6fcc336-aaf7-4d0b-b4b1-16d95e795fe9">
 
