@@ -14,6 +14,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType().equals(String.class);
+
     }
 
     /*@LoginUser 사용시 사용자 정보 인젝션*/
