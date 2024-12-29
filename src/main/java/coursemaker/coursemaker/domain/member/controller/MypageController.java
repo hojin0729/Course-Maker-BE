@@ -1,9 +1,13 @@
 package coursemaker.coursemaker.domain.member.controller;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
+import coursemaker.coursemaker.domain.member.dto.ChangePasswordRequestDTO;
+import coursemaker.coursemaker.domain.member.dto.MemberUpdateInfo;
+import coursemaker.coursemaker.domain.member.dto.ValidatePasswordInfo;
 import coursemaker.coursemaker.domain.member.service.MypageService;
 import coursemaker.coursemaker.exception.ErrorResponse;
 import coursemaker.coursemaker.util.CourseMakerPagination;
@@ -15,11 +19,15 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +60,107 @@ public class MypageController {
 
         return ResponseEntity.ok(response);
     }
+
+    /*비밀번호 변경*/
+    @Operation(summary = "비밀번호 변경", description = "로그인 한 사용자의 비밀번호를 변경 합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공", content = @Content(schema = @Schema(implementation = BasicUserInfoResponseDTO.class))),
+
+        @ApiResponse(responseCode = "400", description = "비밀번호가 틀렸습니다.", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(
+                value = "{\"status\": 400, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 일치하지 않습니다.\"}"
+            )
+        )),
+
+        @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+                mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(
+                value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+            )
+        ))
+    })
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(
+        @AuthenticationPrincipal LoginedInfo loginedInfo,
+        @Valid @RequestBody ChangePasswordRequestDTO dto) {
+
+        mypageService.changePassword(
+            loginedInfo.getNickname(),
+            dto.getOldPassword(),
+            dto.getNewPassword());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /*비밀번호 일치여부 검증*/
+    @Operation(summary = "비밀번호 검증", description = "로그인 한 사용자의 비밀번호를 다시 확인합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "비밀번호 일치", content = @Content(schema = @Schema(implementation = BasicUserInfoResponseDTO.class))),
+
+        @ApiResponse(responseCode = "400", description = "비밀번호가 틀렸습니다.", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(
+                value = "{\"status\": 400, \"errorType\": \"Authentication failed\", \"message\": \"비밀번호가 일치하지 않습니다.\"}"
+            )
+        )),
+
+        @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(
+                value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+            )
+        ))
+    })
+    @PostMapping("/validate-password")
+    public ResponseEntity<Void> validatePassword(
+        @AuthenticationPrincipal LoginedInfo loginedInfo,
+        @Valid @RequestBody ValidatePasswordInfo dto) {
+
+        boolean isMatch = mypageService.passwordIsMatch(loginedInfo.getNickname(), dto.getPassword());
+        
+        if(!isMatch){
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다", "비밀번호 검증 실패: password: " + dto.getPassword());
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    /*사용자 정보를 변경하는 경우*/
+    @Operation(summary = "사용자 정보 변경", description = "로그인 한 사용자의 정보를 변경합니다..")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "사용자 정보 변경 성공", content = @Content(schema = @Schema(implementation = BasicUserInfoResponseDTO.class))),
+
+        @ApiResponse(responseCode = "400", description = "사용자 정보 변경 실패.", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(
+                value = "{\"status\": 400, \"errorType\": \"Illegal argument\", \"message\": \"이름은 공백 혹은 빈 문자는 허용하지 않습니다.\"}"
+            )
+        )),
+
+        @ApiResponse(responseCode = "401", description = "로그인 후 이용이 가능합니다.", content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(
+                value = "{\"status\": 401, \"errorType\": \"login required\", \"message\": \"로그인 후 이용이 가능합니다.\"}"
+            )
+        ))
+    })
+    @PutMapping("/info")
+    public ResponseEntity<Void> updateBasicInfo(
+        @AuthenticationPrincipal LoginedInfo loginedInfo,
+        @Valid @RequestBody MemberUpdateInfo info) {
+
+        mypageService.updateInfo(loginedInfo.getNickname(), info);
+
+        return ResponseEntity.ok().build();
+    }
+
 
     /***********************내가 만든 코스/여행지************************/
     /*내가 만든코스*/

@@ -1,6 +1,7 @@
 package coursemaker.coursemaker.domain.member.service;
 
 import coursemaker.coursemaker.domain.auth.dto.LoginedInfo;
+import coursemaker.coursemaker.domain.auth.exception.InvalidPasswordException;
 import coursemaker.coursemaker.domain.course.dto.CourseDestinationResponse;
 import coursemaker.coursemaker.domain.course.dto.TravelCourseResponse;
 import coursemaker.coursemaker.domain.course.entity.TravelCourse;
@@ -14,8 +15,10 @@ import coursemaker.coursemaker.domain.like.dto.DestinationLikeResponseDto;
 import coursemaker.coursemaker.domain.like.service.CourseLikeService;
 import coursemaker.coursemaker.domain.like.service.DestinationLikeService;
 import coursemaker.coursemaker.domain.member.dto.BasicUserInfoResponseDTO;
+import coursemaker.coursemaker.domain.member.dto.MemberUpdateInfo;
 import coursemaker.coursemaker.domain.member.entity.Member;
 import coursemaker.coursemaker.domain.member.entity.Role;
+import coursemaker.coursemaker.domain.member.repository.MemberRepository;
 import coursemaker.coursemaker.domain.review.service.CourseReviewService;
 import coursemaker.coursemaker.domain.review.service.DestinationReviewService;
 import coursemaker.coursemaker.domain.tag.dto.TagResponseDto;
@@ -30,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,14 +56,46 @@ public class MypageService {
     private final DestinationService destinationService;
     private final DestinationLikeService destinationLikeService;
     private final DestinationReviewService destinationReviewService;
+    private final PasswordEncoder passwordEncoder;
+    private final MemberRepository memberRepository;
 
     /**
      * 도메인 분리 이유: 순환참조
      * 코스 -> 멤버 참조(사용자 정보 필요),
      * 멤버 -> 코스 참조(코스 정보 필요)
      * => 순환참조 발생으로 서브도메인으로 분리함.
-     * TODO: 마이페이지 기능 구현
      * */
+
+    public boolean passwordIsMatch(String nickname, String password) {
+
+        Member member = memberService.findByNickname(nickname);
+
+        return passwordEncoder.matches(password, member.getPassword());
+    }
+
+    public void changePassword(String nickname, String oldPassword, String newPassword) {
+        Member member = memberService.findByNickname(nickname);
+
+        if(!passwordEncoder.matches(oldPassword, member.getPassword())) {
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다", "비밀번호 변경 실패: password: " + oldPassword);
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        member.updatePassword(encodedPassword);
+
+        memberRepository.save(member);
+    }
+
+    public void updateInfo(String nickname, MemberUpdateInfo updateInfo) {
+
+        Member member = memberService.findByNickname(nickname);
+
+        member.setName(updateInfo.getNewName());
+        member.setPhoneNumber(updateInfo.getNewPhoneNumber());
+
+        memberRepository.save(member);
+    }
 
     /*사용자 기본정보 반환*/
     public BasicUserInfoResponseDTO getBasicUserInfo(String nickname) {
@@ -71,8 +107,8 @@ public class MypageService {
         response.setNickname(member.getNickname());
         response.setName(member.getName());
         response.setRole(Role.toKor(member.getRoles().getRole()));
-
-        System.out.println(member.getRoles().getRole());
+        response.setEmail(member.getEmail());
+        response.setPhoneNumber(member.getPhoneNumber());
 
         return response;
     }
