@@ -20,6 +20,7 @@ public class Member extends BaseEntity {
     private LoginType loginType;
 
     @Column(name = "name", columnDefinition = "VARCHAR(20)")
+    @Setter
     private String name; // 회원 이름
 
     @Column(name = "email", columnDefinition = "VARCHAR(255) UNIQUE")
@@ -29,6 +30,7 @@ public class Member extends BaseEntity {
     private String nickname; // 회원 닉네임
 
     @Column(nullable = true, length = 15)
+    @Setter
     private String phoneNumber; // 회원 전화번호
 
     @Column(name = "password", columnDefinition = "VARCHAR(255)")
@@ -36,6 +38,10 @@ public class Member extends BaseEntity {
 
     public void setRoles(Role roles) {
         this.roles = roles;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
     @Column(nullable = false)
